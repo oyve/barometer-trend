@@ -1,6 +1,5 @@
 const pressure = require('../index');
 const assert = require('assert');
-const { clear } = require('console');
 
 describe("Pressure - Unit Tests", function () {
     // afterEach(function(done) {
