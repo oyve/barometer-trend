@@ -1,6 +1,6 @@
 {
   "name": "barometer-trend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Calculate the trend of a barometer",
   "main": "index.js",
   "directories": {
