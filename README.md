@@ -18,7 +18,7 @@ let trend = barometer.getTrend();
 > Pressure must be in Pascals, 1015 mBar/hPa = 101500 Pascal\
 > Pressure readings older than *three hours* are automatically deleted.\
 > GetTrend() investigate the trend for the latest *half hour*, *one hour* and *three hours*.\
-> The newest trend with the highest severity is chosen.\
+> The most recent trend with the highest severity is chosen.\
 
 ## Contribute
 Feel free to create a Pull Request including test code.
