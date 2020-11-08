@@ -112,7 +112,7 @@ function getTrend() {
 function calculate(from) {
     if (pressures.length < 2) return null;
 
-    var fromDatetime = minutesFromNow(from);
+    var fromDatetime = minutesFromNow(-Math.abs(from));
 
     let subsetOfPressures = pressures.filter((p) => {
         return p.datetime.getTime() >= fromDatetime.getTime();
