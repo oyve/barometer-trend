@@ -68,12 +68,12 @@ function removeOldPressures(threshold) {
 /**
  * 
  * @param {number} minutes Minutes from current time
+ * @returns {Date} Date with given minute difference
  */
 function minutesFromNow(minutes) {
     var now = new Date();
     now.setMinutes(now.getMinutes() + minutes);
-    now = new Date(now);
-    return now;
+    return new Date(now);
 }
 
 function ascendingNumbers(a, b) {
@@ -82,6 +82,7 @@ function ascendingNumbers(a, b) {
 
 /**
  * Get the trend of the barometer
+ * @returns {Array.<Object>} .tendency, .trend and .prediction
  */
 function getTrend() {
     let latestHalfHour = calculate(-HALF_HOUR);
