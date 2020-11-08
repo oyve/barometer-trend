@@ -68,7 +68,6 @@ function ascendingNumbers(a, b) {
     return a-b;
 }
 
-
 function getTrend(utcFrom) {
     if (pressures.length < 2) return null;
 
@@ -103,6 +102,7 @@ module.exports = {
     clear: clear,
     addPressure: addPressure,
     getTrend: getTrend,
+    minutesFromNow: minutesFromNow,
     TENDENCY: TENDENCY,
     TREND: TREND
 }
