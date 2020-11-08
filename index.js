@@ -42,9 +42,14 @@ function clear() {
     pressures = [];
 }
 
-function addPressure(utc, pressureSI) {
+/**
+ * 
+ * @param {Date} datetime Timestamp of barometer reading
+ * @param {number} pressureSI Pascal unit
+ */
+function addPressure(datetime, pressureSI) {
     pressures.push({
-        utc: utc,
+        utc: datetime,
         value: pressureSI
     });
 
@@ -57,6 +62,10 @@ function removeOldPressures(threshold) {
     pressures = pressures.filter((p) => p.utc >= threshold);
 }
 
+/**
+ * 
+ * @param {number} minutes Minutes from current time
+ */
 function minutesFromNow(minutes) {
     var now = new Date();
     now.setMinutes(now.getMinutes() + minutes);
@@ -68,11 +77,15 @@ function ascendingNumbers(a, b) {
     return a-b;
 }
 
-function getTrend(utcFrom) {
+/**
+ * 
+ * @param {Date} from Datetime from when to compare readings
+ */
+function getTrend(from) {
     if (pressures.length < 2) return null;
 
     let subsetOfPressures = pressures.filter((p) => {
-        return p.utc >= utcFrom;
+        return p.utc >= from;
     });
 
     if (subsetOfPressures.length >= 2) {
