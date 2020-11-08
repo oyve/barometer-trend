@@ -1,19 +1,22 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Calculate the trend of a barometer over time.
+Calculate the trend of a barometer over a three hour period.
 
 ## Use
+Also see the Test folder for more examples.
 
 ```
 const barometer = require('barometer-trend');
 
-barometer.addPressure(datetime1, 1015)
-barometer.addPressure(datetime2, 1016)
-barometer.addPressure(datetime3, 1017)
+barometer.addPressure(datetime1, 1015);
+barometer.addPressure(datetime2, 1016);
+barometer.addPressure(datetime3, 1017);
 
-let from = barometer.minutesFromNow(-60*3) //the last three hours
-let trend = barometer.getTrend(from);
+let trend = barometer.getTrend();
 ```
+
+*!* Pressure readings older than *3 hours* are automatically deleted.
+*!* GetTrend() investigate the trend for the latest *half hour*, *hour* and *three hours*, and the newest trend with the highest severity is choosen. I.e. if the *half hour* trend shows rapidly falling pressure, this will be the one returned.
 
 ## Contribute
 Feel free to create a Pull Request including test code.
