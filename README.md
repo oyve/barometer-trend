@@ -15,8 +15,10 @@ barometer.addPressure(datetime3, 1017);
 let trend = barometer.getTrend();
 ```
 
-*!* Pressure readings older than *3 hours* are automatically deleted.
-*!* GetTrend() investigate the trend for the latest *half hour*, *hour* and *three hours*, and the newest trend with the highest severity is choosen. I.e. if the *half hour* trend shows rapidly falling pressure, this will be the one returned.
+> Pressure readings older than *3 hours* are automatically deleted.\
+> GetTrend() investigate the trend for the latest *half hour*, *hour* and *three hours*.\
+> The newest trend with the highest severity is choosen.\
+> I.e. if the *half hour* trend shows rapidly falling pressure, this will be the one returned.\
 
 ## Contribute
 Feel free to create a Pull Request including test code.
