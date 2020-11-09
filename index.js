@@ -27,9 +27,9 @@ const PREDICTIONS = [
     //falling
     { tendency: TENDENCY.FALLING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
     { tendency: TENDENCY.FALLING, trend: TREND.SLOWLY, indicator: 'Slowly more wet and unsettled conditions are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions are expected' }
+    { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind could be expected' },
+    { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions likely to be expected' },
+    { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions likely to be expected' }
 ];
 
 const THRESHOLDS = [
