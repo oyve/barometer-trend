@@ -13,6 +13,29 @@ describe("Unit Tests", function () {
             assert.ok(true, "My function does not crash");
         });
     });
+    describe("Has pressure", function () {
+        it("it should not have", function () {
+            //arrange
+            barometer.clear();
+            let expected = false;
+            //act
+            let actual = barometer.hasPressures();
+        
+            //assert
+            assert.strictEqual(actual, expected)
+        });
+        it("it should have", function () {
+            //arrange
+            barometer.clear();
+            let expected = true;
+            barometer.addPressure(new Date(), 101500);
+            //act
+            let actual = barometer.hasPressures();
+        
+            //assert
+            assert.strictEqual(actual, expected)
+        });
+    });
 });
 
 

@@ -46,6 +46,10 @@ function clear() {
     pressures = [];
 }
 
+function hasPressures() {
+    return pressures.length > 0;
+}
+
 /**
  * 
  * @param {Date} datetime Timestamp of barometer reading
@@ -148,6 +152,7 @@ module.exports = {
     addPressure: addPressure,
     getTrend: getTrend,
     minutesFromNow: minutesFromNow,
+    hasPressures: hasPressures,
     TENDENCY: TENDENCY,
     TREND: TREND
 }
