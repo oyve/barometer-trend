@@ -9,10 +9,14 @@ Also see the Test folder for more examples.
 const barometer = require('barometer-trend');
 
 barometer.addPressure(datetime1, 101500);
-barometer.addPressure(datetime2, 101600);
-barometer.addPressure(datetime3, 101700);
+barometer.addPressure(datetime2, 101505);
+barometer.addPressure(datetime3, 101512);
 
 let trend = barometer.getTrend();
+
+console.log(trend.tendency); //'RISING'
+console.log(trend.trend); //'SLOWLY'
+console.log(trend.prediction); //'Slowly more dry, clear and stable conditions are expected'
 ```
 
 > Pressure must be in Pascals, 1015 mBar/hPa = 101500 Pascal\
