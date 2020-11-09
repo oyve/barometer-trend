@@ -137,7 +137,11 @@ function calculate(from) {
             return {
                 tendency: tendency.key,
                 trend: threshold.trend.key,
-                prediction: prediction ? prediction.indicator : null
+                prediction: prediction ? prediction.indicator : null,
+                from: earlier.value,
+                to: later.value,
+                difference: difference,
+                minutes: from
             }
         }
 
