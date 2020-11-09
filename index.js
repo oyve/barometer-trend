@@ -17,6 +17,14 @@ const TREND = {
     RAPIDLY: { key: 'RAPIDLY', severity: 5 }
 };
 
+const THRESHOLDS = [
+    { pascal: 10, trend: TREND.STEADY },
+    { pascal: 16, trend: TREND.SLOWLY },
+    { pascal: 36, trend: TREND.CHANGING },
+    { pascal: 60, trend: TREND.QUICKLY },
+    { pascal: 1000, trend: TREND.RAPIDLY }
+];
+
 const PREDICTIONS = [
     //rising
     { tendency: TENDENCY.RISING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
@@ -30,14 +38,6 @@ const PREDICTIONS = [
     { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind could be expected' },
     { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions likely to be expected' },
     { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions likely to be expected' }
-];
-
-const THRESHOLDS = [
-    { pascal: 10, trend: TREND.STEADY },
-    { pascal: 16, trend: TREND.SLOWLY },
-    { pascal: 36, trend: TREND.CHANGING },
-    { pascal: 60, trend: TREND.QUICKLY },
-    { pascal: 1000, trend: TREND.RAPIDLY }
 ];
 
 let pressures = [];
@@ -81,7 +81,7 @@ function minutesFromNow(minutes) {
 }
 
 function ascendingNumbers(a, b) {
-    return a-b;
+    return a - b;
 }
 
 /**
@@ -95,14 +95,14 @@ function getTrend() {
 
     let actual = latestThreeHours;
 
-    if(latestHour != null && latestThreeHours != null) {
-        if(TREND[latestHour.trend].severity > TREND[latestThreeHours.trend].severity) {
+    if (latestHour != null && latestThreeHours != null) {
+        if (TREND[latestHour.trend].severity > TREND[latestThreeHours.trend].severity) {
             actual = latestHour;
         }
     }
 
-    if(latestHalfHour != null && latestHour != null) {
-        if(TREND[latestHalfHour.trend].severity > TREND[latestHour.trend].severity) {
+    if (latestHalfHour != null && latestHour != null) {
+        if (TREND[latestHalfHour.trend].severity > TREND[latestHour.trend].severity) {
             actual = latestHalfHour;
         }
     }
