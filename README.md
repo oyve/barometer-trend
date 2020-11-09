@@ -2,7 +2,7 @@
 # barometer-trend
 Calculate the trend of a barometer over a three hour period.
 
-# Install
+## Install
 
 ```
 npm install --save-dev barometer-trend
