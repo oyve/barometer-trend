@@ -1,194 +1,232 @@
-const pressure = require('../index');
+const barometer = require('../index');
 const assert = require('assert');
 
-describe("Pressure - Unit Tests", function () {
-    // afterEach(function(done) {
-    //     pressure.clear();
-    //  });
-
+describe("Unit Tests", function () {
     describe("Add pressure", function () {
         it("it should not throw exceptions", function () {
             //arrange
             //act
-            pressure.addPressure(new Date().getTime(), 1015);
+            barometer.clear();
+            barometer.addPressure(new Date(), 101500);
 
             //assert
             assert.ok(true, "My function does not crash");
-            pressure.clear();
         });
     });
 });
 
 
 
-describe("Pressure - Integration Tests", function () {
-    // afterEach(function(done) {
-    //     pressure.clear();
-    //  });
-
+describe("Integration Tests", function () {
     describe("Get Trend", function () {
         it("it should be null", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
+            barometer.clear();
+            barometer.addPressure(new Date(), 101500);
             const expected = null;
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
             assert.strictEqual(actual, expected);
-            pressure.clear();
         });
 
         it("it should be RISING.STEADY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015 + 9);
-            const expected = "RISING.STEADY";
+            mockPressures(101500, 9);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "STEADY");
         });
         
         it("it should be RISING.SLOWLY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015 + 15);
-            const expected = "RISING.SLOWLY";
-
+            mockPressures(1015, 15);
+            
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "SLOWLY");
         });
 
         it("it should be RISING.CHANGING", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015 + 16);
-            const expected = "RISING.CHANGING";
+            mockPressures(1015, 16);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "CHANGING");
         });
 
         it("it should be RISING.QUICKLY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015 + 36);
-            const expected = "RISING.QUICKLY";
+            mockPressures(101500, 36);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "QUICKLY");
         });
 
         it("it should be RISING.RAPIDLY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015 + 60);
-            const expected = "RISING.RAPIDLY";
+            mockPressures(101500, 60);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "RAPIDLY");
         });
 
         it("it should be FALLING.STEADY", function () {
             //arrange
-            
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015 + 9);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015);
-            const expected = "FALLING.STEADY";
+            mockPressures(101500, -9);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "STEADY");
         });
 
         it("it should be FALLING.SLOWLY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015 + 15);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015);
-            const expected = "FALLING.SLOWLY";
+            mockPressures(101500, -15);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "SLOWLY");
         });
 
         it("it should be FALLING.CHANGING", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015 + 16);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015);
-            const expected = "FALLING.CHANGING";
+            mockPressures(101500, -16);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "CHANGING");
         });
 
         it("it should be FALLING.QUICKLY", function () {
             //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015 + 36);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015);
-            const expected = "FALLING.QUICKLY";
+            mockPressures(101500, -36);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "QUICKLY");
         });
 
         it("it should be FALLING.RAPIDLY", function () {
-            //arrange
-            pressure.addPressure(new Date(2020, 11, 5, 12, 0, 0).getTime(), 1015 + 60);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 10, 0).getTime(), 1016);
-            pressure.addPressure(new Date(2020, 11, 5, 12, 20, 0).getTime(), 1015);
-            const expected = "FALLING.RAPIDLY";
+            //arrange     
+            mockPressures(101500, -60);
 
             //act
-            var actual = pressure.getTrend(new Date(2020, 11, 5, 12, 0, 0).getTime());
+            var actual = barometer.getTrend();
 
             //assert
-            assert.strictEqual(actual.key, expected);
-            pressure.clear();
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "RAPIDLY");
+        });
+    });
+
+    describe("Function Tests - Trend chooser", function () {
+        it("it should be RISING.STEADY and pick the THREE HOUR prognose", function () {
+            //arrange     
+            barometer.clear();
+            //THREE HOURS: this should result in FALLING.STEADY
+            barometer.addPressure(barometer.minutesFromNow(-180), 101500);
+            barometer.addPressure(barometer.minutesFromNow(-160), 101500 + 5);
+
+            //ONE HOUR: this should result in FALLING.SLOWLY
+            barometer.addPressure(barometer.minutesFromNow(-50), 101500 + 6);
+            barometer.addPressure(barometer.minutesFromNow(-40), 101500 + 7);
+
+            //HALF HOUR: this should result in FALLING.CHANGING
+            barometer.addPressure(barometer.minutesFromNow(-20), 101500 + 8);
+            barometer.addPressure(barometer.minutesFromNow(0), 101500 + 9);
+
+            //act
+            var actual = barometer.getTrend();
+
+            //assert
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "STEADY");
+        });
+
+        it("it should be RISING.RAPIDLY and pick the ONE HOUR prognose", function () {
+            //arrange     
+            barometer.clear();
+            //THREE HOURS: this should result in FALLING.STEADY
+            barometer.addPressure(barometer.minutesFromNow(-180), 101500);
+            barometer.addPressure(barometer.minutesFromNow(-160), 101500 + 5);
+
+            //ONE HOUR: this should result in FALLING.SLOWLY
+            barometer.addPressure(barometer.minutesFromNow(-50), 101500 + 10);
+            barometer.addPressure(barometer.minutesFromNow(-40), 101500 + 15);
+
+            //HALF HOUR: this should result in FALLING.CHANGING
+            barometer.addPressure(barometer.minutesFromNow(-20), 101500 + 60);
+            barometer.addPressure(barometer.minutesFromNow(0), 101500 + 70);
+
+            //act
+            var actual = barometer.getTrend();
+
+            //assert
+            assert.strictEqual(actual.tendency, "RISING");
+            assert.strictEqual(actual.trend, "RAPIDLY");
+        });
+
+        it("it should be FALLING.CHANGING and pick the HALF HOUR prognose", function () {
+            //arrange     
+            barometer.clear();
+            //THREE HOUR: this should result in FALLING.STEADY
+            barometer.addPressure(barometer.minutesFromNow(-180), 101500);
+            barometer.addPressure(barometer.minutesFromNow(-160), 101500 - 5);
+
+            //ONE HOUR: this should result in FALLING.SLOWLY
+            barometer.addPressure(barometer.minutesFromNow(-60), 101500 - 10);
+            barometer.addPressure(barometer.minutesFromNow(-50), 101500 - 12);
+
+            //HALF HOUR: this should result in FALLING.CHANGING
+            barometer.addPressure(barometer.minutesFromNow(-20), 101500 - 15);
+            barometer.addPressure(barometer.minutesFromNow(0), 101500 - 17);
+
+            //act
+            var actual = barometer.getTrend();
+
+            //assert
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "CHANGING");
         });
     });
 });
+
+function mockPressures(pressure, difference) {
+    barometer.clear();
+    barometer.addPressure(barometer.minutesFromNow(-20), pressure);
+    barometer.addPressure(barometer.minutesFromNow(0), pressure + difference);
+}

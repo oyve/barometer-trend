@@ -1,5 +1,9 @@
 'use strict'
 
+const HALF_HOUR = 30;
+const ONE_HOUR = 60;
+const THREE_HOURS = 180;
+
 const TENDENCY = {
     RISING: { key: 'RISING' },
     FALLING: { key: 'FALLING' }
@@ -45,32 +49,31 @@ function clear() {
 /**
  * 
  * @param {Date} datetime Timestamp of barometer reading
- * @param {number} pressureSI Pascal unit
+ * @param {number} pressure Pressure in Pascal
  */
-function addPressure(datetime, pressureSI) {
+function addPressure(datetime, pressure) {
     pressures.push({
-        utc: datetime,
-        value: pressureSI
+        datetime: datetime,
+        value: pressure
     });
 
     removeOldPressures();
 }
 
-const THREE_HOURS = 3 * 60;
 function removeOldPressures(threshold) {
     var threshold = minutesFromNow(-THREE_HOURS);
-    pressures = pressures.filter((p) => p.utc >= threshold);
+    pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
 }
 
 /**
  * 
  * @param {number} minutes Minutes from current time
+ * @returns {Date} Date with given minute difference
  */
 function minutesFromNow(minutes) {
     var now = new Date();
     now.setMinutes(now.getMinutes() + minutes);
-    now = new Date(now);
-    return now;
+    return new Date(now);
 }
 
 function ascendingNumbers(a, b) {
@@ -78,14 +81,42 @@ function ascendingNumbers(a, b) {
 }
 
 /**
+ * Get the trend of the barometer
+ * @returns {Array.<Object>} .tendency, .trend and .prediction
+ */
+function getTrend() {
+    let latestHalfHour = calculate(-HALF_HOUR);
+    let latestHour = calculate(-ONE_HOUR);
+    let latestThreeHours = calculate(-THREE_HOURS);
+
+    let actual = latestThreeHours;
+
+    if(latestHour != null && latestThreeHours != null) {
+        if(TREND[latestHour.trend].severity > TREND[latestThreeHours.trend].severity) {
+            actual = latestHour;
+        }
+    }
+
+    if(latestHalfHour != null && latestHour != null) {
+        if(TREND[latestHalfHour.trend].severity > TREND[latestHour.trend].severity) {
+            actual = latestHalfHour;
+        }
+    }
+
+    return actual;
+}
+
+/**
  * 
  * @param {Date} from Datetime from when to compare readings
  */
-function getTrend(from) {
+function calculate(from) {
     if (pressures.length < 2) return null;
 
+    var fromDatetime = minutesFromNow(-Math.abs(from));
+
     let subsetOfPressures = pressures.filter((p) => {
-        return p.utc >= from;
+        return p.datetime.getTime() >= fromDatetime.getTime();
     });
 
     if (subsetOfPressures.length >= 2) {
@@ -100,7 +131,8 @@ function getTrend(from) {
             let prediction = PREDICTIONS.find((pr) => pr.tendency == tendency && pr.trend == threshold.trend);
 
             return {
-                key: tendency.key + "." + threshold.trend.key,
+                tendency: tendency.key,
+                trend: threshold.trend.key,
                 prediction: prediction ? prediction.indicator : null
             }
         }
