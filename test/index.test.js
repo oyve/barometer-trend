@@ -65,6 +65,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "STEADY");
+            assert.strictEqual(actual.severity, 0);
         });
         
         it("it should be RISING.SLOWLY", function () {
@@ -77,6 +78,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "SLOWLY");
+            assert.strictEqual(actual.severity, 1);
         });
 
         it("it should be RISING.CHANGING", function () {
@@ -89,6 +91,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "CHANGING");
+            assert.strictEqual(actual.severity, 2);
         });
 
         it("it should be RISING.QUICKLY", function () {
@@ -101,6 +104,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "QUICKLY");
+            assert.strictEqual(actual.severity, 3);
         });
 
         it("it should be RISING.RAPIDLY", function () {
@@ -113,6 +117,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "RAPIDLY");
+            assert.strictEqual(actual.severity, 4);
         });
 
         it("it should be FALLING.STEADY", function () {
@@ -138,7 +143,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "SLOWLY");
-            assert.strictEqual(actual.severity, 1);
+            assert.strictEqual(actual.severity, -1);
         });
 
         it("it should be FALLING.CHANGING", function () {
@@ -151,7 +156,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "CHANGING");
-            assert.strictEqual(actual.severity, 2);
+            assert.strictEqual(actual.severity, -2);
         });
 
         it("it should be FALLING.QUICKLY", function () {
@@ -164,7 +169,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "QUICKLY");
-            assert.strictEqual(actual.severity, 3);
+            assert.strictEqual(actual.severity, -3);
         });
 
         it("it should be FALLING.RAPIDLY", function () {
@@ -177,7 +182,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "RAPIDLY");
-            assert.strictEqual(actual.severity, 4);
+            assert.strictEqual(actual.severity, -4);
         });
     });
 

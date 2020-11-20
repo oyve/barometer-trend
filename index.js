@@ -97,7 +97,7 @@ function ascendingNumbers(a, b) {
 
 /**
  * Get the trend of the barometer
- * @returns {Array.<Object>} .tendency, .trend and .prediction
+ * @returns {Array.<Object>}
  */
 function getTrend() {
     let latestHalfHour = calculate(-HALF_HOUR);
@@ -105,8 +105,8 @@ function getTrend() {
     let latestThreeHours = calculate(-THREE_HOURS);
 
     let actual = latestThreeHours;
-    actual = compareSeverity(latestHour, actual) || actual;
-    actual = compareSeverity(latestHalfHour, actual) || actual;
+    actual = compareSeverity(latestHour, actual);
+    actual = compareSeverity(latestHalfHour, actual);
 
     return actual;
 }
@@ -148,12 +148,12 @@ function calculate(from) {
             return {
                 tendency: prediction.tendency.key,
                 trend: prediction.trend.key,
-                indicator: prediction ? prediction.indicator : null,
-                fromPressure: earlier.value,
-                toPressure: later.value,
-                pressureDifference: difference,
-                periodMinutes: from,
-                severity: prediction.trend.severity
+                indicator: prediction.indicator,
+                from: earlier.value,
+                to: later.value,
+                difference: difference,
+                period: from,
+                severity: getSeverityNotion(prediction.trend.severity, tendency)
             }
         }
 
@@ -161,6 +161,12 @@ function calculate(from) {
     }
 
     return null;
+}
+
+function getSeverityNotion(severity, tendency) {
+    if(severity === 0) return severity;
+
+    return tendency === TENDENCY.RISING ? severity : -severity;
 }
 
 module.exports = {
