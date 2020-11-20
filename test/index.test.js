@@ -13,6 +13,29 @@ describe("Unit Tests", function () {
             assert.ok(true, "My function does not crash");
         });
     });
+    describe("Has pressure", function () {
+        it("it should not have", function () {
+            //arrange
+            barometer.clear();
+            let expected = false;
+            //act
+            let actual = barometer.hasPressures();
+        
+            //assert
+            assert.strictEqual(actual, expected)
+        });
+        it("it should have", function () {
+            //arrange
+            barometer.clear();
+            let expected = true;
+            barometer.addPressure(new Date(), 101500);
+            //act
+            let actual = barometer.hasPressures();
+        
+            //assert
+            assert.strictEqual(actual, expected)
+        });
+    });
 });
 
 
@@ -42,6 +65,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "STEADY");
+            assert.strictEqual(actual.severity, 0);
         });
         
         it("it should be RISING.SLOWLY", function () {
@@ -54,6 +78,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "SLOWLY");
+            assert.strictEqual(actual.severity, 1);
         });
 
         it("it should be RISING.CHANGING", function () {
@@ -66,6 +91,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "CHANGING");
+            assert.strictEqual(actual.severity, 2);
         });
 
         it("it should be RISING.QUICKLY", function () {
@@ -78,6 +104,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "QUICKLY");
+            assert.strictEqual(actual.severity, 3);
         });
 
         it("it should be RISING.RAPIDLY", function () {
@@ -90,6 +117,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "RISING");
             assert.strictEqual(actual.trend, "RAPIDLY");
+            assert.strictEqual(actual.severity, 4);
         });
 
         it("it should be FALLING.STEADY", function () {
@@ -102,6 +130,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "STEADY");
+            assert.strictEqual(actual.severity, 0);
         });
 
         it("it should be FALLING.SLOWLY", function () {
@@ -114,6 +143,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "SLOWLY");
+            assert.strictEqual(actual.severity, -1);
         });
 
         it("it should be FALLING.CHANGING", function () {
@@ -126,6 +156,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "CHANGING");
+            assert.strictEqual(actual.severity, -2);
         });
 
         it("it should be FALLING.QUICKLY", function () {
@@ -138,6 +169,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "QUICKLY");
+            assert.strictEqual(actual.severity, -3);
         });
 
         it("it should be FALLING.RAPIDLY", function () {
@@ -150,6 +182,7 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "RAPIDLY");
+            assert.strictEqual(actual.severity, -4);
         });
     });
 
@@ -221,6 +254,27 @@ describe("Integration Tests", function () {
             //assert
             assert.strictEqual(actual.tendency, "FALLING");
             assert.strictEqual(actual.trend, "CHANGING");
+        });
+        
+        it("it should not include older pressure readings", function () {
+            //arrange     
+            barometer.clear();
+            //THREE HOUR+: this should result in FALLING.STEADY
+            barometer.addPressure(barometer.minutesFromNow(-190), 101500 + 80);
+            barometer.addPressure(barometer.minutesFromNow(-185), 101500 + 75);
+
+            //IF THE OLD READINGS WHERE INCLUDED THIS SHOULD RESULT IN FALLING.RAPIDLY - NOT FALLING.STEADY
+            barometer.addPressure(barometer.minutesFromNow(-20), 101500 - 1);
+            barometer.addPressure(barometer.minutesFromNow(0), 101500 - 2);
+
+            //act
+            var actual = barometer.getTrend();
+            var actualCount = barometer.getPressureCount();
+
+            //assert
+            assert.strictEqual(actual.tendency, "FALLING");
+            assert.strictEqual(actual.trend, "STEADY");
+            assert.strictEqual(actualCount, 2);
         });
     });
 });

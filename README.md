@@ -5,7 +5,7 @@ Calculate the trend of a barometer over a three hour period.
 ## Install
 
 ```
-$ npm install barometer-trend
+npm i barometer-trend
 ```
 
 ## Use
@@ -22,7 +22,7 @@ let trend = barometer.getTrend();
 
 console.log(trend.tendency); //'RISING'
 console.log(trend.trend); //'SLOWLY'
-console.log(trend.prediction); //'Slowly more dry, clear and stable conditions are expected'
+console.log(trend.indicator); //'Slowly more dry, clear and stable conditions are expected'
 ```
 
 > Pressure must be in Pascals, 1015 mBar/hPa = 101500 Pascal\
@@ -36,3 +36,4 @@ Feel free to create a Pull Request including test code.
 ## Disclaimer
 This code is inspired by the article
 - [How to use a barometer when sailing](https://www.jollyparrot.co.uk/blog/how-to-use-barometer-when-sailing)
+- Many factors play into weather forecasting; a barometer is only one source and may only give a general indication.

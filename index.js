@@ -10,27 +10,12 @@ const TENDENCY = {
 };
 
 const TREND = {
-    STEADY: { key: 'STEADY', severity: 1 },
-    SLOWLY: { key: 'SLOWLY', severity: 2 },
-    CHANGING: { key: 'CHANGING', severity: 3 },
-    QUICKLY: { key: 'QUICKLY', severity: 4 },
-    RAPIDLY: { key: 'RAPIDLY', severity: 5 }
+    STEADY: { key: 'STEADY', severity: 0 },
+    SLOWLY: { key: 'SLOWLY', severity: 1 },
+    CHANGING: { key: 'CHANGING', severity: 2 },
+    QUICKLY: { key: 'QUICKLY', severity: 3 },
+    RAPIDLY: { key: 'RAPIDLY', severity: 4 }
 };
-
-const PREDICTIONS = [
-    //rising
-    { tendency: TENDENCY.RISING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
-    { tendency: TENDENCY.RISING, trend: TREND.SLOWLY, indicator: 'Slowly more dry, clear and stable conditions are expected' },
-    { tendency: TENDENCY.RISING, trend: TREND.CHANGING, indicator: 'More dry, clear and stable conditions are expected' },
-    { tendency: TENDENCY.RISING, trend: TREND.QUICKLY, indicator: 'Quickly more fair conditions, but also more wind are expected' },
-    { tendency: TENDENCY.RISING, trend: TREND.RAPIDLY, indicator: 'A short bout of fair weather and stiff winds are expected' },
-    //falling
-    { tendency: TENDENCY.FALLING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
-    { tendency: TENDENCY.FALLING, trend: TREND.SLOWLY, indicator: 'Slowly more wet and unsettled conditions are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions are expected' }
-];
 
 const THRESHOLDS = [
     { pascal: 10, trend: TREND.STEADY },
@@ -40,10 +25,32 @@ const THRESHOLDS = [
     { pascal: 1000, trend: TREND.RAPIDLY }
 ];
 
+const PREDICTIONS = [
+    //rising
+    { tendency: TENDENCY.RISING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
+    { tendency: TENDENCY.RISING, trend: TREND.SLOWLY, indicator: 'Slowly more dry, clear and stable conditions are expected' },
+    { tendency: TENDENCY.RISING, trend: TREND.CHANGING, indicator: 'More dry, clear and stable conditions are expected' },
+    { tendency: TENDENCY.RISING, trend: TREND.QUICKLY, indicator: 'Quickly more fair conditions, but also more wind are likely' },
+    { tendency: TENDENCY.RISING, trend: TREND.RAPIDLY, indicator: 'A short bout of fair weather and stiff winds are likely' },
+    //falling
+    { tendency: TENDENCY.FALLING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
+    { tendency: TENDENCY.FALLING, trend: TREND.SLOWLY, indicator: 'Slowly more wet and unsettled conditions are expected' },
+    { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind are expected' },
+    { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions are likely' },
+    { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions are likely' }
+];
+
 let pressures = [];
 
+/**
+ * Clear the pressure readings. (Mainly for testing purposes)
+ */
 function clear() {
     pressures = [];
+}
+
+function hasPressures() {
+    return pressures.length > 0;
 }
 
 /**
@@ -58,6 +65,14 @@ function addPressure(datetime, pressure) {
     });
 
     removeOldPressures();
+}
+
+/**
+ * Get the count of pressure entries. (Mainly for testing purposes)
+ * @returns {number} Number of pressure entries
+ */
+function getPressureCount() {
+    return pressures.length;
 }
 
 function removeOldPressures(threshold) {
@@ -77,12 +92,12 @@ function minutesFromNow(minutes) {
 }
 
 function ascendingNumbers(a, b) {
-    return a-b;
+    return a - b;
 }
 
 /**
  * Get the trend of the barometer
- * @returns {Array.<Object>} .tendency, .trend and .prediction
+ * @returns {Array.<Object>}
  */
 function getTrend() {
     let latestHalfHour = calculate(-HALF_HOUR);
@@ -90,20 +105,20 @@ function getTrend() {
     let latestThreeHours = calculate(-THREE_HOURS);
 
     let actual = latestThreeHours;
-
-    if(latestHour != null && latestThreeHours != null) {
-        if(TREND[latestHour.trend].severity > TREND[latestThreeHours.trend].severity) {
-            actual = latestHour;
-        }
-    }
-
-    if(latestHalfHour != null && latestHour != null) {
-        if(TREND[latestHalfHour.trend].severity > TREND[latestHour.trend].severity) {
-            actual = latestHalfHour;
-        }
-    }
+    actual = compareSeverity(latestHour, actual);
+    actual = compareSeverity(latestHalfHour, actual);
 
     return actual;
+}
+
+function compareSeverity(earlier, later) {
+    if (earlier != null && later != null) {
+        if (earlier.trend.severity > later.trend.severity) {
+            return earlier;
+        }
+    }
+
+    return later;
 }
 
 /**
@@ -128,12 +143,17 @@ function calculate(from) {
         let threshold = THRESHOLDS.sort(ascendingNumbers).find((t) => Math.abs(difference) < t.pascal);
 
         if (threshold != null) {
-            let prediction = PREDICTIONS.find((pr) => pr.tendency == tendency && pr.trend == threshold.trend);
+            let prediction = PREDICTIONS.find((pr) => pr.tendency === tendency && pr.trend === threshold.trend);
 
             return {
-                tendency: tendency.key,
-                trend: threshold.trend.key,
-                prediction: prediction ? prediction.indicator : null
+                tendency: prediction.tendency.key,
+                trend: prediction.trend.key,
+                indicator: prediction.indicator,
+                from: earlier.value,
+                to: later.value,
+                difference: difference,
+                period: from,
+                severity: getSeverityNotion(prediction.trend.severity, tendency)
             }
         }
 
@@ -143,11 +163,19 @@ function calculate(from) {
     return null;
 }
 
+function getSeverityNotion(severity, tendency) {
+    if(severity === 0) return severity;
+
+    return tendency === TENDENCY.RISING ? severity : -severity;
+}
+
 module.exports = {
     clear: clear,
     addPressure: addPressure,
+    getPressureCount,
     getTrend: getTrend,
     minutesFromNow: minutesFromNow,
+    hasPressures: hasPressures,
     TENDENCY: TENDENCY,
     TREND: TREND
 }
