@@ -10,11 +10,11 @@ const TENDENCY = {
 };
 
 const TREND = {
-    STEADY: { key: 'STEADY', severity: 1 },
-    SLOWLY: { key: 'SLOWLY', severity: 2 },
-    CHANGING: { key: 'CHANGING', severity: 3 },
-    QUICKLY: { key: 'QUICKLY', severity: 4 },
-    RAPIDLY: { key: 'RAPIDLY', severity: 5 }
+    STEADY: { key: 'STEADY', severity: 0 },
+    SLOWLY: { key: 'SLOWLY', severity: 1 },
+    CHANGING: { key: 'CHANGING', severity: 2 },
+    QUICKLY: { key: 'QUICKLY', severity: 3 },
+    RAPIDLY: { key: 'RAPIDLY', severity: 4 }
 };
 
 const THRESHOLDS = [
@@ -42,6 +42,9 @@ const PREDICTIONS = [
 
 let pressures = [];
 
+/**
+ * Clear the pressure readings. (Mainly for testing purposes)
+ */
 function clear() {
     pressures = [];
 }
@@ -62,6 +65,14 @@ function addPressure(datetime, pressure) {
     });
 
     removeOldPressures();
+}
+
+/**
+ * Get the count of pressure entries. (Mainly for testing purposes)
+ * @returns {number} Number of pressure entries
+ */
+function getPressureCount() {
+    return pressures.length;
 }
 
 function removeOldPressures(threshold) {
@@ -94,20 +105,20 @@ function getTrend() {
     let latestThreeHours = calculate(-THREE_HOURS);
 
     let actual = latestThreeHours;
-
-    if (latestHour != null && latestThreeHours != null) {
-        if (TREND[latestHour.trend].severity > TREND[latestThreeHours.trend].severity) {
-            actual = latestHour;
-        }
-    }
-
-    if (latestHalfHour != null && latestHour != null) {
-        if (TREND[latestHalfHour.trend].severity > TREND[latestHour.trend].severity) {
-            actual = latestHalfHour;
-        }
-    }
+    actual = compareSeverity(latestHour, actual) || actual;
+    actual = compareSeverity(latestHalfHour, actual) || actual;
 
     return actual;
+}
+
+function compareSeverity(earlier, later) {
+    if (earlier != null && later != null) {
+        if (earlier.trend.severity > later.trend.severity) {
+            return earlier;
+        }
+    }
+
+    return later;
 }
 
 /**
@@ -132,16 +143,17 @@ function calculate(from) {
         let threshold = THRESHOLDS.sort(ascendingNumbers).find((t) => Math.abs(difference) < t.pascal);
 
         if (threshold != null) {
-            let prediction = PREDICTIONS.find((pr) => pr.tendency == tendency && pr.trend == threshold.trend);
+            let prediction = PREDICTIONS.find((pr) => pr.tendency === tendency && pr.trend === threshold.trend);
 
             return {
-                tendency: tendency.key,
-                trend: threshold.trend.key,
-                prediction: prediction ? prediction.indicator : null,
-                from: earlier.value,
-                to: later.value,
-                difference: difference,
-                minutes: from
+                tendency: prediction.tendency.key,
+                trend: prediction.trend.key,
+                indicator: prediction ? prediction.indicator : null,
+                fromPressure: earlier.value,
+                toPressure: later.value,
+                pressureDifference: difference,
+                periodMinutes: from,
+                severity: prediction.trend.severity
             }
         }
 
@@ -154,6 +166,7 @@ function calculate(from) {
 module.exports = {
     clear: clear,
     addPressure: addPressure,
+    getPressureCount,
     getTrend: getTrend,
     minutesFromNow: minutesFromNow,
     hasPressures: hasPressures,
