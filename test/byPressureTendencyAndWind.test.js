@@ -6,7 +6,7 @@ describe("By Pressure Tendency and Wind Tests", function () {
         it("it should equal a pressure below 100900", function () {
             //arrange
             //act
-            var actual = quadrantPrediction.getPredictionByQuadrant(100800, 280, "FALLING");
+            var actual = quadrantPrediction.getPrediction(100800, 280, "FALLING");
             //assert
             assert.strictEqual(actual, "Changing weather.");
         });
@@ -14,7 +14,7 @@ describe("By Pressure Tendency and Wind Tests", function () {
         it("it should equal a pressure below 102200", function () {
             //arrange
             //act
-            var actual = quadrantPrediction.getPredictionByQuadrant(102100, 45, "STEADY");
+            var actual = quadrantPrediction.getPrediction(102100, 45, "STEADY");
             //assert
             assert.strictEqual(actual, "No change.");
         });
@@ -22,7 +22,7 @@ describe("By Pressure Tendency and Wind Tests", function () {
         it("it should equal a pressure below 999999", function () {
             //arrange     
             //act
-            var actual = quadrantPrediction.getPredictionByQuadrant(102300, 100, "RISING");
+            var actual = quadrantPrediction.getPrediction(102300, 100, "RISING");
             //assert
             assert.strictEqual(actual, "Fair weather.");
 		});

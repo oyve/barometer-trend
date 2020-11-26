@@ -63,12 +63,14 @@ function getLastPressure() {
 function getTrend(isNorthernHemisphere = true) {
     if (pressures.length < 2) return null;
 
+    let lastPressure = getLastPressure();
+
     var pressureTrend = trend.getTrend(pressures);
     let pressureTrendPrediction = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
     let predictionFront = front.getFront(pressures);
     let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
-    let predictionSeason = byPressureTrendAndSeason.getPrediction(getLastPressure().value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere))
-    let pressureTendencyAndWindPrediction = byPressureTendencyAndWind.getPredictionByQuadrant(getLastPressure().value, getLastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
+    let predictionSeason = byPressureTrendAndSeason.getPrediction(lastPressure.value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere))
+    let pressureTendencyAndWindPrediction = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
     let forecast = {
         trend: pressureTrend,

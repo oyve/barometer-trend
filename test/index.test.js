@@ -99,4 +99,24 @@ describe("Function Tests - Trend chooser", function () {
         assert.strictEqual(actual.trend.trend, "STEADY");
         assert.strictEqual(actualCount, 2);
     });
+
+    it("it should be fALLING.RAPIDLY and include wind", function () {
+        //arrange     
+        barometer.clear();
+        //THREE HOURS: this should result in FALLING.CHANGING
+        barometer.addPressure(utils.minutesFromNow(-120), 101500, 225);
+        barometer.addPressure(utils.minutesFromNow(-80), 101500 - 300, 226);
+
+        //ONE HOUR: this should result in FALLING.RAPIDLY
+        barometer.addPressure(utils.minutesFromNow(-50), 101500 - 600, 228);
+        barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 230);
+
+        //act
+        var actual = barometer.getTrend();
+
+        //assert
+        assert.strictEqual(actual.trend.tendency, "FALLING");
+        assert.strictEqual(actual.trend.trend, "RAPIDLY");
+        assert.strictEqual(actual.predictions.byPressureTrendAndWind, "Increasing rain, clearing within 12 hours.");
+    });
 });

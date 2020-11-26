@@ -1,7 +1,7 @@
 const predictionsNorthernHemisphere = require('./prediction_nh.json');
 const predictionsSouthernHemisphere = null;
 
-function getPredictionByQuadrant(pressure, windDirection, tendency, trend = null, isNorthernHemisphere = true)
+function getPrediction(pressure, windDirection, tendency, trend = null, isNorthernHemisphere = true)
 {
 	if(windDirection === null || windDirection === undefined) return 'No wind data';
 
@@ -35,5 +35,5 @@ const quadrants = [
 ]
 
 module.exports = {
-	getPredictionByQuadrant,
+	getPrediction,
 }
