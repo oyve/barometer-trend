@@ -1,0 +1,71 @@
+[
+	{
+		"pressure": 100900,
+		"forecast": {
+			"RISING": {
+				"NW": "Clearing within a few hours and lower temperature.",
+				"SW": "Clearing within 6 hours.",
+				"SE": "Clearing weather.",
+				"NE": "Clearing and cooler."
+			},
+			"STEADY": {
+				"NW": "Continued threatening weather and lower temperatures.",
+				"SW": "Continued stormy weather.",
+				"SE": "Continued rain or no change.",
+				"NE": "Rainy weather, clearing in 12 to 24 hours."
+			},
+			"FALLING": {
+				"NW": "Changing weather.",
+				"SW": "Increasing rain, clearing within 12 hours.",
+				"SE": "Severe storm imminent, clearing within 24 hours.",
+				"NE": "Heavy rain, severe North-East (NE) gale and colder."
+			}
+		}
+	},
+	{
+		"pressure": 102200,
+		"forecast": {
+			"RISING": {
+				"NW": "Fair for 48 hours, lower temperatures.",
+				"SW": "Fair for 48 hours, lower temperatures.",
+				"SE": "Fair.",
+				"NE": "Clear with colder weather."
+			},
+			"STEADY": {
+				"NW": "Continued fair weather.",
+				"SW": "Fair for 12 hours and same temperature.",
+				"SE": "Rain within 12 to 24 hours.",
+				"NE": "No change."
+			},
+			"FALLING": {
+				"NW": "Fair for 12 to 24 hours and temperature stable.",
+				"SW": "Rain imminent.",
+				"SE": "Rain within 6 to 12 hours, stronger wind and rising temperatures.",
+				"NE": "Rain within 12 hours."
+			}
+		}
+	},
+	{
+		"pressure": 999999,
+		"forecast": {
+			"RISING": {
+				"NW": "Continued fair for 24 hours and lower temperatures.",
+				"SW": "Continued fair for 12 hours.",
+				"SE": "Fair weather.",
+				"NE": "Clear and cool."
+			},
+			"STEADY": {
+				"NW": "Continued fair for 48 hours and same temperatures.",
+				"SW": "Continued fair for 12 hours and same temperatures.",
+				"SE": "Rain within 24 to 48 hours.",
+				"NE": "Continued fair and lower temperatures."
+			},
+			"FALLING": {
+				"NW": "Continued fair for 24 hours and slowly rising temperatures.",
+				"SW": "Fair for 6 to 12 hours and rising temperatures.",
+				"SE": "Rain within 12 hours and stronger wind rising temperatures.",
+				"NE": "Rain within 24 to 48 hours."
+			}
+		}
+	}
+]
