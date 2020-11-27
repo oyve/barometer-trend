@@ -20,8 +20,6 @@ function getPrediction(pressure, windDirection, tendency, trend = null, isNorthe
 	return prediction || 'N/A';
 }
 
-const precipitation_nh = require('./prediction_nh.json');
-
 function getQuadrantByCompassDegree(degree) {
 	degree = Math.round(degree);
 	if(degree === 360) degree = 0;
