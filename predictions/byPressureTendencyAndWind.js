@@ -1,18 +1,21 @@
 const predictionsNorthernHemisphere = require('./prediction_nh.json');
-const predictionsSouthernHemisphere = null;
 
 function getPrediction(pressure, windDirection, tendency, trend = null, isNorthernHemisphere = true)
 {
 	if(windDirection === null || windDirection === undefined) return 'No wind data';
 
-	let predictionsByHemisphere = isNorthernHemisphere ? predictionsNorthernHemisphere : predictionsSouthernHemisphere;
-	if(predictionsByHemisphere === null) return 'No predictions for your hemisphere yet';
-
 	let quadrant = getQuadrantByCompassDegree(windDirection);
+
+	if(!isNorthernHemisphere) {
+		if(quadrant === "NE") quadrant = "NW";
+		else if(quadrant === "SE") quadrant = "SW";
+		else if(quadrant === "SW") quadrant = "SE";
+		else if(quadrant === "NW") quadrant = "NE";
+	}
 
 	if(trend !== null && trend === "STEADY") tendency = "STEADY";
 
-	let prediction = predictionsByHemisphere.find((p) => pressure <= p.pressure)["forecast"][tendency][quadrant];
+	let prediction = predictionsNorthernHemisphere.find((p) => pressure <= p.pressure)["forecast"][tendency][quadrant];
 
 	return prediction || 'N/A';
 }
