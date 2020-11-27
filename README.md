@@ -11,13 +11,11 @@ Gets the suggested:
 - Prediction of weather by tendency and wind direction (`Increasing rain, clearing within 12 hours.`)
 - Prediction of weather by trend and winter|summer (`Cloudy and humid, thunderstorms`)
 
-## Install
-
+## Install & Use
 ```
 npm i barometer-trend
 ```
 
-## Use
 ```
 const barometer = require('barometer-trend');
 
@@ -39,13 +37,13 @@ Feel free to create a Pull Request including test code.
 
 ## Disclaimer
 - All calculations is done by online research; the author of this library does not have a background in metereology. All sources listed below.
-- A barometer is only *one source of weather information* and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelitte exists and being a metereologist is a paid job.)
+- A barometer is only *one source of weather information* and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelittes exists and being a metereologist is a paid job.)
 - All calculations presumes being located at sea with no disturbances.
 - Near land, winds may be one-two Beaufort scale numbers lower and the wind might be coming from "the wrong direction".
 - In subtropic and tropical regions some of the calculations may not be valid at all; i.e. the tradewind system is different from northern hemishpere west->east low pressure systems.
 - In trade wind zones observe the daily variations; any change to this pattern could possibly indicate gale weather.
 
-## Sources and references
+## Sources / References
 - [How to use a barometer when sailing](https://www.jollyparrot.co.uk/blog/how-to-use-barometer-when-sailing)
 - [UK Met Office Marine Forecast Glossary](https://www.metoffice.gov.uk/weather/guides/coast-and-sea/glossary)
 - [Hughes38.com](http://www.hughes38.com/wp-content/uploads/2016/02/Barometer-Wind-and-Temperature-WX.pdf)
