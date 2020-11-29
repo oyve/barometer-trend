@@ -1,12 +1,12 @@
 [
-	{ "key": "FFF", "tendency": "Continously falling", "front": "Warm or cold front approaching", "wind": "Has backed and increasing" },
-	{ "key": "FFS", "tendency": "Falling, then steady", "front": "Warm front passage", "wind": "Increases, veers, then steady" },
-	{ "key": "FFR", "tendency": "Falling before a lesser rise", "front": "Cold front passage", "wind": "Strong and gusty, then veers" },
-	{ "key": "RFF", "tendency": "Rising before a greater fall", "front": "Warm front approaching", "wind": "Backed and increasing" },
-	{ "key": "RRR", "tendency": "Continously rising", "front": "Post cold front", "wind": "Gusty and easing" },
-	{ "key": "RRS", "tendency": "Rising, then steady", "front": "High pressure", "wind": "Eases, then light" },
-	{ "key": "FRR", "tendency": "Falling before a greater rise", "front": "Cold front passage", "wind": "Veered, gusty, easing" },
-	{ "key": "RRF", "tendency": "Rising before a lesser fall", "front": "Warm front approaching", "wind": "Backs, starts increasing" },
-	{ "key": "SSS", "tendency": "Steady", "front": "Stationary system or warm sector", "wind": "Stationary" },
-	{ "key": "N/A", "tendency": "N/A", "front": "N/A", "wind": "N/A" }
+	{ "key": "FFF", "tendency": "Continously falling", "prognose": "Warm or cold front approaching", "wind": "Has backed and increasing" },
+	{ "key": "FFS", "tendency": "Falling, then steady", "prognose": "Warm front passage", "wind": "Increases, veers, then steady" },
+	{ "key": "FFR", "tendency": "Falling before a lesser rise", "prognose": "Cold front passage", "wind": "Strong and gusty, then veers" },
+	{ "key": "RFF", "tendency": "Rising before a greater fall", "prognose": "Warm front approaching", "wind": "Backed and increasing" },
+	{ "key": "RRR", "tendency": "Continously rising", "prognose": "Post cold front", "wind": "Gusty and easing" },
+	{ "key": "RRS", "tendency": "Rising, then steady", "prognose": "High pressure", "wind": "Eases, then light" },
+	{ "key": "FRR", "tendency": "Falling before a greater rise", "prognose": "Cold front passage", "wind": "Veered, gusty, easing" },
+	{ "key": "RRF", "tendency": "Rising before a lesser fall", "prognose": "Warm front approaching", "wind": "Backs, starts increasing" },
+	{ "key": "SSS", "tendency": "Steady", "prognose": "Stationary system or warm sector", "wind": "Stationary" },
+	{ "key": "N/A", "tendency": "N/A", "prognose": "N/A", "wind": "N/A" }
 ]

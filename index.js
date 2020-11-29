@@ -66,19 +66,19 @@ function getPredictions(isNorthernHemisphere = true) {
     let lastPressure = getLastPressure();
 
     var pressureTrend = trend.getTrend(pressures);
-    let pressureTrendPrediction = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
+    let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
     let predictionFront = front.getFront(pressures);
     let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
     let predictionSeason = byPressureTrendAndSeason.getPrediction(lastPressure.value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere))
-    let pressureTendencyAndWindPrediction = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
+    let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
     let forecast = {
         trend: pressureTrend,
         indicator: "Please update JSON, see latest documentation",
         predictions: {
-             byPressureTrend: pressureTrendPrediction,
-             byPressureTrendAndWind: pressureTendencyAndWindPrediction,
-             bySeason: predictionSeason,
+             pressureOnly: predictionPressureOnly,
+             quadrant: predictionPressureTendencyThresholdAndQuadrant,
+             season: predictionSeason,
              beaufort: predictionBeaufort,
              front: predictionFront
         }

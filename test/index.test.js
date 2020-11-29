@@ -117,6 +117,6 @@ describe("Function Tests - Trend chooser", function () {
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
         assert.strictEqual(actual.trend.trend, "RAPIDLY");
-        assert.strictEqual(actual.predictions.byPressureTrendAndWind, "Increasing rain, clearing within 12 hours.");
+        assert.strictEqual(actual.predictions.quadrant, "Increasing rain, clearing within 12 hours.");
     });
 });
