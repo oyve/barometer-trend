@@ -1,0 +1,32 @@
+[
+	{
+		"pressure": 98205.3,
+		"predictions": [
+			{ "tendency": "RISING", "trend": "RAPIDLY", "winter": "Fair for 48 hours, lower temperatures.", "summer": "Gales, showers, colder"},
+			{ "tendency": "RISING", "trend": "SLOWLY", "winter": "Flurries, windy, much colder.", "summer": "Windy, showers, cooler"},
+			{ "tendency": "STEADY", "trend": "STEADY", "winter": "Stormy, rain or snow", "summer": "Windy with showers"},
+			{ "tendency": "FALLING", "trend": "SLOWLY", "winter": "Increasing storm, strong wind, rain or snow.", "summer": "Increasing storm, gales, rain"},
+			{ "tendency": "FALLING", "trend": "RAPIDLY", "winter": "Severe storm, gales, rain or snow.", "summer": "Hurricane"}
+		]
+	},
+	{
+		"pressure": 101592,
+		"predictions": [
+			{ "tendency": "RISING", "trend": "RAPIDLY", "winter": "Clearing, windy, much colder", "summer": "Clearing, windy, much cooler"},
+			{ "tendency": "RISING", "trend": "SLOWLY", "winter": "Clearing and colder", "summer": "Clearing and cooler"},
+			{ "tendency": "STEADY", "trend": "STEADY", "winter": "Cloudy and warmer", "summer": "Little change"},
+			{ "tendency": "FALLING", "trend": "SLOWLY", "winter": "Rain or snow, warmer", "summer": "Humid with showers"},
+			{ "tendency": "FALLING", "trend": "RAPIDLY", "winter": "High wind, rain or snow", "summer": "High wind, thundershowers"}
+		]
+	},
+	{
+		"pressure": 104978,
+		"predictions": [
+			{ "tendency": "RISING", "trend": "RAPIDLY", "winter": "Fair, windy, much cooler", "summer": "Fair, windy, cooler"},
+			{ "tendency": "RISING", "trend": "SLOWLY", "winter": "Clearing, colder", "summer": "Fair, dry, cool"},
+			{ "tendency": "STEADY", "trend": "STEADY", "winter": "Increasing cloudiness and warmer", "summer": "Little change"},
+			{ "tendency": "FALLING", "trend": "SLOWLY", "winter": "Cloudy, warmer, then rain or snow", "summer": "Cloudy and more humid"},
+			{ "tendency": "FALLING", "trend": "RAPIDLY", "winter": "Rain or snow, windy", "summer": "Cloudy and humid, thunderstorms"}
+		]
+	}
+]

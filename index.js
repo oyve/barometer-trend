@@ -1,44 +1,11 @@
 'use strict'
-
-const HALF_HOUR = 30;
-const ONE_HOUR = 60;
-const THREE_HOURS = 180;
-
-const TENDENCY = {
-    RISING: { key: 'RISING' },
-    FALLING: { key: 'FALLING' }
-};
-
-const TREND = {
-    STEADY: { key: 'STEADY', severity: 0 },
-    SLOWLY: { key: 'SLOWLY', severity: 1 },
-    CHANGING: { key: 'CHANGING', severity: 2 },
-    QUICKLY: { key: 'QUICKLY', severity: 3 },
-    RAPIDLY: { key: 'RAPIDLY', severity: 4 }
-};
-
-const THRESHOLDS = [
-    { pascal: 10, trend: TREND.STEADY },
-    { pascal: 16, trend: TREND.SLOWLY },
-    { pascal: 36, trend: TREND.CHANGING },
-    { pascal: 60, trend: TREND.QUICKLY },
-    { pascal: 1000, trend: TREND.RAPIDLY }
-];
-
-const PREDICTIONS = [
-    //rising
-    { tendency: TENDENCY.RISING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
-    { tendency: TENDENCY.RISING, trend: TREND.SLOWLY, indicator: 'Slowly more dry, clear and stable conditions are expected' },
-    { tendency: TENDENCY.RISING, trend: TREND.CHANGING, indicator: 'More dry, clear and stable conditions are expected' },
-    { tendency: TENDENCY.RISING, trend: TREND.QUICKLY, indicator: 'Quickly more fair conditions, but also more wind are likely' },
-    { tendency: TENDENCY.RISING, trend: TREND.RAPIDLY, indicator: 'A short bout of fair weather and stiff winds are likely' },
-    //falling
-    { tendency: TENDENCY.FALLING, trend: TREND.STEADY, indicator: 'Conditions are stable for now' },
-    { tendency: TENDENCY.FALLING, trend: TREND.SLOWLY, indicator: 'Slowly more wet and unsettled conditions are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.CHANGING, indicator: 'Wet and unsettled conditions with more wind are expected' },
-    { tendency: TENDENCY.FALLING, trend: TREND.QUICKLY, indicator: 'Gale weather conditions are likely' },
-    { tendency: TENDENCY.FALLING, trend: TREND.RAPIDLY, indicator: 'Storm weather conditions are likely' }
-];
+const front = require('./predictions/front');
+const byPressureTrend = require('./predictions/byPressureTrend')
+const byPressureTendencyAndWind = require('./predictions/byPressureTendencyAndWind')
+const byPressureTrendAndSeason = require('./predictions/byPressureTrendAndSeason')
+const beaufort = require('./predictions/beaufort')
+const trend = require('./trend');
+const utils = require('./utils');
 
 let pressures = [];
 
@@ -57,11 +24,15 @@ function hasPressures() {
  * 
  * @param {Date} datetime Timestamp of barometer reading
  * @param {number} pressure Pressure in Pascal
+ * @param {number} trueWindDirection True wind direction in degrees
  */
-function addPressure(datetime, pressure) {
+function addPressure(datetime, pressure, trueWindDirection = null) {
+    if(trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
+
     pressures.push({
         datetime: datetime,
-        value: pressure
+        value: pressure,
+        twd: trueWindDirection
     });
 
     removeOldPressures();
@@ -76,97 +47,44 @@ function getPressureCount() {
 }
 
 function removeOldPressures(threshold) {
-    var threshold = minutesFromNow(-THREE_HOURS);
+    var threshold = utils.minutesFromNow(-utils.MINUTES.THREE_HOURS);
     pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
 }
 
-/**
- * 
- * @param {number} minutes Minutes from current time
- * @returns {Date} Date with given minute difference
- */
-function minutesFromNow(minutes) {
-    var now = new Date();
-    now.setMinutes(now.getMinutes() + minutes);
-    return new Date(now);
-}
-
-function ascendingNumbers(a, b) {
-    return a - b;
+function getLastPressure() {
+    return pressures[pressures.length - 1];
 }
 
 /**
  * Get the trend of the barometer
+ * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
  * @returns {Array.<Object>}
  */
-function getTrend() {
-    let latestHalfHour = calculate(-HALF_HOUR);
-    let latestHour = calculate(-ONE_HOUR);
-    let latestThreeHours = calculate(-THREE_HOURS);
-
-    let actual = latestThreeHours;
-    actual = compareSeverity(latestHour, actual);
-    actual = compareSeverity(latestHalfHour, actual);
-
-    return actual;
-}
-
-function compareSeverity(earlier, later) {
-    if (earlier != null && later != null) {
-        if (earlier.trend.severity > later.trend.severity) {
-            return earlier;
-        }
-    }
-
-    return later;
-}
-
-/**
- * 
- * @param {Date} from Datetime from when to compare readings
- */
-function calculate(from) {
+function getTrend(isNorthernHemisphere = true) {
     if (pressures.length < 2) return null;
 
-    var fromDatetime = minutesFromNow(-Math.abs(from));
+    let lastPressure = getLastPressure();
 
-    let subsetOfPressures = pressures.filter((p) => {
-        return p.datetime.getTime() >= fromDatetime.getTime();
-    });
+    var pressureTrend = trend.getTrend(pressures);
+    let pressureTrendPrediction = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
+    let predictionFront = front.getFront(pressures);
+    let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
+    let predictionSeason = byPressureTrendAndSeason.getPrediction(lastPressure.value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere))
+    let pressureTendencyAndWindPrediction = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
-    if (subsetOfPressures.length >= 2) {
-        let earlier = subsetOfPressures[0];
-        let later = subsetOfPressures[subsetOfPressures.length - 1];
-        let difference = later.value - earlier.value;
-        let tendency = difference >= 0 ? TENDENCY.RISING : TENDENCY.FALLING;
-
-        let threshold = THRESHOLDS.sort(ascendingNumbers).find((t) => Math.abs(difference) < t.pascal);
-
-        if (threshold != null) {
-            let prediction = PREDICTIONS.find((pr) => pr.tendency === tendency && pr.trend === threshold.trend);
-
-            return {
-                tendency: prediction.tendency.key,
-                trend: prediction.trend.key,
-                indicator: prediction.indicator,
-                from: earlier.value,
-                to: later.value,
-                difference: difference,
-                period: from,
-                severity: getSeverityNotion(prediction.trend.severity, tendency)
-            }
+    let forecast = {
+        trend: pressureTrend,
+        indicator: "Please update JSON, see latest documentation",
+        predictions: {
+             byPressureTrend: pressureTrendPrediction,
+             byPressureTrendAndWind: pressureTendencyAndWindPrediction,
+             bySeason: predictionSeason,
+             beaufort: predictionBeaufort,
+             front: predictionFront
         }
-
-        return null;
     }
 
-    return null;
-}
-
-function getSeverityNotion(severity, tendency) {
-    if(severity === 0) return severity;
-
-    return tendency === TENDENCY.RISING ? severity : -severity;
+    return forecast;
 }
 
 module.exports = {
@@ -174,8 +92,5 @@ module.exports = {
     addPressure: addPressure,
     getPressureCount,
     getTrend: getTrend,
-    minutesFromNow: minutesFromNow,
-    hasPressures: hasPressures,
-    TENDENCY: TENDENCY,
-    TREND: TREND
+    hasPressures: hasPressures
 }
