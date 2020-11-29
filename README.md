@@ -8,8 +8,8 @@ Gets the suggested:
 - Front system tendency, passage and wind analyze based on the latest three hours. (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
 - Force wind expectation in Beaufort scale based on the ratio of pressure increase/decrease (`F8-9`)
 - Prediction of weather by ratio of increase/decrease trend (`Expect gale force weather'`)
-- Prediction of weather by tendency and wind direction (`Increasing rain, clearing within 12 hours.`)
-- Prediction of weather by trend and winter|summer (`Cloudy and humid, thunderstorms`)
+- Prediction of weather by pressure tendency, threshold and wind direction (`Increasing rain, clearing within 12 hours.`)
+- Prediction of weather by pressure threshold for winter|summer (`Cloudy and humid, thunderstorms`)
 
 ## Install & Use
 ```
