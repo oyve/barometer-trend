@@ -53,7 +53,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-40), 101500 + 7);
 
         //act
-        var actual = barometer.getTrend();
+        var actual = barometer.getPredictions();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "RISING");
@@ -72,7 +72,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-40), 101500 - 600);
 
         //act
-        var actual = barometer.getTrend();
+        var actual = barometer.getPredictions();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
@@ -91,7 +91,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(0), 101500 - 2);
 
         //act
-        var actual = barometer.getTrend();
+        var actual = barometer.getPredictions();
         var actualCount = barometer.getPressureCount();
 
         //assert
@@ -112,7 +112,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 230);
 
         //act
-        var actual = barometer.getTrend();
+        var actual = barometer.getPredictions();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");

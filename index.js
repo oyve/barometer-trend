@@ -60,7 +60,7 @@ function getLastPressure() {
  * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
  * @returns {Array.<Object>}
  */
-function getTrend(isNorthernHemisphere = true) {
+function getPredictions(isNorthernHemisphere = true) {
     if (pressures.length < 2) return null;
 
     let lastPressure = getLastPressure();
@@ -88,9 +88,9 @@ function getTrend(isNorthernHemisphere = true) {
 }
 
 module.exports = {
-    clear: clear,
-    addPressure: addPressure,
+    clear,
+    addPressure,
     getPressureCount,
-    getTrend: getTrend,
-    hasPressures: hasPressures
+    getPredictions,
+    hasPressures
 }
