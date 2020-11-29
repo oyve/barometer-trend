@@ -27,7 +27,7 @@ function hasPressures() {
  * @param {number} trueWindDirection True wind direction in degrees
  */
 function addPressure(datetime, pressure, trueWindDirection = null) {
-    if(trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
+    if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
 
     pressures.push({
         datetime: datetime,
@@ -76,11 +76,11 @@ function getPredictions(isNorthernHemisphere = true) {
         trend: pressureTrend,
         indicator: "Please update JSON, see latest documentation",
         predictions: {
-             pressureOnly: predictionPressureOnly,
-             quadrant: predictionPressureTendencyThresholdAndQuadrant,
-             season: predictionSeason,
-             beaufort: predictionBeaufort,
-             front: predictionFront
+            pressureOnly: predictionPressureOnly,
+            quadrant: predictionPressureTendencyThresholdAndQuadrant,
+            season: predictionSeason,
+            beaufort: predictionBeaufort,
+            front: predictionFront
         }
     }
 
