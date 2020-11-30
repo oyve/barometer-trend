@@ -2,7 +2,7 @@ const predictionsNorthernHemisphere = require('./prediction_nh.json');
 
 function getPrediction(pressure, windDirection, tendency, trend = null, isNorthernHemisphere = true)
 {
-	if(windDirection === null || windDirection === undefined) return 'No wind data';
+	if(windDirection === null || windDirection === undefined) return 'N/A - No true wind data';
 
 	let quadrant = getQuadrantByCompassDegree(windDirection);
 

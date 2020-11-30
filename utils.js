@@ -14,6 +14,11 @@ function minutesFromNow(minutes) {
 	return new Date(now);
 }
 
+function adjustPressureToSeaLevel(pressure, height, temperature = 15) {
+	let seaLevelPressure = pressure * Math.pow(1 - ((0.0065 * height) / (temperature + 0.0065 * height + 273.15)), -5.257);
+	return Math.round(seaLevelPressure);
+}
+
 /**
  * 
  * @param {*} pressures The pressures to filter
@@ -39,5 +44,6 @@ module.exports = {
 	minutesFromNow,
 	getPressuresSince,
 	isSummer,
+	adjustPressureToSeaLevel,
 	MINUTES
 }

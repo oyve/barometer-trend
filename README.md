@@ -52,3 +52,4 @@ Feel free to create a Pull Request including test code.
 - [Air pressure changes and their meanings](http://www.bohlken.net/airpressure2.htm)
 - [Sailing Eurybia](https://sailingeurybia.com/weather-resources/)
 - [Wikipedia: Beaufort scale](https://en.wikipedia.org/wiki/Beaufort_scale)
+- [Pressure conversion to sea level](https://keisan.casio.com/exec/system/1224575267)

@@ -24,10 +24,18 @@ function hasPressures() {
  * 
  * @param {Date} datetime Timestamp of barometer reading
  * @param {number} pressure Pressure in Pascal
+ * @param {number} altitude Altitude above sea level in meters, default = 0
+ * @param {number} temperature Temperature, default = 15C
  * @param {number} trueWindDirection True wind direction in degrees
  */
-function addPressure(datetime, pressure, trueWindDirection = null) {
+function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
     if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
+    if(altitude === null) altitude = 0;
+    if(temperature === null) temperature = 15;
+
+    if(altitude > 0) {
+        pressure = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
+    }
 
     pressures.push({
         datetime: datetime,
@@ -37,6 +45,7 @@ function addPressure(datetime, pressure, trueWindDirection = null) {
 
     removeOldPressures();
 }
+
 
 /**
  * Get the count of pressure entries. (Mainly for testing purposes)

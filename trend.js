@@ -55,7 +55,7 @@ function calculate(pressures, from) {
 			from: earlier.value,
 			to: later.value,
 			difference: difference,
-			ratio: ratio,
+			ratio: Math.abs(ratio),
 			period: from,
 			severity: getSeverityNotion(threshold.trend.severity, tendency),
 		}

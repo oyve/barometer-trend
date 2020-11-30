@@ -104,12 +104,12 @@ describe("Function Tests - Trend chooser", function () {
         //arrange     
         barometer.clear();
         //THREE HOURS: this should result in FALLING.CHANGING
-        barometer.addPressure(utils.minutesFromNow(-120), 101500, 225);
-        barometer.addPressure(utils.minutesFromNow(-80), 101500 - 300, 226);
+        barometer.addPressure(utils.minutesFromNow(-120), 101500, 0, null, 225);
+        barometer.addPressure(utils.minutesFromNow(-80), 101500 - 300, 0, null, 226);
 
         //ONE HOUR: this should result in FALLING.RAPIDLY
-        barometer.addPressure(utils.minutesFromNow(-50), 101500 - 600, 228);
-        barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 230);
+        barometer.addPressure(utils.minutesFromNow(-50), 101500 - 600, 0, null, 228);
+        barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 0, null, 230);
 
         //act
         var actual = barometer.getPredictions();
