@@ -140,6 +140,21 @@ describe("Front Tests", function () {
 			assert.strictEqual(actual.key, expected);
 		});
 
+		it("it has only less than one hour readings", function () {
+			//arrange
+			const expected = "N/A";
+			const pressures = [
+				{ datetime: utils.minutesFromNow(-45), value: 101310 },
+				{ datetime: utils.minutesFromNow(-30), value: 101315 },
+				{ datetime: utils.minutesFromNow(-20), value: 101320 },
+				{ datetime: utils.minutesFromNow(-1), value: 101325 }
+			];
+			//act
+			var actual = front.getFront(pressures);
+			//assert
+			assert.strictEqual(actual.key, expected);
+		});
+
 		it("it should not be recognized", function () {
 			//arrange
 			const expected = "N/A";
