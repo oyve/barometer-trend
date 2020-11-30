@@ -10,7 +10,7 @@ Gets the suggested:
 - Prediction of weather by ratio of increase/decrease trend (`Expect gale force weather'`)
 - Prediction of weather by pressure tendency, threshold and wind direction (`Increasing rain, clearing within 12 hours.`)
 - Prediction of weather by pressure threshold for winter|summer (`Cloudy and humid, thunderstorms`)
-- Correct pressure to sea level by altitude and temperature
+- All calculations corrected to sea level pressure by optional `altitude` and `temperature`
 
 ## Install & Use
 ```
