@@ -20,6 +20,24 @@ describe("By Pressure Trend And Seasons Tests", function () {
             //assert
 			assert.strictEqual(actual, expected);
 		});
+
+		it("it should replace CHANGING with RAPIDLY - summer", function () {
+			//arrange
+			const expected = "Gales, showers, colder";
+            //act
+            var actual = byPressureTrendAndSeason.getPrediction(97000, "RISING", "CHANGING", true);
+            //assert
+			assert.strictEqual(actual, expected);
+		});
+
+		it("it should replace QUICKLY with RAPIDLY - summer", function () {
+			//arrange
+			const expected = "Gales, showers, colder";
+            //act
+            var actual = byPressureTrendAndSeason.getPrediction(97000, "RISING", "QUICKLY", true);
+            //assert
+			assert.strictEqual(actual, expected);
+		});
 	});
     describe("Pressure lower than 101592", function () {
         it("it should equal a STEADY.STEADY - winter", function () {
