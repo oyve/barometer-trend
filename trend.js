@@ -18,10 +18,10 @@ const TREND = {
 };
 
 const THRESHOLDS_RATIO = [
-	{ pascal: 0.56, trend: TREND.STEADY }, //up to 100 Pa per 3 hours
-	{ pascal: 0.89, trend: TREND.SLOWLY }, //160 Pa per 3 hours
-	{ pascal: 2, trend: TREND.CHANGING }, //360 Pa per 3 hours
-	{ pascal: 3.33, trend: TREND.QUICKLY }, //600 Pa per 3 hours
+	{ pascal: 0.056, trend: TREND.STEADY }, //up to 10 Pa per 3 hours
+	{ pascal: 0.89, trend: TREND.SLOWLY }, //10-160 Pa per 3 hours
+	{ pascal: 2, trend: TREND.CHANGING }, //160-360 Pa per 3 hours
+	{ pascal: 3.33, trend: TREND.QUICKLY }, //360-600 Pa per 3 hours
 	{ pascal: 9999, trend: TREND.RAPIDLY }
 ];
 
