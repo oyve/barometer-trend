@@ -1,6 +1,6 @@
 {
   "name": "barometer-trend",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "description": "Calculate the trend of a barometer",
   "main": "index.js",
   "directories": {
@@ -18,7 +18,14 @@
     "weather",
     "trend",
     "pressure",
-    "calculate"
+    "calculate",
+    "trend",
+    "tendency",
+    "front",
+    "hemisphere",
+    "prediction",
+    "weather",
+    "forecast"
   ],
   "author": "github.com/oyve",
   "license": "ISC",
