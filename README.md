@@ -22,7 +22,7 @@ const barometer = require('barometer-trend');
 
 barometer.addPressure(datetime1, 101500);
 barometer.addPressure(datetime2, 101505);
-barometer.addPressure(datetime3, 101512, 225); //225 = wind direction - enables more calculations
+barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction - enables more calculations (or give NULL for each seperately)
 
 let forecast = barometer.getPredictions();
 ```
