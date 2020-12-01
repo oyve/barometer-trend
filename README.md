@@ -54,3 +54,4 @@ Feel free to create a Pull Request including test code.
 - [Sailing Eurybia](https://sailingeurybia.com/weather-resources/)
 - [Wikipedia: Beaufort scale](https://en.wikipedia.org/wiki/Beaufort_scale)
 - [Pressure conversion to sea level](https://keisan.casio.com/exec/system/1224575267)
+- [Heidorn.info](http://www.heidorn.info/keith/weather/eyes/barometer3.htm)
