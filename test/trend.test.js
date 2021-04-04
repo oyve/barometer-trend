@@ -18,6 +18,19 @@ describe("Prediction Rough Tests", function () {
 			assert.strictEqual(actual.trend, "STEADY");
 		});
 
+		it("it should FALLING.SLOWLY", function () {
+			//arrange
+			let pressures = [
+				{ datetime: utils.minutesFromNow(-170), value: 101350 },
+				{ datetime: utils.minutesFromNow(-1), value: 101350 - 11 },
+			];
+			//act
+			var actual = prough.getTrend(pressures);
+			//assert
+			assert.strictEqual(actual.tendency, "FALLING");
+			assert.strictEqual(actual.trend, "SLOWLY");
+		});
+
 		it("it should RISING.SLOWLY", function () {
 			//arrange
 			let pressures = [
