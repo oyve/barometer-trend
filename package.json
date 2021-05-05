@@ -28,7 +28,7 @@
     "forecast"
   ],
   "author": "github.com/oyve",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/oyve/barometer-trend/issues"
   },
