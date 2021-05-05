@@ -25,7 +25,7 @@ function hasPressures() {
  * @param {Date} datetime Timestamp of barometer reading
  * @param {number} pressure Pressure in Pascal
  * @param {number} altitude Altitude above sea level in meters, default = 0
- * @param {number} temperature Temperature, default = 15C
+ * @param {number} temperature Temperature in Kelvin, defaults to 15 Celcius degrees
  * @param {number} trueWindDirection True wind direction in degrees
  */
 function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
