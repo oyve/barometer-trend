@@ -30,10 +30,14 @@ function hasPressures() {
  */
 function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
     if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
-    if(altitude === null) altitude = 0;
-    if(temperature === null) temperature = 15;
+    if (altitude === null) altitude = 0;
+    if (temperature === null) temperature = 15 + utils.KELVIN;
 
-    if(altitude > 0) {
+    let SIUnits = utils.toSIUnits(pressure, temperature);
+    pressure = SIUnits.pressure;
+    temperature = SIUnits.temperature;
+
+    if (altitude > 0) {
         pressure = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
     }
 
