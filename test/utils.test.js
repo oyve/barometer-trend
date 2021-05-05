@@ -14,7 +14,7 @@ describe("Utils Tests", function () {
 		});
 	});
 
-	describe("Correct pressure to sea level", function () {
+	describe("Correct pressure to sea level with default temperature", function () {
 
 		it("it should equal", function () {
 			//arrange
@@ -24,7 +24,7 @@ describe("Utils Tests", function () {
 			assert.strictEqual(actual, 99168);
 		});
 
-		it("it should equal with temperature", function () {
+		it("Correct pressure to sea level with altitude and temperature", function () {
 			//arrange
 			//act
 			var actual = utils.adjustPressureToSeaLevel(98000, 100, 30 + utils.KELVIN);
