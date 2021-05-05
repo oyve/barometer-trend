@@ -33,10 +33,6 @@ function addPressure(datetime, pressure, altitude = null, temperature = null, tr
     if (altitude === null) altitude = 0;
     if (temperature === null) temperature = 15 + utils.KELVIN;
 
-    let SIUnits = utils.toSIUnits(pressure, temperature);
-    pressure = SIUnits.pressure;
-    temperature = SIUnits.temperature;
-
     if (altitude > 0) {
         pressure = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
     }

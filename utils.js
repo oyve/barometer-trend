@@ -43,30 +43,11 @@ function isSummer(isNorthernHemisphere = true) {
 	return isNorthernHemisphere ? summer : !summer;
 }
 
-/**
- * 
- * @param {number} pressure Pressure
- * @param {number} temperature Temperature
- * @returns returns Pascal and Kelvin if pressure and temperature is recieved in hPa or Celcius
- */
- function toSIUnits(pressure, temperature) {  
-    if (Math.trunc(pressure).toString().length <= 4) {
-        pressure *= 100;
-    }
-
-    if (Math.trunc(temperature).toString().length <= 2) {
-        temperature += KELVIN;
-    }
-
-    return { pressure, temperature };
-}
-
 module.exports = {
 	minutesFromNow,
 	getPressuresSince,
 	isSummer,
 	adjustPressureToSeaLevel,
-	toSIUnits,
 	MINUTES,
 	KELVIN
 }
