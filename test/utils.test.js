@@ -31,5 +31,14 @@ describe("Utils Tests", function () {
 			//assert
 			assert.strictEqual(actual, 99110);
 		});
+
+		it("Correct pressure to sea level with only temperature", function () {
+			//arrange
+			//act
+			var actual = utils.adjustPressureToSeaLevel(98000, 0, 30 + utils.KELVIN);
+			//assert
+			assert.strictEqual(actual, 98000);
+			//https://www.easycalculation.com/weather/temperature-barometer-correction.php
+		});
 	});
 });
