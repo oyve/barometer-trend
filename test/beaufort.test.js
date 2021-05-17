@@ -9,7 +9,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "F6-7";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(+3);
+			var actual = beaufort.getByPressureVariationRatio(+3).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
@@ -18,7 +18,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "F8-9";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(+4);
+			var actual = beaufort.getByPressureVariationRatio(+4).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
@@ -27,7 +27,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "F10+";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(+6);
+			var actual = beaufort.getByPressureVariationRatio(+6).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
@@ -36,7 +36,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "F6-7";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(-2);
+			var actual = beaufort.getByPressureVariationRatio(-2).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
@@ -45,7 +45,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "F8-12";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(-4);
+			var actual = beaufort.getByPressureVariationRatio(-4).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
@@ -54,7 +54,7 @@ describe("Beaufort Tests", function () {
 			//arrange
 			const expected = "Less than F6";
 			//act
-			var actual = beaufort.getByPressureVariationRatio(1);
+			var actual = beaufort.getByPressureVariationRatio(1).force;
 			//assert
 			assert.strictEqual(actual, expected);
 		});
