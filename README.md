@@ -1,16 +1,21 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Calculate the trend of a barometer over a three hour period.
+Calculate the tendency and trend of a barometer for a one to three hour period.
+Barometric weather predictions by barometer tendency and trend.
 
 ## Features
-Gets the suggested:
-- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLNG|SLOWLY`)
-- Front system tendency, passage and wind analyze based on the latest three hours. (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
-- Force wind expectation in Beaufort scale based on the ratio of pressure increase/decrease (`F8-9`)
-- Prediction of weather by ratio of increase/decrease trend (`Expect gale force weather'`)
-- Prediction of weather by pressure tendency, threshold and wind direction (`Increasing rain, clearing within 12 hours.`)
-- Prediction of weather by pressure threshold for winter|summer (`Cloudy and humid, thunderstorms`)
+- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLNG|SLOWLY`)- 
+- Prediction of weather and systems
+  - By pressure tendency only (`Expect gale force weather'`)
+  - By pressure tendency, thresholds and wind direction (`Increasing rain, clearing within 12 hours.`)
+  - By seasonal pressure thresholds for winter and summer (`Cloudy and humid, thunderstorms`)
+  - Front system tendency for the last three hours (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
+  - Force wind expectation in Beaufort scale based on the pressure tendency (`F8-9`)
+- Detects current pressure system `Low`, `Normal`, `High`
+
+Note
 - All calculations corrected to sea level pressure by optional `altitude` and `temperature`
+- 48 hour history
 
 ## Install & Use
 ```
@@ -22,20 +27,20 @@ const barometer = require('barometer-trend');
 
 barometer.addPressure(datetime1, 101500);
 barometer.addPressure(datetime2, 101505);
-barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction - enables more calculations (or give NULL for each seperately)
+barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction 
+//addPressure(...) is more presice when pressure is corrected by altitude and temperature.
 
-let forecast = barometer.getPredictions();
+let forecast = barometer.getPredictions(); //returns JSON
 ```
 
 ## Note
 - Pressure must be in Pascals, 1015 mBar/hPa = 101500 Pascal.
-- Pressure readings older than *three hours* are automatically removed.
 - `getPredictions()` investigate the trend for the latest *one hour* and *three hours*
 - If run less than *one hour* or *three hours*, the latest timing up until now is picked.
-- The most recent trend with the highest severity is chosen.
+- The most recent trend with the highest severity is chosen (*One hour* or *Three hour* reading)
 
 ## Contribute
-Feel free to create a Pull Request including test code.
+Feel free to contribute; create an Issue, and Pull Request including test code.
 
 ## Disclaimer
 - All calculations is done by online research; the author of this library does not have a background in metereology. All sources listed below.
