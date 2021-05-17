@@ -26,10 +26,12 @@ function analyzePressures(hourThreePressure, hourTwoPressure, hourOnePressure, n
 	return front !== undefined ? front : fronts.find((f) => f.key === "N/A");
 }
 
+const Pascal10 = 10;
+
 function getTendency(earlier, later) {
 	let difference = earlier - later;
 	
-	if(Math.abs(difference) < 10) return "S"; //STEADY
+	if(Math.abs(difference) < Pascal10) return "S"; //STEADY
 	if(difference > 0) return "F"; //FALLING
 	if(difference < 0) return "R"; //RISING
 }
