@@ -1,6 +1,7 @@
 const MINUTES = {
 	ONE_HOUR: 60,
-	THREE_HOURS: 60*3
+	THREE_HOURS: 60*3,
+	FORTYEIGHT_HOURS: 60*48
 }
 
 const KELVIN = 273.15;
@@ -16,9 +17,9 @@ function minutesFromNow(minutes) {
 	return new Date(now);
 }
 
-function adjustPressureToSeaLevel(pressure, height, temperature = 288.15) { //15C
-	temperature = temperature - 273.15;
-	let seaLevelPressure = pressure * Math.pow(1 - ((0.0065 * height) / (temperature + 0.0065 * height + 273.15)), -5.257);
+function adjustPressureToSeaLevel(pressure, height, temperature = toKelvinFromCelcius(15)) {
+	temperature = temperature - KELVIN;
+	let seaLevelPressure = pressure * Math.pow(1 - ((0.0065 * height) / (temperature + 0.0065 * height + KELVIN)), -5.257);
 	return Math.round(seaLevelPressure);
 }
 
@@ -43,11 +44,16 @@ function isSummer(isNorthernHemisphere = true) {
 	return isNorthernHemisphere ? summer : !summer;
 }
 
+function toKelvinFromCelcius(celcius) {
+	return celcius + 273.15;
+}
+
 module.exports = {
 	minutesFromNow,
 	getPressuresSince,
 	isSummer,
 	adjustPressureToSeaLevel,
+	toKelvinFromCelcius,
 	MINUTES,
 	KELVIN
 }
