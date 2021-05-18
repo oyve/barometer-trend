@@ -34,6 +34,6 @@
   },
   "homepage": "https://github.com/oyve/barometer-trend#readme",
   "devDependencies": {
-    "mocha": "^8.2.1"
+    "mocha": "^8.4.0"
   }
 }
