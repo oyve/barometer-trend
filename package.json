@@ -15,17 +15,17 @@
   },
   "keywords": [
     "barometer",
-    "weather",
-    "trend",
     "pressure",
-    "calculate",
     "trend",
     "tendency",
+    "history",
+    "calculate",
+    "weather",
     "front",
     "hemisphere",
     "prediction",
-    "weather",
-    "forecast"
+    "forecast",
+    "barometric"
   ],
   "author": "github.com/oyve",
   "license": "Apache-2.0",
