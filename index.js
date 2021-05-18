@@ -60,10 +60,10 @@ function getPressureCount() {
 }
 
 function removeOldPressures(threshold = null) {
-    if(threshold === null) {
+    if (threshold === null) {
         threshold = utils.minutesFromNow(-utils.MINUTES.FORTYEIGHT_HOURS);
     }
-    
+
     pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
 }
 
@@ -93,10 +93,10 @@ function getPredictions(isNorthernHemisphere = true) {
     let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.meta.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
     let forecast = {
-        pressureASL: lastPressure,
+        lastPressure: lastPressure,
+        history: pressureHistory,
         trend: pressureTrend,
         system: pressureSystem,
-        history: pressureHistory,
         predictions: {
             pressureOnly: predictionPressureOnly,
             quadrant: predictionPressureTendencyThresholdAndQuadrant,
