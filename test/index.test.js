@@ -83,8 +83,8 @@ describe("Function Tests - Trend chooser", function () {
         //arrange     
         barometer.clear();
         //THREE HOUR+: this should result in FALLING.STEADY
-        barometer.addPressure(utils.minutesFromNow(-190), 101500 + 80);
-        barometer.addPressure(utils.minutesFromNow(-185), 101500 + 75);
+        barometer.addPressure(utils.minutesFromNow(-49*60), 101500 + 80);
+        barometer.addPressure(utils.minutesFromNow(-48.5*60), 101500 + 75);
 
         //IF THE OLD READINGS WHERE INCLUDED THIS SHOULD RESULT IN FALLING.RAPIDLY - NOT FALLING.STEADY
         barometer.addPressure(utils.minutesFromNow(-20), 101500 - 1);

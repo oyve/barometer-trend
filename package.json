@@ -1,7 +1,7 @@
 {
   "name": "barometer-trend",
-  "version": "2.1.4",
-  "description": "Calculate the trend of a barometer",
+  "version": "2.2.0",
+  "description": "Calculate the tendency, trend and weather predictions of barometric pressure",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -15,17 +15,17 @@
   },
   "keywords": [
     "barometer",
-    "weather",
-    "trend",
     "pressure",
-    "calculate",
     "trend",
     "tendency",
+    "history",
+    "calculate",
+    "weather",
     "front",
     "hemisphere",
     "prediction",
-    "weather",
-    "forecast"
+    "forecast",
+    "barometric"
   ],
   "author": "github.com/oyve",
   "license": "Apache-2.0",
@@ -34,6 +34,6 @@
   },
   "homepage": "https://github.com/oyve/barometer-trend#readme",
   "devDependencies": {
-    "mocha": "^8.2.1"
+    "mocha": "^8.4.0"
   }
 }

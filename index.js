@@ -6,6 +6,8 @@ const byPressureTrendAndSeason = require('./predictions/byPressureTrendAndSeason
 const beaufort = require('./predictions/beaufort')
 const trend = require('./trend');
 const utils = require('./utils');
+const history = require('./predictions/history');
+const system = require('./predictions/system');
 
 let pressures = [];
 
@@ -29,23 +31,25 @@ function hasPressures() {
  * @param {number} trueWindDirection True wind direction in degrees
  */
 function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
-    if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
     if (altitude === null) altitude = 0;
-    if (temperature === null) temperature = 15 + utils.KELVIN;
+    if (temperature === null) temperature = utils.toKelvinFromCelcius(15);
+    if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
 
-    if (altitude > 0) {
-        pressure = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-    }
+    let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
 
     pressures.push({
         datetime: datetime,
-        value: pressure,
-        twd: trueWindDirection
+        value: pressureASL,
+        meta: {
+            value: pressure,
+            altitude: altitude,
+            temperature: temperature,
+            twd: trueWindDirection
+        }
     });
 
     removeOldPressures();
 }
-
 
 /**
  * Get the count of pressure entries. (Mainly for testing purposes)
@@ -55,14 +59,19 @@ function getPressureCount() {
     return pressures.length;
 }
 
-function removeOldPressures(threshold) {
-    var threshold = utils.minutesFromNow(-utils.MINUTES.THREE_HOURS);
+function removeOldPressures(threshold = null) {
+    if (threshold === null) {
+        threshold = utils.minutesFromNow(-utils.MINUTES.FORTYEIGHT_HOURS);
+    }
+
     pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
 }
 
 function getLastPressure() {
     return pressures[pressures.length - 1];
 }
+
+
 
 /**
  * Get the trend of the barometer
@@ -74,16 +83,20 @@ function getPredictions(isNorthernHemisphere = true) {
 
     let lastPressure = getLastPressure();
 
-    var pressureTrend = trend.getTrend(pressures);
+    let pressureTrend = trend.getTrend(pressures);
+    let pressureSystem = system.getSystemByPressure(lastPressure.value);
+    let pressureHistory = history.getHistoricPressures(pressures);
     let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
     let predictionFront = front.getFront(pressures);
     let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
     let predictionSeason = byPressureTrendAndSeason.getPrediction(lastPressure.value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere))
-    let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
+    let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.meta.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
     let forecast = {
+        lastPressure: lastPressure,
+        history: pressureHistory,
         trend: pressureTrend,
-        indicator: "Please update JSON, see latest documentation",
+        system: pressureSystem,
         predictions: {
             pressureOnly: predictionPressureOnly,
             quadrant: predictionPressureTendencyThresholdAndQuadrant,

@@ -1,16 +1,20 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Calculate the trend of a barometer over a three hour period.
+Calculate the tendency and trend of a barometer for a one to three hour period with barometric weather predictions.
 
 ## Features
-Gets the suggested:
-- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLNG|SLOWLY`)
-- Front system tendency, passage and wind analyze based on the latest three hours. (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
-- Force wind expectation in Beaufort scale based on the ratio of pressure increase/decrease (`F8-9`)
-- Prediction of weather by ratio of increase/decrease trend (`Expect gale force weather'`)
-- Prediction of weather by pressure tendency, threshold and wind direction (`Increasing rain, clearing within 12 hours.`)
-- Prediction of weather by pressure threshold for winter|summer (`Cloudy and humid, thunderstorms`)
+- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLNG|SLOWLY`)- 
+- Prediction of weather and systems:
+  - By pressure tendency only (`Expect gale force weather'`)
+  - By pressure tendency, thresholds and wind direction (`Increasing rain, clearing within 12 hours.`)
+  - By seasonal pressure thresholds for winter and summer (`Cloudy and humid, thunderstorms`)
+  - Front system tendency for the last three hours (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
+  - Force wind expectation in Beaufort scale based on the pressure tendency (`F8-9`)
+- Detects current pressure system `Low`, `Normal`, `High`
+
+Note
 - All calculations corrected to sea level pressure by optional `altitude` and `temperature`
+- 48 hour history
 
 ## Install & Use
 ```
@@ -22,27 +26,28 @@ const barometer = require('barometer-trend');
 
 barometer.addPressure(datetime1, 101500);
 barometer.addPressure(datetime2, 101505);
-barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction - enables more calculations (or give NULL for each seperately)
+barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction 
 
-let forecast = barometer.getPredictions();
+//barometer.addPressure(...) is more presice when pressure is corrected by altitude and temperature.
+
+let forecast = barometer.getPredictions(); //returns JSON
 ```
 
 ## Note
-- Pressure must be in Pascals, 1015 mBar/hPa = 101500 Pascal.
-- Pressure readings older than *three hours* are automatically removed.
+- Pressure must be input in Pascals, 1015 mBar/hPa = 101500 Pascal.
 - `getPredictions()` investigate the trend for the latest *one hour* and *three hours*
 - If run less than *one hour* or *three hours*, the latest timing up until now is picked.
-- The most recent trend with the highest severity is chosen.
+- The most recent trend with the highest severity is chosen (*One hour* or *Three hour* reading)
 
 ## Contribute
-Feel free to create a Pull Request including test code.
+Feel free to contribute; create an Issue, and Pull Request including test code.
 
 ## Disclaimer
 - All calculations is done by online research; the author of this library does not have a background in metereology. All sources listed below.
 - A barometer is only *one source of weather information* and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelittes exists and being a metereologist is a paid job.)
 - All calculations presumes being located at sea with no disturbances.
 - Near land, winds may be one-two Beaufort scale numbers lower and the wind might be coming from "the wrong direction".
-- In subtropic and tropical regions some of the calculations may not be valid at all; i.e. the tradewind system is different from northern hemishpere west->east low pressure systems.
+- In subtropic and tropical regions some of the calculations may not be valid at all; i.e. the trade winds (easterlies) is different from northern hemishpere west->east (westerlies) low pressure systems.
 - In trade wind zones observe the daily variations; any change to this pattern could possibly indicate gale weather.
 
 ## Sources / References
