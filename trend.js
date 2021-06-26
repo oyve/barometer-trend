@@ -1,9 +1,5 @@
 const utils = require('./utils');
 
-const TWENTY_MINUTES = 20;
-const ONE_HOUR = 60;
-const THREE_HOURS = 180;
-
 const TENDENCY = {
 	RISING: { key: 'RISING' },
 	FALLING: { key: 'FALLING' }
@@ -52,8 +48,8 @@ function calculate(pressures, from) {
 		return {
 			tendency: tendency.key,
 			trend: threshold.trend.key,
-			from: earlier.value,
-			to: later.value,
+			from: earlier,
+			to: later,
 			difference: difference,
 			ratio: Math.abs(ratio),
 			period: Math.abs(from),

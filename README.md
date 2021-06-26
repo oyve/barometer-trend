@@ -1,20 +1,21 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Calculate the tendency and trend of a barometer for a one to three hour period with barometric weather predictions.
+Calculate the tendency and trend of a barometer for a *one* to *three* hour period including barometric weather predictions.
 
 ## Features
-- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLNG|SLOWLY`)- 
+- Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLING|SLOWLY`)
 - Prediction of weather and systems:
-  - By pressure tendency only (`Expect gale force weather'`)
-  - By pressure tendency, thresholds and wind direction (`Increasing rain, clearing within 12 hours.`)
+  - By pressure trend only (`Expect gale force weather'`)
+  - By pressure trend, thresholds and wind direction (`Increasing rain, clearing within 12 hours.`)
   - By seasonal pressure thresholds for winter and summer (`Cloudy and humid, thunderstorms`)
   - Front system tendency for the last three hours (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
   - Force wind expectation in Beaufort scale based on the pressure tendency (`F8-9`)
 - Detects current pressure system `Low`, `Normal`, `High`
 
 Note
-- All calculations corrected to sea level pressure by optional `altitude` and `temperature`
-- 48 hour history
+- Picks the period with the highest severity (one hour or three hours)
+- All calculations corrected (internally) to sea level pressure by optional `altitude` and `temperature`
+- Up to 48 hour history
 
 ## Install & Use
 ```
@@ -28,7 +29,7 @@ barometer.addPressure(datetime1, 101500);
 barometer.addPressure(datetime2, 101505);
 barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 = altitude, 20 = C degrees, 225 = wind direction 
 
-//barometer.addPressure(...) is more presice when pressure is corrected by altitude and temperature.
+//barometer.addPressure(...) is more precise when pressure is corrected by altitude and temperature.
 
 let forecast = barometer.getPredictions(); //returns JSON
 ```

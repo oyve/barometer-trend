@@ -12,7 +12,7 @@ const KELVIN = 273.15;
  * @returns {Date} Date with given minute difference
  */
 function minutesFromNow(minutes) {
-	var now = new Date();
+	let now = new Date();
 	now.setMinutes(now.getMinutes() + minutes);
 	return new Date(now);
 }
@@ -63,6 +63,32 @@ function getPressureClosestTo(pressures, datetime) {
 	return (diffNext < diffPrevious) ? next : previous;
 }
 
+/**
+ * 
+ * @param {Array<Object>} pressures Array of pressures
+ * @param {Date} startTime Period start
+ * @param {Date} endTime Period end
+ * @returns Subset of pressures of the given period
+ */
+function getPressuresByPeriod(pressures, startTime, endTime)
+{
+	return pressures.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
+}
+
+/**
+ * 
+ * @param {Array<Object>} pressures Array of pressures
+ * @returns Average pressure value
+ */
+function getPressureAverage(pressures) {
+	let sum = 0;
+	pressures.forEach((p) => {
+		sum += p.value;
+	});
+
+	return sum / pressures.length;
+}
+
 function isSummer(isNorthernHemisphere = true) {
     let month = new Date().getMonth() + 1;
 	let summer = month >= 4 && month <= 9; //April to September
@@ -86,6 +112,8 @@ module.exports = {
 	adjustPressureToSeaLevel,
 	toKelvinFromCelcius,
 	getPressureClosestTo,
+	getPressuresByPeriod,
+	getPressureAverage,
 	MINUTES,
 	KELVIN
 }

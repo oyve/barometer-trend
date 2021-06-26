@@ -6,7 +6,8 @@ describe("Utils Tests", function () {
 
 		it("it should equal", function () {
 			//arrange
-			const expected = new Date().getHours() - 3;
+			const now = new Date();
+			const expected = now.getHours() < 3 ? now.getHours() + 24 - 3 : now.getHours() - 3; //avoid midnight 00 to 02 problem
 			//act
 			var actual = utils.minutesFromNow(-180).getHours();
 			//assert
@@ -100,6 +101,25 @@ describe("Utils Tests", function () {
 			var actual = utils.getPressureClosestTo(pressures, utils.minutesFromNow(-60*2));
 			//assert
 			assert.strictEqual(actual.value, expected);
+		});
+	});
+
+	describe("getPressureAverageByTime Test", function () {
+
+		it("it should average", function () {
+			//arrange
+			const expected = 101950;
+			const pressures = [
+				{ datetime: utils.minutesFromNow(-59), value: 101800 },
+				{ datetime: utils.minutesFromNow(-30), value: 101900 },
+				{ datetime: utils.minutesFromNow(-10), value: 102000 },
+				{ datetime: utils.minutesFromNow(-1), value: 102100 }
+			];
+			let subset = utils.getPressuresByPeriod(pressures, utils.minutesFromNow(-60), new Date());
+			//act
+			var actual = utils.getPressureAverage(subset);
+			//assert
+			assert.strictEqual(actual, expected);
 		});
 	});
 });
