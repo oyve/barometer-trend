@@ -1,5 +1,5 @@
 const assert = require('assert');
-const prough = require('../trend');
+const trend = require('../trend');
 const utils = require('../utils');
 
 describe("Prediction Rough Tests", function () {
@@ -12,7 +12,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 5 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "STEADY");
@@ -25,7 +25,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 11 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "SLOWLY");
@@ -38,7 +38,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 110 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "SLOWLY");
@@ -51,7 +51,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 170 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "CHANGING");
@@ -64,7 +64,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 360 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "QUICKLY");
@@ -77,7 +77,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 600 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "RAPIDLY");
@@ -90,7 +90,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 9 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "STEADY");
@@ -103,7 +103,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 110 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "SLOWLY");
@@ -116,7 +116,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 180 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "CHANGING");
@@ -129,7 +129,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 360 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "QUICKLY");
@@ -142,7 +142,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 - 700 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "FALLING");
 			assert.strictEqual(actual.trend, "RAPIDLY");
@@ -158,7 +158,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 100 },
 			];
 			//actr
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "SLOWLY");
@@ -172,7 +172,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 170 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "CHANGING");
@@ -186,7 +186,7 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 300 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "QUICKLY");
@@ -200,27 +200,10 @@ describe("Prediction Rough Tests", function () {
 				{ datetime: utils.minutesFromNow(-1), value: 101350 + 700 },
 			];
 			//act
-			var actual = prough.getTrend(pressures);
+			var actual = trend.getTrend(pressures);
 			//assert
 			assert.strictEqual(actual.tendency, "RISING");
 			assert.strictEqual(actual.trend, "RAPIDLY");
 		});
 	});
-
-	// describe("Twenty minute predictions", function () {
-	// 	it("it should RISING.QUICKLY", function () {
-	// 		//arrange
-	// 		let pressures = [
-	// 			{ datetime: utils.minutesFromNow(-170), value: 101350 },
-	// 			{ datetime: utils.minutesFromNow(-55), value: 101350 + 50 },
-	// 			{ datetime: utils.minutesFromNow(-15), value: 101350 + 100 },
-	// 			{ datetime: utils.minutesFromNow(-1), value: 101350 + 150 },
-	// 		];
-	// 		//act
-	// 		var actual = prough.getTrend(pressures);
-	// 		//assert
-	// 		assert.strictEqual(actual.tendency, "RISING");
-	// 		assert.strictEqual(actual.trend, "QUICKLY");
-	// 	});
-	// });
 });
