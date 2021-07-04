@@ -5,7 +5,7 @@ describe("By Pressure Trend And Seasons Tests", function () {
     describe("Pressure lower than 98205.3", function () {
         it("it should equal a RISING.RAPIDLY - winter", function () {
 			//arrange
-			const expected = "Fair for 48 hours, lower temperatures.";
+			const expected = "Fair for 48 hours, lower temperatures";
             //act
             var actual = byPressureTrendAndSeason.getPrediction(97000, "RISING", "RAPIDLY", false);
             //assert
