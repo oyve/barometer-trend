@@ -29,6 +29,7 @@ function analyzePressures(hourThreePressures, hourTwoPressures, hourOnePressures
 	if(!(t1 && t2 && t3)) return frontNull;
 
 	let key = t1.concat(t2, t3);
+	console.debug("Front pattern: " + key);
 	let front = fronts.find((f) => f.key === key);
 	return front !== undefined ? front : frontNull;
 }
