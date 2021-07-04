@@ -8,5 +8,5 @@
 	{ "key": "FRR", "tendency": "Falling before a greater rise", "prognose": "Cold front passage", "wind": "Veered, gusty, easing" },
 	{ "key": "RRF", "tendency": "Rising before a lesser fall", "prognose": "Warm front approaching", "wind": "Backs, starts increasing" },
 	{ "key": "SSS", "tendency": "Steady", "prognose": "Stationary system or warm sector", "wind": "Stationary" },
-	{ "key": "N/A", "tendency": "N/A", "prognose": "N/A", "wind": "N/A" }
+	{ "key": null, "tendency": null, "prognose": null, "wind": null }
 ]
