@@ -71,7 +71,13 @@ function getLastPressure() {
     return pressures[pressures.length - 1];
 }
 
-
+/**
+ * 
+ * @returns All pressure objects in memory
+ */
+function getAll() {
+    return pressures;
+}
 
 /**
  * Get the trend of the barometer
@@ -114,5 +120,6 @@ module.exports = {
     addPressure,
     getPressureCount,
     getPredictions,
-    hasPressures
+    hasPressures,
+    getAll
 }

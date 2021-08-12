@@ -4,6 +4,24 @@ const barometer = require('../index');
 const utils = require('../utils');
 
 describe("Unit Tests", function () {
+    describe("Get all", function () {
+        it("it should get all", function () {
+        //arrange     
+        barometer.clear();
+        barometer.addPressure(utils.minutesFromNow(-170), 101500);
+        barometer.addPressure(utils.minutesFromNow(-160), 101500 + 5);
+        barometer.addPressure(utils.minutesFromNow(-50), 101500 + 6);
+        barometer.addPressure(utils.minutesFromNow(-40), 101500 + 7);
+
+        //act
+        var actual = barometer.getAll();
+
+        //assert
+        assert.strictEqual(actual.length, 4);
+        assert.strictEqual(actual[0].value, 101500);
+        assert.strictEqual(actual[3].value, 101507);
+        });
+    });
     describe("Add pressure", function () {
         it("it should not throw exceptions", function () {
             //arrange
