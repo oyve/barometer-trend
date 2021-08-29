@@ -10,7 +10,7 @@ describe("Prediction System Tests", function () {
 			var actual = system.getSystemByPressure(101500);
 			//assert
 			assert.strictEqual(actual.key, 1);
-			assert.strictEqual(actual.name, "Normal");
+			assert.strictEqual(actual.name, "Between Low and High");
 		});
 
 		it("it should be LOW", function () {
