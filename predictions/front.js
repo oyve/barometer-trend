@@ -3,6 +3,9 @@ const utils = require('../utils');
 const regression = require('regression');
 
 const Pascal10 = 10;
+const ONE_HOUR = 60;
+const TWO_HOURS = 120;
+const THREE_HOURS = 180;
 
 /**
  * 
@@ -22,9 +25,9 @@ function analyzePressures(hourThreePressures, hourTwoPressures, hourOnePressures
 
 	if (!(hourThreePressures && hourTwoPressures && hourOnePressures)) return frontNull;
 
-	let t1 = getTendency(hourThreePressures, 180);
-	let t2 = getTendency(hourTwoPressures, 120);
-	let t3 = getTendency(hourOnePressures, 60);
+	let t1 = getTendency(hourThreePressures, THREE_HOURS);
+	let t2 = getTendency(hourTwoPressures, TWO_HOURS);
+	let t3 = getTendency(hourOnePressures, ONE_HOUR);
 
 	if(!(t1 && t2 && t3)) return frontNull;
 
@@ -41,7 +44,7 @@ function regressPressures(pressures) {
 	 
 	pressures.forEach((p) => {
 		let diff = now - p.datetime;
-		let min = Math.round((diff/1000)/60);
+		let min = Math.round((diff/1000)/ONE_HOUR);
 		minutelyPressures.push([min, p.value]);
 	});
 
@@ -52,7 +55,7 @@ function regressPressures(pressures) {
 function getTendency(pressures, start) {
 	let regression = regressPressures(pressures);
 
-	let difference = regression.predict(start)[1] - regression.predict(start + 60)[1];
+	let difference = regression.predict(start)[1] - regression.predict(start + ONE_HOUR)[1];
 	if (Math.abs(difference) < Pascal10) return "S"; //STEADY
 	if (difference > 0) return "R"; //RISING
 	if (difference < 0) return "F"; //FALLING
