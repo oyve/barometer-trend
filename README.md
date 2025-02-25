@@ -1,6 +1,6 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Calculate the tendency and trend of a barometer for a *one* to *three* hour period including barometric weather predictions.
+Analyzes and calculates the tendency and trend of barometer readings over a *one* or *three* hour period including barometric weather predictions.
 
 ## Features
 - Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLING|SLOWLY`)
@@ -36,7 +36,7 @@ let forecast = barometer.getPredictions(); //returns JSON
 
 ## Note
 - Pressure must be input in Pascals, 1015 mBar/hPa = 101500 Pascal.
-- `getPredictions()` investigate the trend for the latest *one hour* and *three hours*
+- `getPredictions()` analyze the trend for the latest *one hour* and *three hours*. The one with the highest severity is returned.
 - If run less than *one hour* or *three hours*, the latest timing up until now is picked.
 - The most recent trend with the highest severity is chosen (*One hour* or *Three hour* reading)
 
