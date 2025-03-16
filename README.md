@@ -11,12 +11,10 @@ Analyze and calculate tendency, trend and weather predictions of barometer readi
   - Front system tendency last three hours (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
   - Force wind expectation in Beaufort scale based on the pressure tendency (`F8-9`)
 - Detects current pressure system `Low`, `Normal`, `High`
+- (Optional) Additional data for increased precision: `Altitude`, `temperature`, `wind direction`
+- (Optional) Diurnal pressure correction (pressure correction based on location and time of year)
 
-### Optional features
-- Additional parameters for more precise calculations: `Altitude`, `temperature`, `wind direction`
-- Diurnal pressure correction (rudimentary pressure correction based on given `latitude` and time of year)
-
-## Install & Use
+## Install
 ```
 npm i barometer-trend
 ```
@@ -37,21 +35,23 @@ barometer.addPressure(datetime3, 101512, 100, null, null); //only altitude, temp
 let forecast = barometer.getPredictions();
 ```
 
-> [!IMPORTANT]
-> Diurnal pressure Correction
+> [!NOTE]
+> #### Diurnal pressure Correction
+
 Diurnal pressure correction is an adjustment to atmospheric pressure readings that accounts for natural daily fluctuations caused by temperature changes. As the sun heats the air during the day, pressure tends to drop, while cooler nighttime temperatures cause it to rise. These variations can be estimated generically based on latitude and time of year, with peak pressure typically occurring in the early morning and late evening, though this timing varies by region, geography and weather patterns. This makes precise corrections difficult without historical data for a specific location.
 
 Enabling this setting apply pressure correction using a generic approximation. Note: You will also need to set `latitude`. If your stations is moving (i.e. sailboat), you must update the latitude periodically, preferably as often as you update pressure readings.
 
----
+```
 //Enabling diurnal pressure corrections (before adding pressure readings)
 barometer.setDiurnalEnabled(true);
 barometer.setLatitude(45.123); //once for stationary stations or periodically for moving stations
 barometer.addPressure(...as above....);
----
+```
 
 > [!NOTE]
 > General information
+
 - Pressure is input in Pascals (1015 mBar/hPa = 101500 Pascal).
 - Software returns the period with the highest severity (one hour or three hours).
 - Calculations are internally corrected to sea level pressure by optional `altitude` and `temperature`.
