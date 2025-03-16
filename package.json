@@ -1,7 +1,7 @@
 {
   "name": "barometer-trend",
-  "version": "2.2.7",
-  "description": "Calculate the tendency, trend and weather predictions of barometric pressure",
+  "version": "2.2.8",
+  "description": "Analyse and calculate tendency, trend and weather predictions of barometric pressure",
   "main": "index.js",
   "directories": {
     "test": "test"
