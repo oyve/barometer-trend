@@ -173,4 +173,52 @@ describe("Utils Tests", function () {
 			assert.strictEqual(actual, expected);
 		});
 	});
+
+	describe("IsValidLatitude Tests", function () {
+		it("it should not be less than 90", function () {
+			//arrange
+			let latitude = -90.01
+			let expected = false;
+			//act
+			var actual = utils.isValidLatitude(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should not be more than 90", function () {
+			//arrange
+			let latitude = 90.01
+			let expected = false;
+			//act
+			var actual = utils.isValidLatitude(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be true", function () {
+			//arrange
+			let latitude = 45.123
+			let expected = true;
+			//act
+			var actual = utils.isValidLatitude(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be not be NaN", function () {
+			//arrange
+			let latitude = NaN
+			let expected = false;
+			//act
+			var actual = utils.isValidLatitude(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be not be null", function () {
+			//arrange
+			let latitude = null
+			let expected = false;
+			//act
+			var actual = utils.isValidLatitude(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+	});
 });

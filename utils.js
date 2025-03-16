@@ -120,10 +120,19 @@ function getDayOfYear(date) {
 /**
  * 
  * @param {datetime} date Datetime
- * @returns {number} 24-hour format hour
+ * @returns {number} 24-hour format hour of date
  */
 function get24HourFormat(date) {
     return date.getHours();
+}
+
+/**
+ * 
+ * @param {number} latitude Latitude in decimal form, i.e. 63.123
+ * @returns {boolean} true or false
+ */
+function isValidLatitude(latitude) {
+    return Number.isFinite(latitude) && latitude >= -90 && latitude <= 90;
 }
 
 module.exports = {
@@ -137,6 +146,7 @@ module.exports = {
 	getPressureAverage,
 	getDayOfYear,
 	get24HourFormat,
+	isValidLatitude,
 	MINUTES,
 	KELVIN
 }
