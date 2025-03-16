@@ -24,12 +24,15 @@ npm i barometer-trend
 const barometer = require('barometer-trend');
 
 //Basic use
-barometer.addPressure(datetime1, 101500);
-barometer.addPressure(datetime2, 101505);
+barometer.addPressure(datetime1, pressure = 101500); //(1015 mBar/hPa = 101500 Pascal)
+barometer.addPressure(datetime2, pressure = 101505);
+...
 
-//Including any of altitude, temperature and wind direction, otherwise null, for more precise calculations
-barometer.addPressure(datetime3, 101512, 100, 20, 225); //100 altitude, 20 °C degrees, 225° wind direction
-barometer.addPressure(datetime3, 101512, 100, null, null); //only altitude, temperature defaults
+//For additional, more precise calculations, include any of Altitude (meters), Temperature (Celcius) and Wind direction (Degrees)
+barometer.addPressure(datetime3, pressure = 101500, altitude = 100, temperature = 20, windDirection = 225);
+
+ //With only Altitude. Temperature defaults. Wind direction data is not generated in result.
+barometer.addPressure(datetime3, pressure = 101512, altitude = 100, temperature = null, windDirection = null);
 
  //get forecast as JSON
 let forecast = barometer.getPredictions();
@@ -52,7 +55,6 @@ barometer.addPressure(...as above....);
 > [!NOTE]
 > General information
 
-- Pressure is input in Pascals (1015 mBar/hPa = 101500 Pascal).
 - Software returns the period with the highest severity (one hour or three hours).
 - Calculations are internally corrected to sea level pressure by optional `altitude` and `temperature`.
   - Altitude defaults to 0 meter ASL if not set.
@@ -64,8 +66,10 @@ barometer.addPressure(...as above....);
 Feel free to contribute; create an Issue, and Pull Request including test code.
 
 ## Disclaimer
+> [!CAUTION]
+> A barometer is one source of weather information and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelittes exists and being a metereologist is a paid job.)
+
 - All calculations is by online research. Author of this library does not have a background in metereology. Sources listed below.
-- A barometer is *one source of weather information* and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelittes exists and being a metereologist is a paid job.)
 - All calculations assumes being located at sea with no disturbances (i.e. mountains may give different readings)
 - Near land, winds may be one-two Beaufort scale numbers lower and the wind may be from "the wrong direction".
 - In subtropic and tropical regions some calculations may not be valid at all. I.e. the trade winds (easterlies) is different from northern hemishpere west->east (westerlies) low pressure systems.
