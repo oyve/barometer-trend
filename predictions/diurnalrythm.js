@@ -62,7 +62,7 @@ function getWeatherAnomaly(weatherSystem, lat) {
     return anomaly;
 }
 
-function correctPressure(pressureObserved, latitude, date, weatherSystem) {
+function correctPressure(pressureObserved, latitude, date) {
     const time = utils.get24HourFormat(date);
     const dayOfYear = utils.getDayOfYear(date);
     
@@ -75,6 +75,7 @@ function correctPressure(pressureObserved, latitude, date, weatherSystem) {
     const amplitude = baseAmplitude * seasonalFactor;
 
     // Get weather system anomaly (high- or low-pressure system)
+    let weatherSystem = 'low'
     const weatherAnomaly = getWeatherAnomaly(weatherSystem, latitude);
 
     // Calculate pressure correction for each peak time

@@ -11,6 +11,8 @@ const system = require('./predictions/system');
 const diurnalrythm = require('./predictions/diurnalrythm');
 
 let pressures = [];
+let isDiurnalEnabled = false;
+let latitude = -1;
 
 /**
  * Clear the pressure readings. (Mainly for testing purposes)
@@ -35,23 +37,24 @@ function hasPressures() {
  * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
  * @param {number} trueWindDirection True wind direction in degrees
  */
-function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null, latitude = null, diurnal = false) {
-if (altitude === null) altitude = 0;
+function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
+    if (altitude === null) altitude = 0;
     if (temperature === null) temperature = utils.toKelvinFromCelcius(15);
     if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
 
     let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-    let pressureCorrected = diurnal ? diurnalrythm.correctPressure(pressureASL, latitude, datetime, 'low') : pressureASL;
+    let diurnalPressure = latitude !== -1 ? diurnalrythm.correctPressure(pressureASL, latitude, datetime) : null;
 
     pressures.push({
         datetime: datetime,
-        value: pressureCorrected,
+        value: pressureASL,
         meta: {
             value: pressure,
             altitude: altitude,
             temperature: temperature,
             twd: trueWindDirection,
-            latitude: latitude
+            latitude: latitude,
+            diurnalPressure: diurnalPressure
         }
     });
 
@@ -91,6 +94,45 @@ function getAll() {
 }
 
 /**
+ * Get all pressure readings.
+ * @returns {Array<Object>} All pressure readings.
+ */
+function setIsDiurnalEnabled(isEnabled = false) {
+    return isDiurnalEnabled = isEnabled;
+}
+
+/**
+ * Get if diurnal pressure correction is enabled.
+ * @returns {boolean} true or false
+ */
+function getIsDiurnalEnabled() {
+    return isDiurnalEnabled;
+}
+
+/**
+ * Get latest latitude
+ * @returns {number} Returns latitude, -1 if not set
+ */
+function getLatitude()
+{
+    return this.latitude;
+}
+
+/**
+ * Set latitude
+ * @returns {boolean} true or false if set
+ */
+function setLatitude(latitude) {
+    if(utils.isValidLatitude(latitude)) {
+        this.latitude = latitude;
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
  * Get the trend of the barometer.
  * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
  * @returns {Object}
@@ -100,7 +142,7 @@ function getPredictions(isNorthernHemisphere = true) {
 
     let lastPressure = getLastPressure();
 
-    let pressureTrend = trend.getTrend(pressures);
+    let pressureTrend = trend.getTrend(pressures, getIsDiurnalEnabled());
     let pressureSystem = system.getSystemByPressure(lastPressure.value);
     let pressureHistory = history.getHistoricPressures(pressures);
     let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
@@ -132,5 +174,7 @@ module.exports = {
     getPressureCount,
     getPredictions,
     hasPressures,
-    getAll
+    getAll,
+    setIsDiurnalEnabled,
+    getIsDiurnalEnabled
 };

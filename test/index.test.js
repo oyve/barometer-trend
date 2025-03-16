@@ -56,6 +56,35 @@ describe("Unit Tests", function () {
             assert.strictEqual(actual, expected)
         });
     });
+    describe("Diurnal", function () {
+        it("it should be default false", function () {
+        //arrange     
+        const expected = false;
+        //act
+        var actual = barometer.getIsDiurnalEnabled();
+        //assert
+        assert.strictEqual(actual, expected);
+        });
+        it("it should be set to true", function () {
+        //arrange     
+        const expected = true;
+        barometer.setIsDiurnalEnabled(true);
+        //act
+        var actual = barometer.getIsDiurnalEnabled();
+        //assert
+        assert.strictEqual(actual, expected);
+        });
+        it("it should be set to false", function () {
+        //arrange     
+        const expected = false;
+        barometer.setIsDiurnalEnabled(true);
+        barometer.setIsDiurnalEnabled(false);
+        //act
+        var actual = barometer.getIsDiurnalEnabled();
+        //assert
+        assert.strictEqual(actual, expected);
+        });
+    });
 });
 
 describe("Function Tests - Trend chooser", function () {
