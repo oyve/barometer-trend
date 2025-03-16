@@ -105,6 +105,27 @@ function toKelvinFromCelcius(celcius) {
 	return celcius + 273.15;
 }
 
+/**
+ * 
+ * @param {number} date Datetime
+ * @returns {number} Day number of year
+ */
+function getDayOfYear(date) {
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = date - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+}
+
+/**
+ * 
+ * @param {datetime} date Datetime
+ * @returns {number} 24-hour format hour
+ */
+function get24HourFormat(date) {
+    return date.getHours();
+}
+
 module.exports = {
 	minutesFromNow,
 	getPressuresSince,
@@ -114,6 +135,8 @@ module.exports = {
 	getPressureClosestTo,
 	getPressuresByPeriod,
 	getPressureAverage,
+	getDayOfYear,
+	get24HourFormat,
 	MINUTES,
 	KELVIN
 }

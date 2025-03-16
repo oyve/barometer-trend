@@ -122,4 +122,55 @@ describe("Utils Tests", function () {
 			assert.strictEqual(actual, expected);
 		});
 	});
+
+	describe("dayOfYear Tests", function () {
+		it("it should equal 2025", function () {
+			//arrange
+			let date = new Date("2025-03-16");
+			const expected = 75;
+			//act
+			var actual = utils.getDayOfYear(date);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should equal 2024", function () {
+			//arrange
+			let date = new Date("2024-03-16");
+			const expected = 76;
+			//act
+			var actual = utils.getDayOfYear(date);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+	});
+
+	describe("24 Hour Format Tests", function () {
+		it("it should equal half hour", function () {
+			//arrange
+			let time = new Date("2025-03-16T14:30:00");
+			const expected = 14;
+			//act
+			var actual = utils.get24HourFormat(time);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should equal late hour", function () {
+			//arrange
+			let time = new Date("2025-03-16T14:01:00");
+			const expected = 14;
+			//act
+			var actual = utils.get24HourFormat(time);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should equal early hour", function () {
+			//arrange
+			let time = new Date("2025-03-16T14:59:00");
+			const expected = 14;
+			//act
+			var actual = utils.get24HourFormat(time);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+	});
 });
