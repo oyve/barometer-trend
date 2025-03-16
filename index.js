@@ -8,6 +8,7 @@ const trend = require('./trend');
 const utils = require('./utils');
 const history = require('./predictions/history');
 const system = require('./predictions/system');
+const diurnalrythm = require('./predictions/diurnalrythm');
 
 let pressures = [];
 
@@ -34,21 +35,23 @@ function hasPressures() {
  * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
  * @param {number} trueWindDirection True wind direction in degrees
  */
-function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
+function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null, latitude = null, diurnal = false) {
 if (altitude === null) altitude = 0;
     if (temperature === null) temperature = utils.toKelvinFromCelcius(15);
     if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
 
     let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
+    let pressureCorrected = diurnal ? diurnalrythm.correctPressure(pressureASL, latitude, datetime, 'low') : pressureASL;
 
     pressures.push({
         datetime: datetime,
-        value: pressureASL,
+        value: pressureCorrected,
         meta: {
             value: pressure,
             altitude: altitude,
             temperature: temperature,
-            twd: trueWindDirection
+            twd: trueWindDirection,
+            latitude: latitude
         }
     });
 
