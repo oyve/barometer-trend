@@ -135,6 +135,11 @@ function isValidLatitude(latitude) {
     return Number.isFinite(latitude) && latitude >= -90 && latitude <= 90;
 }
 
+function isNorthernHemisphere(latitude) {
+	if(latitude === null) return true;
+    return latitude > 0 ? true : false;
+}
+
 module.exports = {
 	minutesFromNow,
 	getPressuresSince,
@@ -147,6 +152,7 @@ module.exports = {
 	getDayOfYear,
 	get24HourFormat,
 	isValidLatitude,
+	isNorthernHemisphere,
 	MINUTES,
 	KELVIN
 }

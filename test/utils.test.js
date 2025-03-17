@@ -221,4 +221,34 @@ describe("Utils Tests", function () {
 			assert.strictEqual(actual, expected);
 		});
 	});
+
+	describe("Is Northern Hemisphere Tests", function () {
+		it("it should be northern", function () {
+			//arrange
+			let latitude = 1.123
+			let expected = true;
+			//act
+			var actual = utils.isNorthernHemisphere(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should not be northern", function () {
+			//arrange
+			let latitude = -1.123
+			let expected = false;
+			//act
+			var actual = utils.isNorthernHemisphere(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should not be default nortern", function () {
+			//arrange
+			let latitude = null;
+			let expected = true;
+			//act
+			var actual = utils.isNorthernHemisphere(latitude);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+	});
 });
