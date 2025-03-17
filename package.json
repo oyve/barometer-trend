@@ -20,12 +20,14 @@
     "tendency",
     "history",
     "calculate",
+    "analyze",
     "weather",
     "front",
     "hemisphere",
     "prediction",
     "forecast",
-    "barometric"
+    "barometric",
+    "diurnal"
   ],
   "author": "github.com/oyve",
   "license": "Apache-2.0",
