@@ -26,7 +26,6 @@ const barometer = require('barometer-trend');
 //Basic use
 barometer.addPressure(datetime1, pressure = 101500); //(1015 mBar/hPa = 101500 Pascal)
 barometer.addPressure(datetime2, pressure = 101505);
-...
 
 //For additional, more precise calculations, include any of Altitude (meters), Temperature (Celcius) and Wind direction (Degrees)
 barometer.addPressure(datetime3, pressure = 101500, altitude = 100, temperature = 20, windDirection = 225);
