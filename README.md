@@ -1,6 +1,6 @@
 ![Node.js CI](https://github.com/oyve/barometer-trend/workflows/Node.js%20CI/badge.svg)
 # barometer-trend
-Analyze and calculate tendency, trend and weather predictions of barometer readings, over a *one* or *three* hour period.
+Analyze and calculate tendency, trend and weather predictions of barometer readings, for a *one* or *three* hour period.
 
 ## Features
 - Tendency and trend of the barometer for the *last hour* or *three hours* (`FALLING|SLOWLY`)
@@ -11,7 +11,7 @@ Analyze and calculate tendency, trend and weather predictions of barometer readi
   - Front system tendency last three hours (`Falling before a lesser rise` | `Cold front passage` | `Strong and gusty, then veers`)
   - Force wind expectation in Beaufort scale based on the pressure tendency (`F8-9`)
 - Detects current pressure system `Low`, `Normal`, `High`
-- (Optional) Additional data for increased precision: `Altitude`, `temperature`, `wind direction`
+- (Optional) Additional data for increased precision: `Altitude`, `Temperature`, `Wind direction`
 - (Optional) Diurnal pressure correction (pressure correction based on location and time of year)
 
 ## Install
@@ -31,43 +31,50 @@ barometer.addPressure(datetime2, pressure = 101505);
 //For additional, more precise calculations, include any of Altitude (meters), Temperature (Celcius) and Wind direction (Degrees)
 barometer.addPressure(datetime3, pressure = 101500, altitude = 100, temperature = 20, windDirection = 225);
 
- //With only Altitude. Temperature defaults. Wind direction data is not generated in result.
+ //With only Altitude, Temperature defaults. Wind direction data is not generated in result.
 barometer.addPressure(datetime3, pressure = 101512, altitude = 100, temperature = null, windDirection = null);
 
- //get forecast as JSON
+ //Get forecast as JSON
+
+ //Automatically determines northern|southern hemisphere if latitude is set, otherwise default to northern
+barometer.setLatitude(45.123);
 let forecast = barometer.getPredictions();
+
+//or use
+let forecast = barometer.getPredictions(northernHemisphere = true|false);
 ```
 
+### Diurnal Pressure Correction
+Diurnal pressure correction is an adjustment to atmospheric pressure that accounts for natural daily fluctuations caused by temperature changes. These variations can be roughly estimated based on latitude and time of year, with peak pressure typically occurring in the early morning and late evening, though this timing varies by region, geography and weather patterns. This makes precise corrections difficult without historical data for a specific location.
+
 > [!NOTE]
-> #### Diurnal pressure Correction
-
-Diurnal pressure correction is an adjustment to atmospheric pressure readings that accounts for natural daily fluctuations caused by temperature changes. As the sun heats the air during the day, pressure tends to drop, while cooler nighttime temperatures cause it to rise. These variations can be estimated generically based on latitude and time of year, with peak pressure typically occurring in the early morning and late evening, though this timing varies by region, geography and weather patterns. This makes precise corrections difficult without historical data for a specific location.
-
-Enabling this setting apply pressure correction using a generic approximation. Note: You will also need to set `latitude`. If your stations is moving (i.e. sailboat), you must update the latitude periodically, preferably as often as you update pressure readings.
+> By enabling this setting, pressure readings will be corrected using a generic approximation based on your latitude and time of year. You will need to set `latitude`. If your stations is moving (i.e. sailboat), you must update the latitude periodically (preferably as often as you update pressure readings). [Read more at Wikipedia](https://en.wikipedia.org/wiki/Diurnal_cycle).
 
 ```
 //Enabling diurnal pressure corrections (before adding pressure readings)
 barometer.setDiurnalEnabled(true);
-barometer.setLatitude(45.123); //once for stationary stations or periodically for moving stations
+barometer.setLatitude(45.123); //once for stationary stations, or periodically for moving stations
+
+barometer.addPressure(...as above....);
 barometer.addPressure(...as above....);
 ```
 
-> [!NOTE]
-> General information
-
+### Additional information
 - Software returns the period with the highest severity (one hour or three hours).
-- Calculations are internally corrected to sea level pressure by optional `altitude` and `temperature`.
+- Calculations are internally corrected to sea level pressure by optional `Altitude` and `Temperature`.
   - Altitude defaults to 0 meter ASL if not set.
   - Temperature defaults to 15°C degrees (global mean temperature) if not set.
-- Up to `48-hour` in-memory history in case of software restart.
-- If run less than *one hour* or *three hours*, the period until now is picked (might not be stabile)
+- `48-hour` in-memory history.
+
+> [!NOTE]
+> If run less than *one hour* or *three hours*, the period until now is picked (might not be stabile)
 
 ## Contribute
-Feel free to contribute; create an Issue, and Pull Request including test code.
+Feel free to contribute, create an Issue, or Pull Request including test code.
 
 ## Disclaimer
 > [!CAUTION]
-> A barometer is one source of weather information and may give a general trend and indication, but not "see" the overall picture. (There's a reason satelittes exists and being a metereologist is a paid job.)
+> A barometer is one source of weather information and may give a general trend and indication, but not "see" the overall picture (why satelittes exists and metereology is a job).
 
 - All calculations is by online research. Author of this library does not have a background in metereology. Sources listed below.
 - All calculations assumes being located at sea with no disturbances (i.e. mountains may give different readings)
@@ -75,7 +82,7 @@ Feel free to contribute; create an Issue, and Pull Request including test code.
 - In subtropic and tropical regions some calculations may not be valid at all. I.e. the trade winds (easterlies) is different from northern hemishpere west->east (westerlies) low pressure systems.
 - In trade wind zones observe the daily variations; changes to this pattern could possibly indicate gale weather.
 
-## Sources / References
+## Credits
 - [How to use a barometer when sailing](https://www.jollyparrot.co.uk/blog/how-to-use-barometer-when-sailing)
 - [UK Met Office Marine Forecast Glossary](https://www.metoffice.gov.uk/weather/guides/coast-and-sea/glossary)
 - [Hughes38.com](http://www.hughes38.com/wp-content/uploads/2016/02/Barometer-Wind-and-Temperature-WX.pdf)
