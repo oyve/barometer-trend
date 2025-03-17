@@ -8,11 +8,11 @@ const trend = require('./trend');
 const utils = require('./utils');
 const history = require('./predictions/history');
 const system = require('./predictions/system');
-const diurnalrythm = require('./predictions/diurnalrythm');
+const diurnalrythm = require('./predictions/diurnalRythm');
 
 let pressures = [];
 let isDiurnalEnabled = false;
-let latitude = -1;
+let latitude = null;
 
 /**
  * Clear the pressure readings. (Mainly for testing purposes)
@@ -43,7 +43,7 @@ function addPressure(datetime, pressure, altitude = null, temperature = null, tr
     if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
 
     let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-    let diurnalPressure = latitude !== -1 ? diurnalrythm.correctPressure(pressureASL, latitude, datetime) : null;
+    let diurnalPressure = latitude !== null ? diurnalrythm.correctPressure(pressureASL, latitude, datetime) : null;
 
     pressures.push({
         datetime: datetime,
@@ -110,8 +110,8 @@ function getIsDiurnalEnabled() {
 }
 
 /**
- * Get latest latitude
- * @returns {number} Returns latitude, -1 if not set
+ * Get latitude
+ * @returns {number} Returns latitude, null if not set
  */
 function getLatitude()
 {
@@ -119,7 +119,7 @@ function getLatitude()
 }
 
 /**
- * Set latitude
+ * Set latitude as a decimal number, i.e. 45.123
  * @returns {boolean} true or false if set
  */
 function setLatitude(latitude) {
@@ -131,9 +131,17 @@ function setLatitude(latitude) {
     return false;
 }
 
+/**
+ * Get the trend and forecastof the barometer.
+ * If latitude is set it will determine northern|southern hemisphere (default: northern)
+ * @returns {Object}
+ */
+function getPredictions() {
+    return getPredictions(utils.isNorthernHemisphere(latitude));
+}
 
 /**
- * Get the trend of the barometer.
+ * Get the trend and forecast of the barometer.
  * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
  * @returns {Object}
  */
@@ -176,5 +184,7 @@ module.exports = {
     hasPressures,
     getAll,
     setIsDiurnalEnabled,
-    getIsDiurnalEnabled
+    getIsDiurnalEnabled,
+    getLatitude,
+    setLatitude,
 };
