@@ -8,9 +8,9 @@ function getSystemByPressure(pressure) {
     const HIGH_THRESHOLD = 102268.9;
 
     const systems = [
-        { key: 0, name: "Low", threshold: LOW_THRESHOLD + 0.1 },
-        { key: 1, name: "Between Low and High", threshold: HIGH_THRESHOLD },
-        { key: 2, name: "High", threshold: Number.MAX_SAFE_INTEGER }
+        { key: 0, name: "Low", short: "LOW", threshold: LOW_THRESHOLD + 0.1 },
+        { key: 1, name: "Between Low and High", short: "BETWEEEN", threshold: HIGH_THRESHOLD },
+        { key: 2, name: "High", short: "HIGH", threshold: Number.MAX_SAFE_INTEGER }
     ];
 
     try {
