@@ -1,4 +1,5 @@
 const utils = require('../utils');
+const system = require('./system');
 
 // Function to calculate seasonal adjustment based on solar declination
 function calculateSolarDeclination(dayOfYear) {
@@ -36,8 +37,8 @@ function getRegionByLatitude(latitude) {
     if (latitude >= 0 && latitude < 23.5) return 'tropics';
     if (latitude >= 23.5 && latitude < 30) return 'subtropics';
     if (latitude >= 30 && latitude < 60) return 'midLatitudes';
-    if (latitude >= 60 && latitude < 75) return 'highMidLatitudes';
-    if (latitude >= 75 && latitude <= 90) return 'polar';
+    if (latitude >= 60 && latitude < 70) return 'highMidLatitudes';
+    if (latitude >= 70 && latitude <= 90) return 'polar';
     return 'unknown';
 }
 
@@ -45,13 +46,19 @@ function getWeatherAnomaly(weatherSystem, lat) {
     const region = getRegionByLatitude(lat);
     let anomaly = 0;
 
-    if (weatherSystem === 'high') {
+    if (weatherSystem === 'HIGH') {
         if (region === 'tropics') anomaly = 300;
         else if (region === 'subtropics') anomaly = 400;
         else if (region === 'midLatitudes') anomaly = 500;
         else if (region === 'highMidLatitudes') anomaly = 600;
         else if (region === 'polar') anomaly = 700;
-    } else if (weatherSystem === 'low') {
+    } else if (weatherSystem === 'BETWEEN') {
+        if (region === 'tropics') anomaly = 50;
+        else if (region === 'subtropics') anomaly = 50;
+        else if (region === 'midLatitudes') anomaly = 50;
+        else if (region === 'highMidLatitudes') anomaly = 50;
+        else if (region === 'polar') anomaly = 50;      
+    } else if (weatherSystem === 'LOW') {
         if (region === 'tropics') anomaly = -200;
         else if (region === 'subtropics') anomaly = -300;
         else if (region === 'midLatitudes') anomaly = -400;
@@ -61,6 +68,7 @@ function getWeatherAnomaly(weatherSystem, lat) {
 
     return anomaly;
 }
+
 
 function correctPressure(pressureObserved, latitude, date) {
     const time = utils.get24HourFormat(date);
@@ -74,23 +82,22 @@ function correctPressure(pressureObserved, latitude, date) {
     const seasonalFactor = getSeasonalAdjustment(dayOfYear, latitude);
     const amplitude = baseAmplitude * seasonalFactor;
 
-    // Get weather system anomaly (high- or low-pressure system)
-    let weatherSystem = 'low'
-    const weatherAnomaly = getWeatherAnomaly(weatherSystem, latitude);
-
     // Calculate pressure correction for each peak time
     let correctionFactor = 0;
     for (let peakTime of peakTimes) {
         const hoursFromPeak = (time - peakTime + 24) % 24;
-        correctionFactor += amplitude * Math.cos((2 * Math.PI * hoursFromPeak) / 12);
+        correctionFactor = amplitude * Math.cos((2 * Math.PI * hoursFromPeak) / 12);
     }
 
     // Normalize the correction factor by the number of peaks
     correctionFactor /= peakTimes.length;
-
+    
     // Apply the weather anomaly (either increase or decrease pressure)
-    const finalPressure = pressureObserved - correctionFactor + weatherAnomaly;
-    return finalPressure;
+    let finalPressure = pressureObserved - correctionFactor;
+    const pressureSystem = system.getSystemByPressure(finalPressure);
+    let anomaly = getWeatherAnomaly(pressureSystem.short, latitude);
+    finalPressure += anomaly;
+    return Math.round(finalPressure);
 }
 
 module.exports = {
