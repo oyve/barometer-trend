@@ -1,75 +1,87 @@
-function estimateFutureParameters(P1, T1, P2, hours, humidity, latitude, windSpeed = 0, solarRadiation = null) {
-    // Constants
-    const lapseRate = 6.5; // Dry adiabatic lapse rate in °C per kilometer
-    const seaLevelPressure = 1013.25; // Standard atmospheric pressure in hPa
-    const solarEffectFactor = 0.005; // Temperature increase per W/m² (rough estimate)
-    const windEffectFactor = 0.01; // Temperature change per m/s of wind (rough estimate)
-    
-    // Calculate altitude change from pressure difference (using barometric formula)
-    let altitudeChange = (Math.log(P1 / P2) * 44330);  // Calculate altitude difference (meters)
-    let temperatureChange = (altitudeChange / 1000) * lapseRate;  // Apply lapse rate for temperature change
-
-    // Time factor to adjust for longer/shorter prediction (based on pressure change rate)
-    let timeFactor = hours / 6;
-
-    // Adjust temperature change based on humidity
-    let humidityFactor = 1;
-    if (humidity > 80) {
-        humidityFactor = 0.5; // Slow temperature change when humidity is high
-    } else if (humidity < 30) {
-        humidityFactor = 1.5; // Faster temperature change in dry air
-    }
-
-    // Adjust temperature based on wind speed
-    let windFactor = windSpeed * windEffectFactor;
-    
-    // Calculate the future temperature change with time factor, humidity, and wind adjustment
-    let futureTemperatureChange = temperatureChange * timeFactor * humidityFactor + windFactor;
-
-    // Estimate solar radiation effects if provided
-    let futureSolarRadiation = null;
-    if (solarRadiation !== null) {
-        futureSolarRadiation = solarRadiation * timeFactor;  // Adjust solar radiation based on time
-        futureTemperatureChange += solarRadiation * solarEffectFactor * timeFactor;
-    } else {
-        // Estimate time of day based on latitude (simplified model)
-        let currentHour = (latitude >= -23.5 && latitude <= 23.5) ? 12 : 6;  // Summer vs Winter (approx)
-        if (currentHour >= 6 && currentHour <= 18) {
-            let solarEstimate = 200 * (currentHour - 6);  // Rough estimate of solar radiation between 6 AM and 6 PM
-            futureSolarRadiation = solarEstimate * timeFactor;
-            futureTemperatureChange += solarEstimate * solarEffectFactor * timeFactor;
+function predictWeather(pastReadings, latitude, date, hoursAhead = 24, windSpeed = null, solarRadiation = null) {
+    function polynomialRegression(x, y, degree = 2) {
+        let matrix = [];
+        let results = [];
+        
+        for (let i = 0; i < x.length; i++) {
+            let row = [];
+            for (let j = 0; j <= degree; j++) {
+                row.push(Math.pow(x[i], j));
+            }
+            matrix.push(row);
+            results.push(y[i]);
         }
+
+        let coefficients = solveLinearSystem(matrix, results);
+        return (xNew) => coefficients.reduce((sum, coef, index) => sum + coef * Math.pow(xNew, index), 0);
     }
 
-    // Estimate the future pressure
-    let futurePressure = P1 - (altitudeChange / 100);  // Simplified formula for pressure drop with altitude change
+    function solveLinearSystem(A, b) {
+        let math = require('mathjs');
+        return math.lusolve(A, b).map(x => x[0]);
+    }
 
-    // Estimate the future humidity (approximating based on temperature and pressure change)
-    let futureHumidity = humidity + (temperatureChange * 0.2);  // Adjust humidity by a factor based on temperature change
+    function calculateDewPoint(temp, humidity) {
+        return temp - (100 - humidity) / 5;
+    }
 
-    // Estimate the future wind speed (assuming wind speed is constant unless specified)
-    let futureWindSpeed = windSpeed;  // No wind change assumption
+    function estimateCloudCover(temp, dewPoint) {
+        return Math.abs(temp - dewPoint) < 2 ? "High" : "Low";
+    }
 
-    // Package the results into a JSON array
-    return {
-        futureTemperature: T1 + futureTemperatureChange,  // Estimated future temperature
-        futurePressure: futurePressure,  // Estimated future pressure
-        futureHumidity: Math.min(100, Math.max(0, futureHumidity)),  // Estimated future humidity (0 to 100%)
-        futureWindSpeed: futureWindSpeed,  // Future wind speed (constant unless changed)
-        futureSolarRadiation: futureSolarRadiation  // Estimated solar radiation (if applicable)
-    };
+    function seasonalTemperatureAdjustment(latitude, date) {
+        let dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+        return 10 * Math.cos((2 * Math.PI * dayOfYear) / 365) * ((90 - Math.abs(latitude)) / 90);
+    }
+
+    let time = pastReadings.map((_, i) => i);
+    let tempValues = pastReadings.map(r => r.temperature);
+    let pressureValues = pastReadings.map(r => r.pressure);
+    let humidityValues = pastReadings.map(r => r.humidity);
+
+    let tempPredict = polynomialRegression(time, tempValues, 2);
+    let pressurePredict = polynomialRegression(time, pressureValues, 2);
+    let humidityPredict = polynomialRegression(time, humidityValues, 2);
+
+    let seasonalCorrection = seasonalTemperatureAdjustment(latitude, date);
+    let futureForecast = [];
+
+    for (let h = 1; h <= hoursAhead; h++) {
+        let futureTemp = tempPredict(time.length + h) + seasonalCorrection;
+        let futurePressure = pressurePredict(time.length + h);
+        let futureHumidity = Math.max(0, Math.min(100, humidityPredict(time.length + h)));
+
+        if (windSpeed !== null) {
+            futureTemp -= windSpeed * 0.1;
+        }
+        if (solarRadiation !== null) {
+            futureTemp += solarRadiation * 0.005;
+        }
+
+        let dewPoint = calculateDewPoint(futureTemp, futureHumidity);
+        let cloudCover = estimateCloudCover(futureTemp, dewPoint);
+
+        futureForecast.push({
+            hourAhead: h,
+            futureTemperature: futureTemp,
+            futurePressure: futurePressure,
+            futureHumidity: futureHumidity,
+            dewPoint: dewPoint,
+            cloudCover: cloudCover
+        });
+    }
+
+    return futureForecast;
 }
 
-// Example usage:
-let P1 = 1015;  // Current pressure in hPa
-let T1 = 25;    // Current temperature in °C
-let P2 = 1005;  // Future pressure in hPa
-let hours = 6;  // Time in hours for prediction
-let humidity = 50;  // Relative humidity in percentage
-let latitude = 35;  // Latitude in degrees
-let windSpeed = 5;  // Wind speed in m/s (optional)
-let solarRadiation = null;  // Solar radiation, if not provided, time of day is used
+// Example past 3-hour readings
+let pastReadings = [
+    { pressure: 1015, temperature: 25, humidity: 60 },
+    { pressure: 1012, temperature: 24.5, humidity: 58 },
+    { pressure: 1009, temperature: 24, humidity: 55 }
+];
 
-// Estimate multiple parameters
-let result = estimateFutureParameters(P1, T1, P2, hours, humidity, latitude, windSpeed, solarRadiation);
-console.log(result);
+let latitude = 40.0; // Example latitude
+let date = new Date(); // Current date
+
+console.log(JSON.stringify(predictWeather(pastReadings, latitude, date), null, 2));
