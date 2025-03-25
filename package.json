@@ -6,6 +6,8 @@
   "type": "commonjs",
   "files": [
     "index.js",
+    "utils.js",
+    "trend.js",
     "predictions",
     "LICENSE"
   ],
