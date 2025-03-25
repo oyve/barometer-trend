@@ -135,7 +135,15 @@
 
     /**
      * 
-     * @param {number} temperature Sets default mean temperature used if temperature is not submitted separately 
+     * @returns {number} The mean temperature used in calculations if no temperature is set when adding pressure readings
+     */
+    function getMeanTemperature() {
+        return meanTemperature;
+    }
+
+    /**
+     * 
+     * @param {number} temperature Sets default mean temperature used if temperature is not submitted when adding pressure readings 
      */
     function setMeanTemperature(temperature) {
         meanTemperature = temperature;
@@ -197,5 +205,6 @@
         getIsDiurnalEnabled,
         getLatitude,
         setLatitude,
+        getMeanTemperature,
         setMeanTemperature
     };
