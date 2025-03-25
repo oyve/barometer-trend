@@ -82,7 +82,7 @@ function correctPressure(pressureObserved, latitude, date) {
         const hoursFromPeak = (time - peakTime + 24) % 24;
         correctionFactor += amplitude * Math.cos((2 * Math.PI * hoursFromPeak) / 24);
     }
-    correctionFactor /= peakTimes.length; // Normalize correction factor
+    // Allow full effect of summed peaks without averaging them out
 
     // Apply weather anomaly based on system type
     const pressureSystem = system.getSystemByPressure(pressureObserved - correctionFactor);
