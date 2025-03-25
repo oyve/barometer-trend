@@ -14,117 +14,81 @@ function getSeasonalAdjustment(dayOfYear, lat) {
     return 1 + 0.2 * Math.sin(angle); // Modulate amplitude based on latitude and solar declination
 }
 
-// Diurnal pressure data with base amplitudes (without seasonal adjustment)
+// Diurnal pressure data with base amplitudes and adjusted 4-peak cycle (6-hour periodicity)
 const diurnalPressureData = {
-    tropics: { latRange: [0, 23.5], baseAmplitude: 350, peakTimes: [10, 16] },
-    subtropics: { latRange: [23.5, 30], baseAmplitude: 250, peakTimes: [11, 17] },
-    midLatitudes: { latRange: [30, 60], baseAmplitude: 150, peakTimes: [12, 18] },
-    highMidLatitudes: { latRange: [60, 70], baseAmplitude: 100, peakTimes: [13, 19] },
-    polar: { latRange: [70, 90], baseAmplitude: 50, peakTimes: [14, 20] },
+    tropics: { latRange: [0, 23.5], baseAmplitude: 350, peakTimes: [4, 10, 16, 22] },
+    subtropics: { latRange: [23.5, 30], baseAmplitude: 250, peakTimes: [4, 10, 16, 22] },
+    midLatitudes: { latRange: [30, 60], baseAmplitude: 150, peakTimes: [4, 10, 16, 22] },
+    highMidLatitudes: { latRange: [60, 70], baseAmplitude: 100, peakTimes: [4, 10, 16, 22] },
+    polar: { latRange: [70, 90], baseAmplitude: 50, peakTimes: [4, 10, 16, 22] },
 };
 
 function getDiurnalVariation(latitude) {
-    if (latitude >= 0 && latitude < 23.5) return diurnalPressureData.tropics;
-    if (latitude >= 23.5 && latitude < 30) return diurnalPressureData.subtropics;
-    if (latitude >= 30 && latitude < 60) return diurnalPressureData.midLatitudes;
-    if (latitude >= 60 && latitude < 70) return diurnalPressureData.highMidLatitudes;
-    if (latitude >= 70 && latitude <= 90) return diurnalPressureData.polar;
-    return { amplitude: 0, peakTimes: [0, 0] }; // Default for unexpected values
+    for (const region in diurnalPressureData) {
+        const { latRange } = diurnalPressureData[region];
+        if (latitude >= latRange[0] && latitude < latRange[1]) {
+            return diurnalPressureData[region];
+        }
+    }
+    return { amplitude: 0, peakTimes: [0, 0, 0, 0] }; // Default for unexpected values
 }
 
-// Simplified function to return a weather anomaly based on the input weather system ("high" or "low")
 function getRegionByLatitude(latitude) {
-    if (latitude >= 0 && latitude < 23.5) return 'tropics';
-    if (latitude >= 23.5 && latitude < 30) return 'subtropics';
-    if (latitude >= 30 && latitude < 60) return 'midLatitudes';
-    if (latitude >= 60 && latitude < 70) return 'highMidLatitudes';
-    if (latitude >= 70 && latitude <= 90) return 'polar';
+    for (const region in diurnalPressureData) {
+        const { latRange } = diurnalPressureData[region];
+        if (latitude >= latRange[0] && latitude < latRange[1]) {
+            return region;
+        }
+    }
     return 'unknown';
 }
 
 function getWeatherAnomaly(weatherSystem, lat) {
+    const anomalies = {
+        tropics: { HIGH: 300, LOW: -200, BETWEEN: 50 },
+        subtropics: { HIGH: 400, LOW: -300, BETWEEN: 50 },
+        midLatitudes: { HIGH: 500, LOW: -400, BETWEEN: 50 },
+        highMidLatitudes: { HIGH: 600, LOW: -500, BETWEEN: 50 },
+        polar: { HIGH: 700, LOW: -600, BETWEEN: 50 },
+    };
+
     const region = getRegionByLatitude(lat);
-    let anomaly = 0;
-
-    if (weatherSystem === 'HIGH') {
-        if (region === 'tropics') anomaly = 300;
-        else if (region === 'subtropics') anomaly = 400;
-        else if (region === 'midLatitudes') anomaly = 500;
-        else if (region === 'highMidLatitudes') anomaly = 600;
-        else if (region === 'polar') anomaly = 700;
-    } else if (weatherSystem === 'BETWEEN') {
-        if (region === 'tropics') anomaly = 50;
-        else if (region === 'subtropics') anomaly = 50;
-        else if (region === 'midLatitudes') anomaly = 50;
-        else if (region === 'highMidLatitudes') anomaly = 50;
-        else if (region === 'polar') anomaly = 50;      
-    } else if (weatherSystem === 'LOW') {
-        if (region === 'tropics') anomaly = -200;
-        else if (region === 'subtropics') anomaly = -300;
-        else if (region === 'midLatitudes') anomaly = -400;
-        else if (region === 'highMidLatitudes') anomaly = -500;
-        else if (region === 'polar') anomaly = -600;
-    }
-
-    return anomaly;
+    return anomalies[region]?.[weatherSystem] || 0;
 }
 
 /**
- * 
- * @param {number} pressureObserved Pressure observed in pascals 
- * @param {number} latitude Latitude of observation in decimal format, eg. 45.123
- * @param {date} date Date and time of observation
- * @returns {number} Pressure corrected by diurnal rythm
+ * Correct observed atmospheric pressure for diurnal variations and weather anomalies.
+ * @param {number} pressureObserved - Observed pressure in pascals.
+ * @param {number} latitude - Latitude of the observation.
+ * @param {Date} date - Date and time of the observation.
+ * @returns {number} Pressure corrected by diurnal rhythm and weather anomaly.
  */
 function correctPressure(pressureObserved, latitude, date) {
-    if(pressureObserved <= 0) {
-        throw("Not a valid pressure");
-    }
-
-    if(latitude === undefined || latitude === null || !utils.isValidLatitude(latitude)) {
-        throw("Not a valid latitude");
-    }
+    if (pressureObserved <= 0) throw new Error("Invalid pressure value");
+    if (!utils.isValidLatitude(latitude)) throw new Error("Invalid latitude value");
 
     const time = utils.get24HourFormat(date);
     const dayOfYear = utils.getDayOfYear(date);
-    
-    // Get the basic diurnal variation data
-    const variationData = getDiurnalVariation(Math.abs(latitude), dayOfYear);
-    const { baseAmplitude, peakTimes } = variationData;
 
-    // Apply seasonal adjustment based on the solar declination
+    // Get diurnal variation data and apply seasonal adjustment
+    const variationData = getDiurnalVariation(Math.abs(latitude));
+    const { baseAmplitude, peakTimes } = variationData;
     const seasonalFactor = getSeasonalAdjustment(dayOfYear, latitude);
     const amplitude = baseAmplitude * seasonalFactor;
 
-    // Calculate pressure correction for each peak time
+    // Calculate pressure correction based on 4 peaks (6-hour periodicity)
     let correctionFactor = 0;
-    for (let peakTime of peakTimes) {
+    for (const peakTime of peakTimes) {
         const hoursFromPeak = (time - peakTime + 24) % 24;
-        correctionFactor = amplitude * Math.cos((2 * Math.PI * hoursFromPeak) / 12);
+        correctionFactor += amplitude * Math.cos((2 * Math.PI * hoursFromPeak) / 24);
     }
+    correctionFactor /= peakTimes.length; // Normalize correction factor
 
-    // Normalize the correction factor by the number of peaks
-    correctionFactor /= peakTimes.length;
-    
-    // Apply the weather anomaly (either increase or decrease pressure)
-    let finalPressure = pressureObserved - correctionFactor;
-    const pressureSystem = system.getSystemByPressure(finalPressure);
-    let anomaly = getWeatherAnomaly(pressureSystem.short, latitude);
-    finalPressure += anomaly;
-    return Math.round(finalPressure);
+    // Apply weather anomaly based on system type
+    const pressureSystem = system.getSystemByPressure(pressureObserved - correctionFactor);
+    const anomaly = getWeatherAnomaly(pressureSystem.short, latitude);
+
+    return Math.round(pressureObserved - correctionFactor + anomaly);
 }
 
-module.exports = {
-	correctPressure
-}
-
-// Example usage:
-// const lat = 45; // Latitude
-// const lon = -80; // Longitude
-// const time = 14; // Local time in hours (24-hour format)
-// const observedPressure = 101500; // Example barometer reading in Pa (already corrected for altitude)
-// const dayOfYear = 172; // Day of year (e.g., June 21st is the 172nd day)
-// const weatherSystem = 'high'; // Weather system: 'high' or 'low'
-
-// const correctedPressure = correctPressure(observedPressure, lat, lon, time, dayOfYear, weatherSystem);
-// console.log(`Corrected Pressure: ${correctedPressure.toFixed(2)} Pa`);
+module.exports = { correctPressure };
