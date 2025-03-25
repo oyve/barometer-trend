@@ -43,16 +43,18 @@ let forecast = barometer.getPredictions();
 let forecast = barometer.getPredictions(northernHemisphere = true|false);
 ```
 
-### Diurnal Pressure Correction
-Diurnal pressure correction is an adjustment to atmospheric pressure that accounts for natural daily fluctuations caused by temperature changes. These variations can be roughly estimated based on latitude and time of year, with peak pressure typically occurring in the early morning and late evening, though this timing varies by region, geography and weather patterns. This makes precise corrections difficult without historical data for a specific location.
+### Diurnal Pressure Correction (semi-diurnal)
+Diurnal pressure correction is an adjustment to atmospheric pressure that accounts for natural daily variations in atmospheric pressure due to a tidal action in the atmosphere. The swelling and relaxing of air mass causes the pressure to swing through a cycle caused by temperature changes over a day. These variations can be roughly estimated based on latitude and time of year, with peak pressure typically occurring in the early morning and late evening, though this timing varies by region, geography (eg. mountains) and weather patterns. This makes precise corrections difficult without historical data for a specific location.
 
 > [!NOTE]
-> By enabling this setting, pressure readings will be corrected using a generic approximation based on your latitude and time of year. You will need to set `latitude`. If your stations is moving (i.e. sailboat), you must update the latitude periodically (preferably as often as you update pressure readings). [Read more at Wikipedia](https://en.wikipedia.org/wiki/Diurnal_cycle).
+> By enabling this setting, pressure readings will be corrected using a generic approximation based on your latitude and time of year. You will need to set `latitude`. If your stations is moving (i.e. sailboat), you must update the latitude periodically (preferably as often as you update pressure readings).
 
 ```
 //Enabling diurnal pressure corrections (before adding pressure readings)
 barometer.setDiurnalEnabled(true);
-barometer.setLatitude(45.123); //once for stationary stations, or periodically for moving stations
+
+//Set latitude once for stationary stations, or periodically for moving stations
+barometer.setLatitude(45.123);
 
 barometer.addPressure(...as above....);
 barometer.addPressure(...as above....);
