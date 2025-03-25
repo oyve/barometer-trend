@@ -121,6 +121,7 @@
 
     /**
      * Set latitude as a decimal number, i.e. 45.123
+     * @param {number} latitude Latitude in decimal format, i.e. 45.123
      * @returns {boolean} true or false if set
      */
     function setLatitude(latitude) {
