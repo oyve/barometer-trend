@@ -1,6 +1,6 @@
 const assert = require('assert');
-const beaufort = require('../predictions/beaufort');
-const utils = require('../utils');
+const beaufort = require('../../src/predictions/beaufort');
+const utils = require('../../src/utils');
 
 describe("Beaufort Tests", function () {
 	describe("Get beafort prognose", function () {

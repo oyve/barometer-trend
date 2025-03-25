@@ -1,5 +1,5 @@
 const assert = require('assert');
-const utils = require('../utils');
+const utils = require('../../src/utils');
 
 describe("Utils Tests", function () {
 	describe("Minutes from now", function () {

@@ -1,14 +1,14 @@
 'use strict'
-const front = require('./predictions/front');
-const byPressureTrend = require('./predictions/byPressureTrend');
-const byPressureTendencyAndWind = require('./predictions/byPressureTendencyAndWind');
-const byPressureTrendAndSeason = require('./predictions/byPressureTrendAndSeason');
-const beaufort = require('./predictions/beaufort');
-const trend = require('./trend');
-const utils = require('./utils');
-const history = require('./predictions/history');
-const system = require('./predictions/system');
-const diurnalrythm = require('./predictions/diurnalRythm');
+const front = require('./src/predictions/front');
+const byPressureTrend = require('./src/predictions/byPressureTrend');
+const byPressureTendencyAndWind = require('./src/predictions/byPressureTendencyAndWind');
+const byPressureTrendAndSeason = require('./src/predictions/byPressureTrendAndSeason');
+const beaufort = require('./src/predictions/beaufort');
+const trend = require('./src/trend');
+const utils = require('./src/utils');
+const history = require('./src/predictions/history');
+const system = require('./src/predictions/system');
+const diurnalrythm = require('./src/predictions/diurnalRythm');
 
 let pressures = [];
 let isDiurnalEnabled = false;

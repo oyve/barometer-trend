@@ -1,5 +1,5 @@
 const assert = require('assert');
-const beaufort = require('../predictions/diurnalRythm');
+const beaufort = require('../../src/predictions/diurnalRythm');
 
 describe("Diurnal Rythm Tests", function () {
     describe("Get correction 40", function () {

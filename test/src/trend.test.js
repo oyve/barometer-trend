@@ -1,6 +1,6 @@
 const assert = require('assert');
-const trend = require('../trend');
-const utils = require('../utils');
+const trend = require('../../src/trend');
+const utils = require('../../src/utils');
 
 describe("Prediction Rough Tests", function () {
 	describe("THREE HOUR predictions", function () {
