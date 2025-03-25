@@ -96,7 +96,7 @@ describe("Unit Tests", function () {
             assert.strictEqual(actual, expected)
         });
     });
-    describe("Diurnal", function () {
+    describe("Diurnal Enabled Tests", function () {
         it("it should be default false", function () {
         //arrange     
         const expected = false;
