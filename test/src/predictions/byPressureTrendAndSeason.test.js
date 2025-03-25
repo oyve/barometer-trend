@@ -1,4 +1,4 @@
-const byPressureTrendAndSeason = require('../../src/predictions/byPressureTrendAndSeason');
+const byPressureTrendAndSeason = require('../../../src/predictions/byPressureTrendAndSeason');
 const assert = require('assert');
 
 describe("By Pressure Trend And Seasons Tests", function () {

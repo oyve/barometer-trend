@@ -1,5 +1,5 @@
 const assert = require('assert');
-const system = require('../../src/predictions/system');
+const system = require('../../../src/predictions/system');
 
 describe("Prediction System Tests", function () {
 	describe("getHighLow", function () {

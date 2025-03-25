@@ -1,4 +1,4 @@
-const quadrantPrediction = require('../../src/predictions/byPressureTendencyAndWind');
+const quadrantPrediction = require('../../../src/predictions/byPressureTendencyAndWind');
 const assert = require('assert');
 
 describe("Pressure Tendency and Wind Tests", function () {

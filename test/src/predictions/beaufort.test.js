@@ -1,9 +1,8 @@
 const assert = require('assert');
-const beaufort = require('../../src/predictions/beaufort');
-const utils = require('../../src/utils');
+const beaufort = require('../../../src/predictions/beaufort');
 
 describe("Beaufort Tests", function () {
-	describe("Get beafort prognose", function () {
+	describe("Get beaufort prognose", function () {
 
 		it("it should equal F6-7", function () {
 			//arrange
