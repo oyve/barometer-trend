@@ -4,6 +4,46 @@ const barometer = require('../index');
 const utils = require('../src/utils');
 
 describe("Unit Tests", function () {
+    describe("Mean tempereature", function () {
+        it("it should default", function () {
+            //arrange
+            const expected = 15;
+            //act
+            var actual = barometer.getMeanTemperature();
+            //assert
+            assert.strictEqual(actual, expected);
+            });
+        it("it should set", function () {
+        //arrange
+        const expected = 20;
+        barometer.setMeanTemperature(expected);
+        //act
+        var actual = barometer.getMeanTemperature();
+        //assert
+        assert.strictEqual(actual, expected);
+        });
+    });
+
+    describe("Set Latitude", function () {
+        it("it should default", function () {
+            //arrange
+            const expected = undefined;
+            //act
+            var actual = barometer.getLatitude();
+            //assert
+            assert.strictEqual(actual, expected);
+            });
+        it("it should set", function () {
+        //arrange
+        const expected = 45.123;
+        barometer.setLatitude(expected);
+        //act
+        var actual = barometer.getLatitude();
+        //assert
+        assert.strictEqual(actual, expected);
+        });
+    });
+
     describe("Get all", function () {
         it("it should get all", function () {
         //arrange     
