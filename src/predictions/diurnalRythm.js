@@ -69,8 +69,22 @@ function getWeatherAnomaly(weatherSystem, lat) {
     return anomaly;
 }
 
-
+/**
+ * 
+ * @param {number} pressureObserved Pressure observed in pascals 
+ * @param {number} latitude Latitude of observation in decimal format, eg. 45.123
+ * @param {date} date Date and time of observation
+ * @returns {number} Pressure corrected by diurnal rythm
+ */
 function correctPressure(pressureObserved, latitude, date) {
+    if(pressureObserved <= 0) {
+        throw("Not a valid pressure");
+    }
+
+    if(latitude === undefined || latitude === null || !utils.isValidLatitude(latitude)) {
+        throw("Not a valid latitude");
+    }
+
     const time = utils.get24HourFormat(date);
     const dayOfYear = utils.getDayOfYear(date);
     
