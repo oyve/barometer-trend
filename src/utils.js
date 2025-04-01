@@ -83,7 +83,7 @@ function getPressuresByPeriod(pressures, startTime, endTime)
 function getPressureAverage(pressures) {
 	let sum = 0;
 	pressures.forEach((p) => {
-		sum += p.value;
+		sum += p.calculated.pressureASL;
 	});
 
 	return sum / pressures.length;

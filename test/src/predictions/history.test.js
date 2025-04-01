@@ -62,16 +62,16 @@ describe("History Tests", function () {
 			barometer.addPressure(utils.minutesFromNow(0), 101500);
 
 			//act
-			let actual = barometer.getPredictions().history;
+			let actual = barometer.getForecast().history;
 
 			//assert
 			assert.strictEqual(actual.length, 48);
 
-			assert.strictEqual(actual.find((h) => h.hour == 1).pressure.value, 101501);
-			assert.strictEqual(actual.find((h) => h.hour == 2).pressure.value, 101502);
-			assert.strictEqual(actual.find((h) => h.hour == 3).pressure.value, 101503);
-			assert.strictEqual(actual.find((h) => h.hour == 4).pressure.value, 101504);
-			assert.strictEqual(actual.find((h) => h.hour == 5).pressure.value, 101505);
+			assert.strictEqual(actual.find((h) => h.hour == 1).pressure.calculated.pressureASL, 101501);
+			assert.strictEqual(actual.find((h) => h.hour == 2).pressure.calculated.pressureASL, 101502);
+			assert.strictEqual(actual.find((h) => h.hour == 3).pressure.calculated.pressureASL, 101503);
+			assert.strictEqual(actual.find((h) => h.hour == 4).pressure.calculated.pressureASL, 101504);
+			assert.strictEqual(actual.find((h) => h.hour == 5).pressure.calculated.pressureASL, 101505);
 		});
 	});
 });

@@ -40,13 +40,13 @@ function calculate(pressures, from, useDiurnal = false) {
 		let earlier = subsetOfPressures[0];
 		let later = subsetOfPressures[subsetOfPressures.length - 1];
 
-		let earlierValue = useDiurnal && earlier?.meta?.diurnal?.pressure !== null  
-		? earlier.meta.diurnal.pressure  
-		: earlier.value;
+		let earlierValue = useDiurnal && earlier?.calculated?.diurnalPressure !== null  
+		? earlier.calculated.diurnalPressure  
+		: earlier.calculated.pressureASL;
 
-		let laterValue = useDiurnal && later?.meta?.diurnal?.pressure !== null  
-		? later.meta.diurnal.pressure  
-		: later.value;
+		let laterValue = useDiurnal && later?.calculated?.diurnalPressure !== null  
+		? later.calculated.diurnalPressure  
+		: later.calculated.pressureASL;
 
 		let difference = laterValue - earlierValue;
 		let ratio = difference / from;

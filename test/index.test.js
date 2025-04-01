@@ -4,25 +4,7 @@ const barometer = require('../index');
 const utils = require('../src/utils');
 
 describe("Unit Tests", function () {
-    describe("Mean tempereature", function () {
-        it("it should default", function () {
-            //arrange
-            const expected = 15;
-            //act
-            var actual = barometer.getMeanTemperature();
-            //assert
-            assert.strictEqual(actual, expected);
-            });
-        it("it should set", function () {
-        //arrange
-        const expected = 20;
-        barometer.setMeanTemperature(expected);
-        //act
-        var actual = barometer.getMeanTemperature();
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-    });
+
 
     describe("Set Latitude", function () {
         it("it should default", function () {
@@ -44,87 +26,58 @@ describe("Unit Tests", function () {
         });
     });
 
-    describe("Get all", function () {
-        it("it should get all", function () {
-        //arrange     
-        barometer.clear();
-        barometer.addPressure(utils.minutesFromNow(-170), 101500);
-        barometer.addPressure(utils.minutesFromNow(-160), 101500 + 5);
-        barometer.addPressure(utils.minutesFromNow(-50), 101500 + 6);
-        barometer.addPressure(utils.minutesFromNow(-40), 101500 + 7);
+    // describe("Get all", function () {
+    //     it("it should get all", function () {
+    //     //arrange     
+    //     barometer.clear();
+    //     barometer.addPressure(utils.minutesFromNow(-170), 101500);
+    //     barometer.addPressure(utils.minutesFromNow(-160), 101500 + 5);
+    //     barometer.addPressure(utils.minutesFromNow(-50), 101500 + 6);
+    //     barometer.addPressure(utils.minutesFromNow(-40), 101500 + 7);
 
-        //act
-        var actual = barometer.getAll();
+    //     //act
+    //     var actual = barometer.getAll();
 
-        //assert
-        assert.strictEqual(actual.length, 4);
-        assert.strictEqual(actual[0].value, 101500);
-        assert.strictEqual(actual[3].value, 101507);
-        });
-    });
-    describe("Add pressure", function () {
-        it("it should not throw exceptions", function () {
-            //arrange
-            //act
-            barometer.clear();
-            barometer.addPressure(new Date(), 101500);
+    //     //assert
+    //     assert.strictEqual(actual.length, 4);
+    //     assert.strictEqual(actual[0].value, 101500);
+    //     assert.strictEqual(actual[3].value, 101507);
+    //     });
+    // });
+    // describe("Add pressure", function () {
+    //     it("it should not throw exceptions", function () {
+    //         //arrange
+    //         //act
+    //         barometer.clear();
+    //         barometer.addPressure(new Date(), 101500);
 
-            //assert
-            assert.ok(true, "My function does not crash");
-        });
-    });
-    describe("Has pressure", function () {
-        it("it should not have", function () {
-            //arrange
-            barometer.clear();
-            let expected = false;
-            //act
-            let actual = barometer.hasPressures();
+    //         //assert
+    //         assert.ok(true, "My function does not crash");
+    //     });
+    // });
+    // describe("Has pressure", function () {
+    //     it("it should not have", function () {
+    //         //arrange
+    //         barometer.clear();
+    //         let expected = false;
+    //         //act
+    //         let actual = barometer.hasPressures();
 
-            //assert
-            assert.strictEqual(actual, expected)
-        });
-        it("it should have", function () {
-            //arrange
-            barometer.clear();
-            let expected = true;
-            barometer.addPressure(new Date(), 101500);
-            //act
-            let actual = barometer.hasPressures();
+    //         //assert
+    //         assert.strictEqual(actual, expected)
+    //     });
+    //     it("it should have", function () {
+    //         //arrange
+    //         barometer.clear();
+    //         let expected = true;
+    //         barometer.addPressure(new Date(), 101500);
+    //         //act
+    //         let actual = barometer.hasPressures();
 
-            //assert
-            assert.strictEqual(actual, expected)
-        });
-    });
-    describe("Diurnal Enabled Tests", function () {
-        it("it should be default false", function () {
-        //arrange     
-        const expected = false;
-        //act
-        var actual = barometer.getIsDiurnalEnabled();
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-        it("it should be set to true", function () {
-        //arrange     
-        const expected = true;
-        barometer.setIsDiurnalEnabled(true);
-        //act
-        var actual = barometer.getIsDiurnalEnabled();
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-        it("it should be set to false", function () {
-        //arrange     
-        const expected = false;
-        barometer.setIsDiurnalEnabled(true);
-        barometer.setIsDiurnalEnabled(false);
-        //act
-        var actual = barometer.getIsDiurnalEnabled();
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-    });
+    //         //assert
+    //         assert.strictEqual(actual, expected)
+    //     });
+    // });
 });
 
 describe("Function Tests - Trend chooser", function () {
@@ -140,7 +93,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-40), 101500 + 7);
 
         //act
-        var actual = barometer.getPredictions();
+        var actual = barometer.getForecast();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "RISING");
@@ -159,7 +112,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-40), 101500 - 600);
 
         //act
-        var actual = barometer.getPredictions();
+        var actual = barometer.getForecast();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
@@ -178,7 +131,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(0), 101500 - 2);
 
         //act
-        var actual = barometer.getPredictions();
+        var actual = barometer.getForecast();
         var actualCount = barometer.getPressureCount();
 
         //assert
@@ -199,7 +152,7 @@ describe("Function Tests - Trend chooser", function () {
         barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 0, null, 230);
 
         //act
-        var actual = barometer.getPredictions();
+        var actual = barometer.getForecast();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");

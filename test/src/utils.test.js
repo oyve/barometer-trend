@@ -50,57 +50,57 @@ describe("Utils Tests", function () {
 			//arrange
 			const expected = 101400;
 			const pressures = [
-				{ datetime: utils.minutesFromNow(-61), value: expected },
-				{ datetime: utils.minutesFromNow(-58), value: 101600 },
+				{ datetime: utils.minutesFromNow(-61), calculated: { pressureASL: expected }},
+				{ datetime: utils.minutesFromNow(-58), calculated: { pressureASL: 101600 }},
 			];
 			//act
 			var actual = utils.getPressureClosestTo(pressures, utils.minutesFromNow(-60));
 			//assert
-			assert.strictEqual(actual.value, expected);
+			assert.strictEqual(actual.calculated.pressureASL, expected);
 		});
 
 		it("it should pick the next", function () {
 			//arrange
 			const expected = 101600;
 			const pressures = [
-				{ datetime: utils.minutesFromNow(-62), value: 101400 },
-				{ datetime: utils.minutesFromNow(-59), value: expected },
+				{ datetime: utils.minutesFromNow(-62), calculated: { pressureASL: 101400 }},
+				{ datetime: utils.minutesFromNow(-59), calculated: { pressureASL: expected }},
 			];
 			//act
 			var actual = utils.getPressureClosestTo(pressures, utils.minutesFromNow(-60));
 			//assert
-			assert.strictEqual(actual.value, expected);
+			assert.strictEqual(actual.calculated.pressureASL, expected);
 		});
 
 		it("it should pick the middle", function () {
 			//arrange
 			const expected = 101500;
 			const pressures = [
-				{ datetime: utils.minutesFromNow(-61), value: 101400 },
-				{ datetime: utils.minutesFromNow(-60), value: expected },
-				{ datetime: utils.minutesFromNow(-59), value: 101600 },
+				{ datetime: utils.minutesFromNow(-61), calculated: { pressureASL: 101400 }},
+				{ datetime: utils.minutesFromNow(-60), calculated: { pressureASL: expected }},
+				{ datetime: utils.minutesFromNow(-59), calculated: { pressureASL: 101600 }},
 			];
 			//act
 			var actual = utils.getPressureClosestTo(pressures, utils.minutesFromNow(-60));
 			//assert
-			assert.strictEqual(actual.value, expected);
+			assert.strictEqual(actual.calculated.pressureASL, expected);
 		});
 
 		it("it should pick hour", function () {
 			//arrange
 			const expected = 101400;
 			const pressures = [
-				{ datetime: utils.minutesFromNow(-60*5), value: 101100 },
-				{ datetime: utils.minutesFromNow(-60*4), value: 101200 },
-				{ datetime: utils.minutesFromNow(-60*3), value: 101300 },
-				{ datetime: utils.minutesFromNow(-60*2), value: expected },
-				{ datetime: utils.minutesFromNow(-60*1), value: 101500 },
-				{ datetime: new Date(), value: 101600 },
+				{ datetime: utils.minutesFromNow(-60*5), calculated: { pressureASL: 101100 }},
+				{ datetime: utils.minutesFromNow(-60*4), calculated: { pressureASL: 101200 }},
+				{ datetime: utils.minutesFromNow(-60*3), calculated: { pressureASL: 101300 }},
+				{ datetime: utils.minutesFromNow(-60*2), calculated: { pressureASL: expected }},
+				{ datetime: utils.minutesFromNow(-60*1), calculated: { pressureASL: 101500 }},
+				{ datetime: new Date(), calculated: { pressureASL: 101600 }},
 			];
 			//act
 			var actual = utils.getPressureClosestTo(pressures, utils.minutesFromNow(-60*2));
 			//assert
-			assert.strictEqual(actual.value, expected);
+			assert.strictEqual(actual.calculated.pressureASL, expected);
 		});
 	});
 
@@ -110,10 +110,10 @@ describe("Utils Tests", function () {
 			//arrange
 			const expected = 101950;
 			const pressures = [
-				{ datetime: utils.minutesFromNow(-59), value: 101800 },
-				{ datetime: utils.minutesFromNow(-30), value: 101900 },
-				{ datetime: utils.minutesFromNow(-10), value: 102000 },
-				{ datetime: utils.minutesFromNow(-1), value: 102100 }
+				{ datetime: utils.minutesFromNow(-59), calculated: { pressureASL: 101800 }},
+				{ datetime: utils.minutesFromNow(-30), calculated: { pressureASL: 101900 }},
+				{ datetime: utils.minutesFromNow(-10), calculated: { pressureASL: 102000 }},
+				{ datetime: utils.minutesFromNow(-1), calculated: { pressureASL: 102100 }}
 			];
 			let subset = utils.getPressuresByPeriod(pressures, utils.minutesFromNow(-60), new Date());
 			//act
