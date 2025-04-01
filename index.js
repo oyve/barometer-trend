@@ -41,14 +41,6 @@
     }
 
     /**
-     * Get all pressure readings.
-     * @returns {Array<Object>} All pressure readings.
-     */
-    function getAll() {
-        return pressureReadings.pressures;
-    }
-
-    /**
      * Get latitude
      * @returns {number} Returns latitude, null if not set
      */
@@ -97,7 +89,7 @@
         let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
         let predictionFront = front.getFront(allPressures);
         let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
-        let predictionSeason = byPressureTrendAndSeason.getPrediction(latestPressure.calculated.pressureASL, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
+        let predictionSeason = byPressureTrendAndSeason.getPrediction(latestPressure.pressureCalculated(), pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
         let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(latestPressure.calculated.pressureASL, latestPressure.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
         let forecast = {
@@ -122,7 +114,6 @@
         addPressure,
         getPressureCount,
         getForecast,
-        getAll,
         getLatitude,
         setLatitude,
     };

@@ -27,7 +27,7 @@ class PressureReadings extends EventEmitter {
 
         const ema = 1;
         const pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-        const diurnalPressure = null;
+        const diurnalPressure = 0;
 
         const reading = {
             datetime: datetime,
@@ -43,7 +43,7 @@ class PressureReadings extends EventEmitter {
                 diurnalPressure: diurnalPressure,
                 EMA: ema
             },
-            pressureCalculated: () => { return this.calculated.pressureASL; }
+            pressureCalculated: () => { return reading.calculated.pressureASL + reading.calculated.diurnalPressure; }
         };
 
         this.#removeOldPressures();
