@@ -8,27 +8,16 @@
     const utils = require('./src/utils');
     const history = require('./src/predictions/history');
     const system = require('./src/predictions/system');
-    const diurnalrythm = require('./src/predictions/diurnalRythm');
     const pressureReadings = require('./src/pressureReadings');
+    const globals = require('./src/globals')
 
-    let pressures = [];
-    let isDiurnalEnabled = false;
     let latitude = null;
-    let meanTemperature = 15; //celcius
 
     /**
      * Clear the pressure readings. (Mainly for testing purposes)
      */
     function clear() {
         pressureReadings.clear();
-    }
-
-    /**
-     * Check if there are any pressure readings.
-     * @returns {boolean} True if there are pressure readings, false otherwise.
-     */
-    function hasPressures() {
-        return pressures.length > 0;
     }
 
     /**
@@ -40,27 +29,6 @@
      * @param {number} trueWindDirection True wind direction in degrees
      */
     function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
-        // if (altitude === null) altitude = 0;
-        // if (temperature === null) temperature = utils.toKelvinFromCelcius(meanTemperature);
-        // if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
-
-        // let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-        // let diurnalPressure = latitude !== null ? diurnalrythm.correctPressure(pressureASL, latitude, datetime) : null;
-
-        // pressures.push({
-        //     datetime: datetime,
-        //     value: pressureASL,
-        //     meta: {
-        //         value: pressure,
-        //         altitude: altitude,
-        //         temperature: temperature,
-        //         twd: trueWindDirection,
-        //         latitude: latitude,
-        //         diurnalPressure: diurnalPressure
-        //     }
-        // });
-
-        // removeOldPressures();
         pressureReadings.add(datetime, pressure, altitude, temperature, trueWindDirection, latitude);
     }
 
@@ -72,44 +40,12 @@
         return pressureReadings.pressures.length;
     }
 
-    // /**
-    //  * Remove old pressure readings.
-    //  * @param {Date} threshold The threshold date to remove old pressures. Defaults to 48 hours ago.
-    //  */
-    // function removeOldPressures(threshold = utils.minutesFromNow(-utils.MINUTES.FORTYEIGHT_HOURS)) {
-    //     pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
-    // }
-
-    // /**
-    //  * Get the last pressure reading.
-    //  * @returns {Object} The last pressure reading.
-    //  */
-    // function getLastPressure() {
-    //     return pressures[pressures.length - 1];
-    // }
-
     /**
      * Get all pressure readings.
      * @returns {Array<Object>} All pressure readings.
      */
     function getAll() {
         return pressureReadings.pressures;
-    }
-
-    /**
-     * Get all pressure readings.
-     * @returns {Array<Object>} All pressure readings.
-     */
-    function setIsDiurnalEnabled(isEnabled = false) {
-        return isDiurnalEnabled = isEnabled;
-    }
-
-    /**
-     * Get if diurnal pressure correction is enabled.
-     * @returns {boolean} true or false
-     */
-    function getIsDiurnalEnabled() {
-        return isDiurnalEnabled;
     }
 
     /**
@@ -136,22 +72,6 @@
     }
 
     /**
-     * 
-     * @returns {number} The mean temperature used in calculations if no temperature is set when adding pressure readings
-     */
-    function getMeanTemperature() {
-        return meanTemperature;
-    }
-
-    /**
-     * 
-     * @param {number} temperature Sets default mean temperature used if temperature is not submitted when adding pressure readings 
-     */
-    function setMeanTemperature(temperature) {
-        meanTemperature = temperature;
-    }
-
-    /**
      * Get the trend and forecastof the barometer.
      * If latitude is set it will determine northern|southern hemisphere (default: northern)
      * @returns {Object}
@@ -171,7 +91,7 @@
         const latestPressure = pressureReadings.getLatestPressure();
         const allPressures = pressureReadings.pressures;
 
-        let pressureTrend = trend.getTrend(allPressures, getIsDiurnalEnabled());
+        let pressureTrend = trend.getTrend(allPressures, globals.isDiurnalEnabled);
         let pressureSystem = system.getSystemByPressure(latestPressure.calculated.pressureASL);
         let pressureHistory = history.getHistoricPressures(allPressures);
         let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
@@ -202,12 +122,7 @@
         addPressure,
         getPressureCount,
         getForecast,
-        hasPressures,
         getAll,
-        setIsDiurnalEnabled,
-        getIsDiurnalEnabled,
         getLatitude,
         setLatitude,
-        getMeanTemperature,
-        setMeanTemperature
     };

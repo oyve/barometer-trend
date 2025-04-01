@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const utils = require('./utils');
+const diurnalrythm = require('./predictions/diurnalRythm');
 
 let meanTemperature = 15; //celcius
 
@@ -45,9 +46,10 @@ class PressureReadings extends EventEmitter {
             pressureCalculated: () => { return this.calculated.pressureASL; }
         };
 
-        
-        this.pressures.push(reading);
         this.#removeOldPressures();
+
+        this.pressures.push(reading);
+        
         this.emit('pressureAdded', reading);
     }
 
