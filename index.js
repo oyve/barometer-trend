@@ -1,133 +1,128 @@
-'use strict'
-const front = require('./predictions/front');
-const byPressureTrend = require('./predictions/byPressureTrend');
-const byPressureTendencyAndWind = require('./predictions/byPressureTendencyAndWind');
-const byPressureTrendAndSeason = require('./predictions/byPressureTrendAndSeason');
-const beaufort = require('./predictions/beaufort');
-const trend = require('./trend');
-const utils = require('./utils');
-const history = require('./predictions/history');
-const system = require('./predictions/system');
+    'use strict'
+    const front = require('./src/predictions/front');
+    const byPressureTrend = require('./src/predictions/byPressureTrend');
+    const byPressureTendencyAndWind = require('./src/predictions/byPressureTendencyAndWind');
+    const byPressureTrendAndSeason = require('./src/predictions/byPressureTrendAndSeason');
+    const beaufort = require('./src/predictions/beaufort');
+    const trend = require('./src/trend');
+    const utils = require('./src/utils');
+    const history = require('./src/predictions/history');
+    const system = require('./src/predictions/system');
+    const pressureReadings = require('./src/pressureReadings');
+    const globals = require('./src/globals')
 
-let pressures = [];
+    let latitude = null;
 
-/**
- * Clear the pressure readings. (Mainly for testing purposes)
- */
-function clear() {
-    pressures = [];
-}
+    /**
+     * Clear the pressure readings. (Mainly for testing purposes)
+     */
+    function clear() {
+        pressureReadings.clear();
+    }
 
-/**
- * Check if there are any pressure readings.
- * @returns {boolean} True if there are pressure readings, false otherwise.
- */
-function hasPressures() {
-    return pressures.length > 0;
-}
+    /**
+     * Add a pressure reading.
+     * @param {Date} datetime Timestamp of barometer reading
+     * @param {number} pressure Pressure in Pascal
+     * @param {number} altitude Altitude above sea level in meters, default = 0
+     * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
+     * @param {number} trueWindDirection True wind direction in degrees
+     */
+    function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
+        pressureReadings.add(datetime, pressure, altitude, temperature, trueWindDirection, latitude);
+    }
 
-/**
- * Add a pressure reading.
- * @param {Date} datetime Timestamp of barometer reading
- * @param {number} pressure Pressure in Pascal
- * @param {number} altitude Altitude above sea level in meters, default = 0
- * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
- * @param {number} trueWindDirection True wind direction in degrees
- */
-function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
-if (altitude === null) altitude = 0;
-    if (temperature === null) temperature = utils.toKelvinFromCelcius(15);
-    if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
+    /**
+     * Get the count of pressure entries. (Mainly for testing purposes)
+     * @returns {number} Number of pressure entries
+     */
+    function getPressureCount() {
+        return pressureReadings.pressures.length;
+    }
 
-    let pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
+    /**
+     * Get latitude
+     * @returns {number} Returns latitude, null if not set
+     */
+    function getLatitude()
+    {
+        return this.latitude;
+    }
 
-    pressures.push({
-        datetime: datetime,
-        value: pressureASL,
-        meta: {
-            value: pressure,
-            altitude: altitude,
-            temperature: temperature,
-            twd: trueWindDirection
+    /**
+     * Set latitude as a decimal number, i.e. 45.123
+     * @param {number} latitude Latitude in decimal format, i.e. 45.123
+     * @returns {boolean} true or false if set after validation
+     */
+    function setLatitude(latitude) {
+        if(utils.isValidLatitude(latitude)) {
+            this.latitude = latitude;
+            return true;
         }
-    });
 
-    removeOldPressures();
-}
+        return false;
+    }
 
-/**
- * Get the count of pressure entries. (Mainly for testing purposes)
- * @returns {number} Number of pressure entries
- */
-function getPressureCount() {
-    return pressures.length;
-}
+    /**
+     * @deprecated use getForecast instead
+     */
+    function getPredictions(isNorthernHemisphere = true) {
+        console.warn("Warning: deprecated. Use getForecast instead.")
+        return this.getForecast(isNorthernHemisphere);
+    }
 
-/**
- * Remove old pressure readings.
- * @param {Date} threshold The threshold date to remove old pressures. Defaults to 48 hours ago.
- */
-function removeOldPressures(threshold = utils.minutesFromNow(-utils.MINUTES.FORTYEIGHT_HOURS)) {
-    pressures = pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
-}
+    /**
+     * Get the trend and forecastof the barometer.
+     * If latitude is set it will determine northern|southern hemisphere (default: northern)
+     * @returns {Object}
+     */
+    function getForecast() {
+        return getForecast(utils.isNorthernHemisphere(latitude));
+    }
 
-/**
- * Get the last pressure reading.
- * @returns {Object} The last pressure reading.
- */
-function getLastPressure() {
-    return pressures[pressures.length - 1];
-}
+    /**
+     * Get the trend and forecast of the barometer.
+     * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
+     * @returns {Object}
+     */
+    function getForecast(isNorthernHemisphere = true) {
+        if (pressureReadings.pressures.length < 2) return null;
 
-/**
- * Get all pressure readings.
- * @returns {Array<Object>} All pressure readings.
- */
-function getAll() {
-    return pressures;
-}
+        const latestPressure = pressureReadings.getLatestPressure();
+        const allPressures = pressureReadings.pressures;
 
-/**
- * Get the trend of the barometer.
- * @param {boolean} isNorthernHemisphere Located north of equator? Default true.
- * @returns {Object}
- */
-function getPredictions(isNorthernHemisphere = true) {
-    if (pressures.length < 2) return null;
+        let pressureTrend = trend.getTrend(allPressures, globals.isDiurnalEnabled);
+        let pressureSystem = system.getSystemByPressure(latestPressure.calculated.pressureASL);
+        let pressureHistory = history.getHistoricPressures(allPressures);
+        let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
+        let predictionFront = front.getFront(allPressures);
+        let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
+        let predictionSeason = byPressureTrendAndSeason.getPrediction(latestPressure.calculated.pressureASL, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
+        let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(latestPressure.calculated.pressureASL, latestPressure.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
-    let lastPressure = getLastPressure();
+        let forecast = {
+            lastPressure: latestPressure,
+            history: pressureHistory,
+            trend: pressureTrend,
+            system: pressureSystem,
+            predictions: {
+                pressureOnly: predictionPressureOnly,
+                quadrant: predictionPressureTendencyThresholdAndQuadrant,
+                season: predictionSeason,
+                beaufort: predictionBeaufort,
+                front: predictionFront
+            }
+        };
 
-    let pressureTrend = trend.getTrend(pressures);
-    let pressureSystem = system.getSystemByPressure(lastPressure.value);
-    let pressureHistory = history.getHistoricPressures(pressures);
-    let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
-    let predictionFront = front.getFront(pressures);
-    let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
-    let predictionSeason = byPressureTrendAndSeason.getPrediction(lastPressure.value, pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
-    let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(lastPressure.value, lastPressure.meta.twd, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
-
-    let forecast = {
-        lastPressure: lastPressure,
-        history: pressureHistory,
-        trend: pressureTrend,
-        system: pressureSystem,
-        predictions: {
-            pressureOnly: predictionPressureOnly,
-            quadrant: predictionPressureTendencyThresholdAndQuadrant,
-            season: predictionSeason,
-            beaufort: predictionBeaufort,
-            front: predictionFront
-        }
+        return forecast;
     };
 
-    return forecast;
-};
-
-module.exports = {
-    clear,
-    addPressure,
-    getPressureCount,
-    getPredictions,
-    hasPressures,
-    getAll
-};
+    module.exports = {
+        clear,
+        addPressure,
+        getPressureCount,
+        getPredictions,
+        getForecast,
+        getLatitude,
+        setLatitude,
+    };

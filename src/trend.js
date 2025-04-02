@@ -31,7 +31,7 @@ function getSeverityNotion(severity, tendency) {
     return tendency === TENDENCY.RISING ? severity : -severity;
 }
 
-function calculate(pressures, from) {
+function calculate(pressures, from, useDiurnal = false) {
 	if (pressures.length < 2) return null;
 
 	let subsetOfPressures = utils.getPressuresSince(pressures, from);
@@ -39,7 +39,16 @@ function calculate(pressures, from) {
 	if (subsetOfPressures.length >= 2) {
 		let earlier = subsetOfPressures[0];
 		let later = subsetOfPressures[subsetOfPressures.length - 1];
-		let difference = later.value - earlier.value;
+
+		let earlierValue = useDiurnal && earlier?.calculated?.diurnalPressure !== null  
+		? earlier.calculated.diurnalPressure  
+		: earlier.calculated.pressureASL;
+
+		let laterValue = useDiurnal && later?.calculated?.diurnalPressure !== null  
+		? later.calculated.diurnalPressure  
+		: later.calculated.pressureASL;
+
+		let difference = laterValue - earlierValue;
 		let ratio = difference / from;
 		let tendency = difference >= 0 ? TENDENCY.RISING : TENDENCY.FALLING;
 		
@@ -68,9 +77,9 @@ function compareSeverity(earlier, later) {
     return later;
 }
 
-function getTrend(pressures) {
-	let threeHours = calculate(pressures, -utils.MINUTES.THREE_HOURS);
-	let oneHour = calculate(pressures, -utils.MINUTES.ONE_HOUR);
+function getTrend(pressures, useDiurnal = false) {
+	let threeHours = calculate(pressures, -utils.MINUTES.THREE_HOURS, useDiurnal);
+	let oneHour = calculate(pressures, -utils.MINUTES.ONE_HOUR, useDiurnal);
 
     let actual = threeHours;
     actual = compareSeverity(oneHour, actual);
