@@ -39,6 +39,11 @@ function getPressuresSince(pressures, minutes) {
 	return subPressures;
 }
 
+/**
+ * 
+ * @param {any} value Checks if the given parameter is null or undefined
+ * @returns {boolean} true or false
+ */
 function isNullOrUndefined(value) {
 	return (value === null || value === undefined);
 }
@@ -141,6 +146,7 @@ function isNorthernHemisphere(latitude) {
 }
 
 module.exports = {
+	isNullOrUndefined,
 	minutesFromNow,
 	getPressuresSince,
 	isSummer,
