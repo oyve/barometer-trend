@@ -64,6 +64,14 @@
     }
 
     /**
+     * @deprecated use getForecast instead
+     */
+    function getPredictions(isNorthernHemisphere = true) {
+        console.warn("Warning: deprecated. Use getForecast instead.")
+        return this.getForecast(isNorthernHemisphere);
+    }
+
+    /**
      * Get the trend and forecastof the barometer.
      * If latitude is set it will determine northern|southern hemisphere (default: northern)
      * @returns {Object}
@@ -113,6 +121,7 @@
         clear,
         addPressure,
         getPressureCount,
+        getPredictions,
         getForecast,
         getLatitude,
         setLatitude,
