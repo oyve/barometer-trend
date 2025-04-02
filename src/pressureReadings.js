@@ -21,12 +21,15 @@ class PressureReadings extends EventEmitter {
     add(datetime, pressure, altitude, temperature, trueWindDirection, latitude) {
         if(utils.isNullOrUndefined(datetime)) datetime = Date.now();
         if(utils.isNullOrUndefined(altitude)) altitude = 0;
-        if(utils.isNullOrUndefined(temperature)) temperature = utils.toKelvinFromCelcius(globals.meanSeaLevelTemperature);
+        if(utils.isNullOrUndefined(temperature)) temperature = utils.toKelvinFromCelsius(globals.meanSeaLevelTemperature);
         if(!utils.isNullOrUndefined(trueWindDirection) && trueWindDirection === 360) trueWindDirection = 0;
 
         const ema = 1;
         const pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-        const diurnalPressure = 0;
+        
+        const diurnalPressure = utils.isValidLatitude(latitude) ?
+            diurnalrythm.correctPressure(pressureASL, latitude, datetime).correctedPressure :
+            null;
 
         const reading = {
             datetime: datetime,
@@ -39,7 +42,7 @@ class PressureReadings extends EventEmitter {
             },
             calculated: {
                 pressureASL: pressureASL,
-                diurnalPressure: diurnalPressure,
+                diurnalPressureASL: diurnalPressure,
                 EMA: ema
             },
             pressureCalculated: () => { return reading.calculated.pressureASL + reading.calculated.diurnalPressure; }
