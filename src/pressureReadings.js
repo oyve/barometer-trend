@@ -1,8 +1,7 @@
 const EventEmitter = require('events');
 const utils = require('./utils');
 const diurnalrythm = require('./predictions/diurnalRythm');
-
-let meanTemperature = 15; //celcius
+const globals = require('./globals')
 
 class PressureReadings extends EventEmitter {
     constructor() {
@@ -20,10 +19,10 @@ class PressureReadings extends EventEmitter {
      * @param {number} latitude Latitude in decimal degrees, eg. 45.123
      */
     add(datetime, pressure, altitude, temperature, trueWindDirection, latitude) {
-        if(datetime === null) datetime = Date.now();
-        if (altitude === null) altitude = 0;
-        if (temperature === null) temperature = utils.toKelvinFromCelcius(meanTemperature);
-        if (trueWindDirection !== null && trueWindDirection === 360) trueWindDirection = 0;
+        if(utils.isNullOrUndefined(datetime)) datetime = Date.now();
+        if(utils.isNullOrUndefined(altitude)) altitude = 0;
+        if(utils.isNullOrUndefined(temperature)) temperature = utils.toKelvinFromCelcius(globals.meanSeaLevelTemperature);
+        if(!utils.isNullOrUndefined(trueWindDirection) && trueWindDirection === 360) trueWindDirection = 0;
 
         const ema = 1;
         const pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
@@ -46,14 +45,12 @@ class PressureReadings extends EventEmitter {
             pressureCalculated: () => { return reading.calculated.pressureASL + reading.calculated.diurnalPressure; }
         };
 
-        this.#removeOldPressures();
-
         this.pressures.push(reading);
-        
+        this.#removeOldPressures();
         this.emit('pressureAdded', reading);
     }
 
-    #removeOldPressures(threshold = utils.minutesFromNow(-utils.MINUTES.FORTYEIGHT_HOURS)) {
+    #removeOldPressures(threshold = utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
         this.pressures = this.pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
     }
 

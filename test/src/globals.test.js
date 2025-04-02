@@ -1,6 +1,7 @@
 
 const assert = require('assert');
 const globals = require('../../src/globals');
+const utils = require('../../src/utils');
 
 describe("Globals Tests", function () {
     describe("Diurnal Enabled Tests", function () {
@@ -50,6 +51,27 @@ describe("Globals Tests", function () {
         var actual = globals.meanSeaLevelTemperature;
         //assert
         assert.strictEqual(actual, expected);
+        });
+    });
+
+    describe("Keep pressure readings for", function () {
+        it("it should default", function () {
+            //arrange
+            const expected = utils.MINUTES.FORTYEIGHT_HOURS;
+            //act
+            var actual = globals.keepPressureReadingsFor;
+            //assert
+            assert.strictEqual(actual, expected);
+            });
+        it("it should set", function () {
+        //arrange
+        const expected = 20;
+        globals.setKeepPressureReadingsFor(expected);
+        //act
+        var actual = globals.keepPressureReadingsFor;
+        //assert
+        assert.strictEqual(actual, expected);
+        globals.setKeepPressureReadingsFor(); //default it again to not affect later tests
         });
     });
 });
