@@ -29,7 +29,7 @@ class PressureReadings extends EventEmitter {
         
         const diurnalPressure = utils.isValidLatitude(latitude) ?
             diurnalrythm.correctPressure(pressureASL, latitude, datetime).correctedPressure :
-            null;
+            0; //zero affect
 
         const reading = {
             datetime: datetime,
@@ -45,7 +45,7 @@ class PressureReadings extends EventEmitter {
                 diurnalPressureASL: diurnalPressure,
                 EMA: ema
             },
-            pressureCalculated: () => { return reading.calculated.pressureASL + reading.calculated.diurnalPressure; }
+            pressureCalculated: () => { return reading.calculated.pressureASL + reading.calculated.diurnalPressureASL; }
         };
 
         this.pressures.push(reading);
