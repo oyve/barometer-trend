@@ -26,6 +26,7 @@ class PressureReadings extends EventEmitter {
 
         const ema = 1;
         const pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
+        //const pressureASL = utils.adjustPressureToSeaLevelWithHistoricalData(pressure, altitude, this.pressures, datetime);
         
         const diurnalPressure = utils.isValidLatitude(latitude) ?
             diurnalrythm.correctPressure(pressure, latitude, datetime).correctedPressure :
@@ -75,6 +76,11 @@ class PressureReadings extends EventEmitter {
      */
     hasPressures() {
         return this.pressures.length > 0;
+    }
+
+    getPressureByDefault(useDiurnal = false) {
+        const pressure = this.getLatestPressure();
+        useDiurnal ? pressure.calculated.diurnalPressureASL : pressure.calculated.pressureASL;
     }
 
     /**

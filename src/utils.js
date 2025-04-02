@@ -175,6 +175,99 @@ function isNorthernHemisphere(latitude) {
     return latitude > 0;
 }
 
+const lapseRate = 0.0065;
+
+/**
+ * 
+ * @param {number} observedTemperature Temperature in Celsius.
+ * @param {number} altitude Altitude in meters.
+ * @returns 
+ */
+function getApproxSeaLevelTemperature(observedTemperature, altitude) {
+    return observedTemperature + lapseRate * altitude;
+}
+
+function calculateDynamicLapseRate(readings, hours = 24) {
+    // Filter readings to the last X hours
+    const filteredReadings = filterReadingsByTimeRange(readings, hours);
+
+    let totalLapseRate = 0;
+    let count = 0;
+
+    for (let i = 1; i < filteredReadings.length; i++) {
+        const T1 = filteredReadings[i - 1].temperature; // Temperature in Kelvin
+        const altitude1 = filteredReadings[i - 1].altitude; // Altitude in meters
+        const T2 = filteredReadings[i].temperature; // Temperature in Kelvin
+        const altitude2 = filteredReadings[i].altitude; // Altitude in meters
+
+        if (altitude2 !== altitude1) {
+            const lapseRate = (T2 - T1) / (altitude2 - altitude1); // K/m
+            totalLapseRate += lapseRate;
+            count++;
+        }
+    }
+
+    return count > 0 ? totalLapseRate / count : 0.0065; // Default to standard lapse rate if no data
+}
+
+function adjustPressureWithDynamicLapseRate(pressure, altitude, temperature, lapseRate) {
+    const g = 9.80665; // Gravitational acceleration (m/s²)
+    const R = 287.05; // Specific gas constant for dry air (J/(kg·K))
+
+    if (lapseRate > 0) {
+        // Handle temperature inversion
+        const Tavg = temperature + (lapseRate * altitude) / 2; // Average temperature
+        return pressure * Math.exp((g * altitude) / (R * Tavg));
+    } else {
+        // Standard formula
+        return pressure * Math.pow(1 - (lapseRate * altitude) / temperature, -g / (R * lapseRate));
+    }
+}
+
+function filterReadingsByTimeRange(readings, hours) {
+    const cutoffTime = Date.now() - hours * 60 * 60 * 1000; // Convert hours to milliseconds
+    return readings.filter((reading) => reading.datetime.getTime() >= cutoffTime);
+}
+
+function calculateWeightedAverageTemperature(readings, hours = 24) {
+    // Filter readings to the last X hours
+    const filteredReadings = filterReadingsByTimeRange(readings, hours);
+
+    let totalWeight = 0;
+    let weightedSum = 0;
+
+    for (let i = 1; i < filteredReadings.length; i++) {
+        const T1 = filteredReadings[i - 1].meta.temperature; // Temperature in Kelvin
+        const altitude1 = filteredReadings[i - 1].meta.altitude; // Altitude in meters
+        const T2 = filteredReadings[i].meta.temperature; // Temperature in Kelvin
+        const altitude2 = filteredReadings[i].meta.altitude; // Altitude in meters
+
+        const weight = Math.abs(altitude2 - altitude1); // Altitude difference as weight
+        const averageTemperature = (T1 + T2) / 2;
+
+        weightedSum += averageTemperature * weight;
+        totalWeight += weight;
+    }
+
+    return totalWeight > 0 ? weightedSum / totalWeight : readings[0]?.meta.temperature || 288.15; // Default to 15°C in Kelvin if no data
+}
+
+function detectTemperatureInversion(T1, altitude1, T2, altitude2) {
+    const lapseRate = (T2 - T1) / (altitude2 - altitude1); // K/m
+    return lapseRate > 0; // Returns true if inversion is detected
+}
+
+function adjustPressureToSeaLevelWithHistoricalData(pressure, altitude, readings, hours = 24) {
+    // Calculate dynamic lapse rate using recent readings
+    const dynamicLapseRate = calculateDynamicLapseRate(readings, hours);
+
+    // Calculate weighted average temperature using recent readings
+    const weightedAverageTemperature = calculateWeightedAverageTemperature(readings, hours);
+
+    // Adjust pressure using the improved formula
+    return adjustPressureWithDynamicLapseRate(pressure, altitude, weightedAverageTemperature, dynamicLapseRate);
+}
+
 module.exports = {
     isNullOrUndefined,
     minutesFromNow,
@@ -189,6 +282,8 @@ module.exports = {
     get24HourFormat,
     isValidLatitude,
     isNorthernHemisphere,
+    getApproxSeaLevelTemperature,
+    adjustPressureToSeaLevelWithHistoricalData,
     MINUTES,
     KELVIN,
 };
