@@ -1,119 +1,144 @@
 const MINUTES = {
-	ONE_HOUR: 60,
-	THREE_HOURS: 60*3,
-	FORTYEIGHT_HOURS: 60*48
-}
+    ONE_HOUR: 60,
+    THREE_HOURS: 60 * 3,
+    FORTYEIGHT_HOURS: 60 * 48,
+};
 
 const KELVIN = 273.15;
 
 /**
- * 
- * @param {number} minutes Minutes from current time
- * @returns {Date} Date with given minute difference
+ * Get a date object adjusted by a given number of minutes.
+ * @param {number} minutes Minutes from the current time.
+ * @returns {Date} Adjusted date object.
  */
 function minutesFromNow(minutes) {
-	let now = new Date();
-	now.setMinutes(now.getMinutes() + minutes);
-	return new Date(now);
-}
-
-function adjustPressureToSeaLevel(pressure, height, temperature = toKelvinFromCelcius(15)) {
-	temperature = temperature - KELVIN;
-	let seaLevelPressure = pressure * Math.pow(1 - ((0.0065 * height) / (temperature + 0.0065 * height + KELVIN)), -5.257);
-	return Math.round(seaLevelPressure);
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + minutes);
+    return now;
 }
 
 /**
- * 
- * @param {Array<Object>} pressures The pressures to filter
- * @param {number} minutes Since X minutes
- * @returns {Array<Object>} Subset of pressures
+ * Adjust pressure to sea level using the barometric formula.
+ * @param {number} pressure Pressure in Pascals.
+ * @param {number} height Altitude in meters.
+ * @param {number} temperature Temperature in Kelvin (default: 15°C in Kelvin).
+ * @returns {number} Adjusted pressure at sea level.
+ */
+function adjustPressureToSeaLevel(pressure, height, temperature = toKelvinFromCelsius(15)) {
+    if (!Number.isFinite(pressure) || !Number.isFinite(height) || !Number.isFinite(temperature)) {
+        throw new Error("Invalid input for pressure, height, or temperature.");
+    }
+
+    const tempCelsius = temperature - KELVIN;
+    const seaLevelPressure = pressure * Math.pow(1 - (0.0065 * height) / (tempCelsius + 0.0065 * height + KELVIN), -5.257);
+    return Math.round(seaLevelPressure);
+}
+
+/**
+ * Filter pressures recorded since a given number of minutes ago.
+ * @param {Array<Object>} pressures Array of pressure readings.
+ * @param {number} minutes Minutes from now.
+ * @returns {Array<Object>} Filtered pressures.
  */
 function getPressuresSince(pressures, minutes) {
-
-	let earlier = minutesFromNow(-Math.abs(minutes));
-
-	let subPressures = pressures.filter((p) => {
-		return p.datetime.getTime() >= earlier.getTime();
-	});
-	return subPressures;
+    const earlier = minutesFromNow(-Math.abs(minutes));
+    return pressures.filter((p) => p.datetime.getTime() >= earlier.getTime());
 }
 
 /**
- * 
- * @param {any} value Checks if the given parameter is null or undefined
- * @returns {boolean} true or false
+ * Check if a value is null or undefined.
+ * @param {*} value Value to check.
+ * @returns {boolean} True if null or undefined, false otherwise.
  */
 function isNullOrUndefined(value) {
-	return (value === null || value === undefined);
+    return value === null || value === undefined;
 }
 
 /**
- * 
- * @param {Array<Object>} pressures Array of pressurs 
- * @param {Date} datetime 
- * @returns The pressure closest to the given datetime, null if not found
+ * Get the pressure closest to a given datetime.
+ * @param {Array<Object>} pressures Array of pressure readings.
+ * @param {Date} datetime Target datetime.
+ * @returns {Object|null} Closest pressure reading or null if none found.
  */
 function getPressureClosestTo(pressures, datetime) {
-	let previous = [...pressures].reverse().find((p) => p.datetime.getTime() <= datetime.getTime());
-	let next = pressures.find((p) => p.datetime.getTime() >= datetime.getTime());
+    if (!Array.isArray(pressures) || !(datetime instanceof Date)) {
+        throw new Error("Invalid input for pressures or datetime.");
+    }
 
-	if(isNullOrUndefined(next) && isNullOrUndefined(previous)) return null;
-	if(isNullOrUndefined(next)) return previous;
-	if(isNullOrUndefined(previous)) return next;
+    let previous = null;
+    let next = null;
 
-	let diffNext = Math.abs(next.datetime.getTime() - datetime.getTime());
-	let diffPrevious =  Math.abs(previous.datetime.getTime() - datetime.getTime());
+    for (const p of pressures) {
+        if (p.datetime.getTime() <= datetime.getTime()) previous = p;
+        if (p.datetime.getTime() >= datetime.getTime()) {
+            next = p;
+            break;
+        }
+    }
 
-	return (diffNext < diffPrevious) ? next : previous;
+    if (isNullOrUndefined(next) && isNullOrUndefined(previous)) return null;
+    if (isNullOrUndefined(next)) return previous;
+    if (isNullOrUndefined(previous)) return next;
+
+    const diffNext = Math.abs(next.datetime.getTime() - datetime.getTime());
+    const diffPrevious = Math.abs(previous.datetime.getTime() - datetime.getTime());
+
+    return diffNext < diffPrevious ? next : previous;
 }
 
 /**
- * 
- * @param {Array<Object>} pressures Array of pressures
- * @param {Date} startTime Period start
- * @param {Date} endTime Period end
- * @returns Subset of pressures of the given period
+ * Filter pressures within a specific time period.
+ * @param {Array<Object>} pressures Array of pressure readings.
+ * @param {Date} startTime Start of the period.
+ * @param {Date} endTime End of the period.
+ * @returns {Array<Object>} Pressures within the period.
  */
-function getPressuresByPeriod(pressures, startTime, endTime)
-{
-	return pressures.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
+function getPressuresByPeriod(pressures, startTime, endTime) {
+    if (!(startTime instanceof Date) || !(endTime instanceof Date)) {
+        throw new Error("Invalid input for startTime or endTime.");
+    }
+
+    return pressures.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
 }
 
 /**
- * 
- * @param {Array<Object>} pressures Array of pressures
- * @returns Average pressure value
+ * Calculate the average pressure from an array of pressure readings.
+ * @param {Array<Object>} pressures Array of pressure readings.
+ * @returns {number} Average pressure value.
  */
 function getPressureAverage(pressures) {
-	let sum = 0;
-	pressures.forEach((p) => {
-		sum += p.calculated.pressureASL;
-	});
+    if (!Array.isArray(pressures) || pressures.length === 0) {
+        throw new Error("Invalid input for pressures.");
+    }
 
-	return sum / pressures.length;
-}
-
-function isSummer(isNorthernHemisphere = true) {
-    let month = new Date().getMonth() + 1;
-	let summer = month >= 4 && month <= 9; //April to September
-	
-	return isNorthernHemisphere ? summer : !summer;
+    const sum = pressures.reduce((acc, p) => acc + p.calculated.pressureASL, 0);
+    return sum / pressures.length;
 }
 
 /**
- * 
- * @param {number} celcius Celcius degrees
- * @returns Kelvin degrees
+ * Determine if the current season is summer.
+ * @param {boolean} isNorthernHemisphere True if in the Northern Hemisphere.
+ * @returns {boolean} True if summer, false otherwise.
  */
-function toKelvinFromCelcius(celcius) {
-	return celcius + 273.15;
+function isSummer(isNorthernHemisphere = true) {
+    const month = new Date().getMonth() + 1; // Months are 0-indexed
+    const summer = month >= 4 && month <= 9; // April to September
+    return isNorthernHemisphere ? summer : !summer;
 }
 
 /**
- * 
- * @param {number} date Datetime
- * @returns {number} Day number of year
+ * Convert Celsius to Kelvin.
+ * @param {number} celsius Temperature in Celsius.
+ * @returns {number} Temperature in Kelvin.
+ */
+function toKelvinFromCelsius(celsius) {
+    return celsius + KELVIN;
+}
+
+/**
+ * Get the day of the year for a given date.
+ * @param {Date} date Target date.
+ * @returns {number} Day of the year.
  */
 function getDayOfYear(date) {
     const start = new Date(date.getFullYear(), 0, 0);
@@ -123,42 +148,47 @@ function getDayOfYear(date) {
 }
 
 /**
- * 
- * @param {datetime} date Datetime
- * @returns {number} 24-hour format hour of date
+ * Get the 24-hour format hour of a given date.
+ * @param {Date} date Target date.
+ * @returns {number} Hour in 24-hour format.
  */
 function get24HourFormat(date) {
     return date.getHours();
 }
 
 /**
- * 
- * @param {number} latitude Latitude in decimal form, i.e. 63.123
- * @returns {boolean} true or false
+ * Validate if a latitude is within valid bounds.
+ * @param {number} latitude Latitude in decimal format.
+ * @returns {boolean} True if valid, false otherwise.
  */
 function isValidLatitude(latitude) {
     return Number.isFinite(latitude) && latitude >= -90 && latitude <= 90;
 }
 
+/**
+ * Determine if a latitude is in the Northern Hemisphere.
+ * @param {number|null} latitude Latitude in decimal format.
+ * @returns {boolean} True if in the Northern Hemisphere, false otherwise.
+ */
 function isNorthernHemisphere(latitude) {
-	if(latitude === null) return true;
-    return latitude > 0 ? true : false;
+    if (latitude === null) return true; // Default to Northern Hemisphere
+    return latitude > 0;
 }
 
 module.exports = {
-	isNullOrUndefined,
-	minutesFromNow,
-	getPressuresSince,
-	isSummer,
-	adjustPressureToSeaLevel,
-	toKelvinFromCelcius,
-	getPressureClosestTo,
-	getPressuresByPeriod,
-	getPressureAverage,
-	getDayOfYear,
-	get24HourFormat,
-	isValidLatitude,
-	isNorthernHemisphere,
-	MINUTES,
-	KELVIN
-}
+    isNullOrUndefined,
+    minutesFromNow,
+    getPressuresSince,
+    isSummer,
+    adjustPressureToSeaLevel,
+    toKelvinFromCelsius,
+    getPressureClosestTo,
+    getPressuresByPeriod,
+    getPressureAverage,
+    getDayOfYear,
+    get24HourFormat,
+    isValidLatitude,
+    isNorthernHemisphere,
+    MINUTES,
+    KELVIN,
+};
