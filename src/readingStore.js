@@ -97,6 +97,11 @@ class ReadingStore extends EventEmitter {
         return this.getReadingPressureByDefaultChoice(this.getLatestReading());
     }
 
+    /**
+     * Returns the pressure of a reading by global default choices of Adjust To Sea Level and/or applying Diurnal Rythm corrections.
+     * @param {Object} reading The reading to return pressure of
+     * @returns 
+     */
     getReadingPressureByDefaultChoice(reading) {
         let result = null;
 
