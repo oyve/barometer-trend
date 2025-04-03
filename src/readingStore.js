@@ -3,7 +3,13 @@ const utils = require('./utils');
 const diurnalrythm = require('./predictions/diurnalRythm');
 const globals = require('./globals')
 
-class PressureReadings extends EventEmitter {
+// (async () => {
+//     const weatherFormulas = await import('weather-formulas');
+//     const { pressure } = weatherFormulas;
+//     pressure.adjustPressureToSeaLevelAdvanced()
+// })();
+  
+class ReadingStore extends EventEmitter {
     constructor() {
         super();
         this.pressures = [];
@@ -19,7 +25,7 @@ class PressureReadings extends EventEmitter {
      * @param {number} latitude Latitude in decimal degrees, eg. 45.123
      */
     add(datetime, pressure, altitude, temperature, trueWindDirection, latitude) {
-        if(utils.isNullOrUndefined(datetime)) datetime = Date.now();
+        if(utils.isNullOrUndefined(datetime)) datetime = new Date();
         if(utils.isNullOrUndefined(altitude)) altitude = 0;
         if(utils.isNullOrUndefined(temperature)) temperature = utils.toKelvinFromCelsius(globals.meanSeaLevelTemperature);
         if(!utils.isNullOrUndefined(trueWindDirection) && trueWindDirection === 360) trueWindDirection = 0;
@@ -55,18 +61,21 @@ class PressureReadings extends EventEmitter {
 
         this.pressures.push(reading);
         this.#removeOldPressures();
+        this.pressures.sort((a, b) => a.datetime.getTime() - b.datetime.getTime()); //oldest to newest
         this.emit('pressureAdded', reading);
     }
 
     #removeOldPressures(threshold = utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
-        this.pressures = this.pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
+        if(!globals.ignoreFlagInTesting) {
+            this.pressures = this.pressures.filter((p) => p.datetime.getTime() >= threshold.getTime());
+        }
     }
 
     /**
      * Get the last pressure reading.
      * @returns {Object} The last pressure reading.
      */
-    getLatestPressure() {
+    getLatestReading() {
         return this.pressures[this.pressures.length - 1];
     }
 
@@ -78,9 +87,30 @@ class PressureReadings extends EventEmitter {
         return this.pressures.length > 0;
     }
 
-    getPressureByDefault(useDiurnal = false) {
-        const pressure = this.getLatestPressure();
-        useDiurnal ? pressure.calculated.diurnalPressureASL : pressure.calculated.pressureASL;
+    /**
+     * The lastest pressure by the default global choice of using Adjust To Sea Level and/or applying Diurnal Rythm corrections
+     * @returns The lastest pressure
+     */
+    getLatestPressureByDefaultChoice() {
+        if(!this.hasPressures()) return null;
+
+        return this.getReadingPressureByDefaultChoice(this.getLatestReading());
+    }
+
+    getReadingPressureByDefaultChoice(reading) {
+        let result = null;
+
+        if(globals.applyAdjustToSeaLevel) {
+            result = globals.applyDiurnalRythm ? reading?.calculated?.diurnalPressureASL : reading?.calculated?.pressureASL;
+        } else {
+            result = globals.applyDiurnalRythm ? reading?.calculated?.diurnalPressure : reading.pressure;
+        }
+
+        return result;
+    }
+
+    getAll() {
+        return this.pressures;
     }
 
     /**
@@ -91,6 +121,6 @@ class PressureReadings extends EventEmitter {
     }
 }
 
-const pressureReadingsAsSingleton = new PressureReadings();
+const readingStoreAsSingleton = new ReadingStore();
 
-module.exports = pressureReadingsAsSingleton;
+module.exports = readingStoreAsSingleton;

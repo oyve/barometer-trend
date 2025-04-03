@@ -43,6 +43,7 @@
     "mocha": "^10.1.0"
   },
   "dependencies": {
-    "regression": "^2.0.1"
+    "regression": "^2.0.1",
+    "weather-formulas": "^1.0.5"
   }
 }

@@ -62,7 +62,7 @@ describe("Globals Tests", function () {
             var actual = globals.keepPressureReadingsFor;
             //assert
             assert.strictEqual(actual, expected);
-            });
+        });
         it("it should set", function () {
         //arrange
         const expected = 20;
@@ -72,6 +72,48 @@ describe("Globals Tests", function () {
         //assert
         assert.strictEqual(actual, expected);
         globals.setKeepPressureReadingsFor(); //default it again to not affect later tests
+        });
+    });
+
+    describe("Apply Sea Level", function () {
+        it("it should default", function () {
+            //arrange
+            const expected = false;
+            //act
+            var actual = globals.applyAdjustToSeaLevel;
+            //assert
+            assert.strictEqual(actual, expected);
+        });
+        it("it should set", function () {
+        //arrange
+        const expected = true;
+        globals.setApplyAdjustToSeaLevel(expected);
+        //act
+        var actual = globals.applyAdjustToSeaLevel;
+        //assert
+        assert.strictEqual(actual, expected);
+        globals.setApplyAdjustToSeaLevel(); //default it again to not affect later tests
+        });
+    });
+
+    describe("Apply Diurnal Rythm", function () {
+        it("it should default", function () {
+            //arrange
+            const expected = false;
+            //act
+            var actual = globals.applyDiurnalRythm;
+            //assert
+            assert.strictEqual(actual, expected);
+        });
+        it("it should set", function () {
+        //arrange
+        const expected = true;
+        globals.setApplyDiurnalRythm(expected);
+        //act
+        var actual = globals.applyDiurnalRythm;
+        //assert
+        assert.strictEqual(actual, expected);
+        globals.setApplyDiurnalRythm(); //default it again to not affect later tests
         });
     });
 });
