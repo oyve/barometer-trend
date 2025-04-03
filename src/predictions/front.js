@@ -1,6 +1,7 @@
 const fronts = require('./fronts.json');
 const utils = require('../utils');
 const regression = require('regression');
+const readingStore = require('../readingStore');
 
 const Pascal10 = 10;
 const ONE_HOUR = 60;
@@ -45,7 +46,7 @@ function regressPressures(pressures) {
 	pressures.forEach((p) => {
 		let diff = now - p.datetime;
 		let min = Math.round((diff/1000)/ONE_HOUR);
-		minutelyPressures.push([min, p.value]);
+		minutelyPressures.push([min, readingStore.getReadingPressureByDefaultChoice(p)]);
 	});
 
 	let result = regression.linear(minutelyPressures);
