@@ -114,6 +114,10 @@ class ReadingStore extends EventEmitter {
         return result;
     }
 
+    /**
+     * 
+     * @returns Returns all pressure readings
+     */
     getAll() {
         return this.pressures;
     }
