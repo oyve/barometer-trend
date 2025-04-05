@@ -1,4 +1,5 @@
 const utils = require('../utils');
+const readingStore = require('../readingStore');
 
 /**
  * 
@@ -6,13 +7,13 @@ const utils = require('../utils');
  * @param {number} limit Number of historic values to return
  * @returns [{hour: hour, pressure: pressure}]
  */
-function getHistoricPressures(pressures, limit = 48) {
+function getHistoricPressures(limit = 48) {
 	let historicPressures = [];
 
 	for (hour = 1; hour <= limit; hour++) {
 		let threshold = utils.minutesFromNow(-hour * 60);
 
-		let pressure = utils.getPressureClosestTo(pressures, threshold);
+		let pressure = readingStore.getPressureClosestTo(threshold);
 
 		if (pressure !== null && isLessThanOld(pressure.datetime, threshold, 30)) {
 			historicPressures.push({ hour: hour, pressure: pressure });

@@ -44,6 +44,6 @@
   },
   "dependencies": {
     "regression": "^2.0.1",
-    "weather-formulas": "^1.0.5"
+    "weather-formulas": "^1.0.7"
   }
 }

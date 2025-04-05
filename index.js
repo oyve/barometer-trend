@@ -33,11 +33,10 @@
     }
 
     /**
-     * Get the count of pressure entries. (Mainly for testing purposes)
-     * @returns {number} Number of pressure entries
+     * @returns True or false
      */
-    function getPressureCount() {
-        return readingStore.pressures.length;
+    function hasPressures() {
+        return readingStore.hasPressures();
     }
 
     /**
@@ -86,16 +85,18 @@
      * @returns {Object}
      */
     function getForecast(isNorthernHemisphere = true) {
-        if (readingStore.pressures.length < 2) return null;
+        if (readingStore.readings.length < 2) return null;
 
-        let pressureTrend = trend.getTrend(readingStore.getAll());
-        let pressureSystem = system.getSystemByPressure(readingStore.getLatestPressureByDefaultChoice());
-        let pressureHistory = history.getHistoricPressures(readingStore.getAll());
+        let all = readingStore.getAll();
+
+        let pressureTrend = trend.getTrend();
+        let pressureSystem = system.getSystemByPressure(readingStore.getPressureByDefaultChoice());
+        let pressureHistory = history.getHistoricPressures();
         let predictionPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend);
-        let predictionFront = front.getFront(readingStore.getAll());
+        let predictionFront = front.getFront(all);
         let predictionBeaufort = beaufort.getByPressureVariationRatio(pressureTrend.ratio);
-        let predictionSeason = byPressureTrendAndSeason.getPrediction(readingStore.getLatestPressureByDefaultChoice(), pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
-        let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(readingStore.getLatestPressureByDefaultChoice(), readingStore.getLatestReading().meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
+        let predictionSeason = byPressureTrendAndSeason.getPrediction(readingStore.getPressureByDefaultChoice(), pressureTrend.tendency, pressureTrend.trend, utils.isSummer(isNorthernHemisphere));
+        let predictionPressureTendencyThresholdAndQuadrant = byPressureTendencyAndWind.getPrediction(readingStore.getPressureByDefaultChoice(), readingStore.getLatestReading().meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere);
 
         let forecast = {
             lastPressure: readingStore.getLatestReading(),
@@ -116,8 +117,8 @@
 
     module.exports = {
         clear,
+        hasPressures,
         addPressure,
-        getPressureCount,
         getPredictions,
         getForecast,
         getLatitude,

@@ -1,5 +1,4 @@
 const utils = require('./utils');
-const globals = require('./globals');
 const readingStore = require('./readingStore');
 
 const TENDENCY = {
@@ -33,18 +32,17 @@ function getSeverityNotion(severity, tendency) {
     return tendency === TENDENCY.RISING ? severity : -severity;
 }
 
-function calculate(pressures, from) {
-	if (pressures.length < 2) return null;
+function calculate(from) {
+	if (readingStore.getAll().length < 2) return null;
 
-	let subsetOfPressures = utils.getPressuresSince(pressures, from);
+	let subsetOfPressures = readingStore.getPressuresSince(from);
 
 	if (subsetOfPressures.length >= 2) {
 		let earlier = subsetOfPressures[0];
 		let later = subsetOfPressures[subsetOfPressures.length - 1];
 
-		
-		let earlierValue = readingStore.getReadingPressureByDefaultChoice(earlier);
-		let laterValue = readingStore.getReadingPressureByDefaultChoice(later);
+		let earlierValue = readingStore.getPressureByDefaultChoice(earlier);
+		let laterValue = readingStore.getPressureByDefaultChoice(later);
 
 		let difference = laterValue - earlierValue;
 		let ratio = difference / from;
@@ -75,9 +73,9 @@ function compareSeverity(earlier, later) {
     return later;
 }
 
-function getTrend(pressures) {
-	let threeHours = calculate(pressures, -utils.MINUTES.THREE_HOURS);
-	let oneHour = calculate(pressures, -utils.MINUTES.ONE_HOUR);
+function getTrend() {
+	let threeHours = calculate(-utils.MINUTES.THREE_HOURS);
+	let oneHour = calculate(-utils.MINUTES.ONE_HOUR);
 
     let actual = threeHours;
     actual = compareSeverity(oneHour, actual);
