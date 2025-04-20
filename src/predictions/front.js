@@ -46,7 +46,7 @@ function regressPressures(pressures) {
 	pressures.forEach((p) => {
 		let diff = now - p.datetime;
 		let min = Math.round((diff/1000)/ONE_HOUR);
-		minutelyPressures.push([min, readingStore.getReadingPressureByDefaultChoice(p)]);
+		minutelyPressures.push([min, readingStore.getPressureByDefaultChoice(p)]);
 	});
 
 	let result = regression.linear(minutelyPressures);

@@ -2,6 +2,7 @@
 const assert = require('assert');
 const barometer = require('../index');
 const utils = require('../src/utils');
+const readingStore = require('../src/readingStore');
 
 describe("Unit Tests", function () {
     describe("Set Latitude", function () {
@@ -77,7 +78,7 @@ describe("Function Tests - Trend chooser", function () {
 
         //act
         var actual = barometer.getForecast();
-        var actualCount = barometer.getPressureCount();
+        var actualCount = readingStore.count();
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
