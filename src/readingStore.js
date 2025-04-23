@@ -36,7 +36,7 @@ class ReadingStore extends EventEmitter {
         if(!utils.isNullOrUndefined(meta.trueWindDirection) && meta.trueWindDirection === 360) meta.trueWindDirection = 0;
 
         const smoothing = this.#smoothPressure(pressure);
-        pressure = smoothing !== null && smoothing.smoothed && smoothing.smoothed !== pressure ? smoothing.smoothed : pressure;
+        pressure = smoothing.smoothed && smoothing.smoothed !== pressure ? smoothing.smoothed : pressure;
         
         const pressureASL = meta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, meta.altitude, meta.temperature)) : pressure;
         
@@ -59,7 +59,7 @@ class ReadingStore extends EventEmitter {
                 latitude: meta.latitude
             },
             calculated: {
-                smoothingCorrrection: smoothing?.correction || 0,
+                smoothingCorrrection: smoothing.correction,
                 pressureASL: pressureASL, //defaults to pressure if not ASL
                 diurnalPressure: diurnalPressure, //defaults to pressure if not diurnal
                 diurnalPressureASL: diurnalPressureASL //default to pressure ASL if not diurnal
@@ -88,11 +88,9 @@ class ReadingStore extends EventEmitter {
 
                 return { pressure: pressure, smoothed: pressureSmoothed, correction: pressureSmoothed - pressure };
             }
-
-            return { pressure: pressure, smoothed: null, correction: 0 };
         }
 
-        return null;
+        return { pressure: pressure, smoothed: null, correction: 0 };
     }
 
     #removeOldPressures(threshold = utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
