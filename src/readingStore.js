@@ -76,7 +76,6 @@ class ReadingStore extends EventEmitter {
     #smoothPressure(pressure) {
         //only apply if we already have more than 3 readings the last hour
         if (globals.applySmoothing) {
-            const oneHourAgo = Date.now() - 60 * 60 * 1000;
             const recentReadings = this.getAll().filter(
                 reading => new Date(reading.datetime).getTime() >= oneHourAgo
             );
