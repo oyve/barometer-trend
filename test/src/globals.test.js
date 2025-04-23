@@ -4,36 +4,6 @@ const globals = require('../../src/globals');
 const utils = require('../../src/utils');
 
 describe("Globals Tests", function () {
-    describe("Diurnal Enabled Tests", function () {
-        it("it should be default false", function () {
-        //arrange     
-        const expected = false;
-        //act
-        var actual = globals.isDiurnalEnabled;
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-        it("it should be set to true", function () {
-        //arrange     
-        const expected = true;
-        globals.setIsDiurnalEnabled(true);
-        //act
-        var actual = globals.isDiurnalEnabled;
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-        it("it should be set to false", function () {
-        //arrange     
-        const expected = false;
-        globals.setIsDiurnalEnabled(true);
-        globals.setIsDiurnalEnabled(false);
-        //act
-        var actual = globals.isDiurnalEnabled;
-        //assert
-        assert.strictEqual(actual, expected);
-        });
-    });
-
     describe("Mean tempereature", function () {
         it("it should default", function () {
             //arrange

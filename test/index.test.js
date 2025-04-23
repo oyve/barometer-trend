@@ -90,12 +90,12 @@ describe("Function Tests - Trend chooser", function () {
         //arrange     
         barometer.clear();
         //THREE HOURS: this should result in FALLING.CHANGING
-        barometer.addPressure(utils.minutesFromNow(-120), 101500, 0, null, 225);
-        barometer.addPressure(utils.minutesFromNow(-80), 101500 - 300, 0, null, 226);
+        barometer.addPressure(utils.minutesFromNow(-120), 101500, { trueWindDirection: 225});
+        barometer.addPressure(utils.minutesFromNow(-80), 101500 - 300, { trueWindDirection: 226});
 
         //ONE HOUR: this should result in FALLING.RAPIDLY
-        barometer.addPressure(utils.minutesFromNow(-50), 101500 - 600, 0, null, 228);
-        barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, 0, null, 230);
+        barometer.addPressure(utils.minutesFromNow(-50), 101500 - 600, { trueWindDirection: 228});
+        barometer.addPressure(utils.minutesFromNow(-1), 101500 - 900, { trueWindDirection: 230});
 
         //act
         var actual = barometer.getForecast();
@@ -103,6 +103,6 @@ describe("Function Tests - Trend chooser", function () {
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
         assert.strictEqual(actual.trend.trend, "RAPIDLY");
-        assert.strictEqual(actual.predictions.quadrant, "Increasing rain, clearing within 12 hours");
+        assert.strictEqual(actual.models.quadrant, "Increasing rain, clearing within 12 hours");
     });
 });

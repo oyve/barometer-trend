@@ -25,24 +25,6 @@ function minutesFrom(datetime, minutes) {
 }
 
 /**
- * Adjust pressure to sea level using the barometric formula.
- * @param {number} pressure Pressure in Pascals.
- * @param {number} altitude Altitude in meters.
- * @param {number} temperature Temperature in Kelvin (default: 15°C in Kelvin).
- * @returns {number} Adjusted pressure at sea level.
- */
-function adjustPressureToSeaLevel(pressureX, altitude, temperature = toKelvinFromCelsius(15)) {
-    
-    if (!Number.isFinite(pressureX) || !Number.isFinite(altitude) || !Number.isFinite(temperature)) {
-        throw new Error("Invalid input for pressure, height, or temperature.");
-    }
-
-    const tempCelsius = temperature - KELVIN;
-    const seaLevelPressure = pressureX * Math.pow(1 - (0.0065 * altitude) / (tempCelsius + 0.0065 * altitude + KELVIN), -5.257);
-    return Math.round(seaLevelPressure);
-}
-
-/**
  * Check if a value is null or undefined.
  * @param {*} value Value to check.
  * @returns {boolean} True if null or undefined, false otherwise.
@@ -75,15 +57,6 @@ function isSummer(isNorthernHemisphere = true) {
     const month = new Date().getMonth() + 1; // Months are 0-indexed
     const summer = month >= 4 && month <= 9; // April to September
     return isNorthernHemisphere ? summer : !summer;
-}
-
-/**
- * Convert Celsius to Kelvin.
- * @param {number} celsius Temperature in Celsius.
- * @returns {number} Temperature in Kelvin.
- */
-function toKelvinFromCelsius(celsius) {
-    return celsius + KELVIN;
 }
 
 /**
@@ -131,8 +104,6 @@ module.exports = {
     minutesFromNow,
     minutesFrom,
     isSummer,
-    adjustPressureToSeaLevel,
-    toKelvinFromCelsius,
     getPressuresByPeriod,
     getDayOfYear,
     get24HourFormat,

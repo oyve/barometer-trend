@@ -8,6 +8,8 @@
     "index.js",
     "src",
     "LICENSE",
+    "src/readingStore.js",
+    "src/globals.js",
     "NOTICE"
   ],
   "scripts": {

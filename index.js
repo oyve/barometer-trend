@@ -9,7 +9,6 @@
     const history = require('./src/predictions/history');
     const system = require('./src/predictions/system');
     const readingStore = require('./src/readingStore');
-    const globals = require('./src/globals');
 
     let latitude = null;
 
@@ -20,16 +19,27 @@
         readingStore.clear();
     }
 
+    // /**
+    //  * Add a pressure reading.
+    //  * @param {Date} datetime Timestamp of barometer reading
+    //  * @param {number} pressure Pressure in Pascal
+    //  * @param {number} altitude Altitude above sea level in meters, default = 0
+    //  * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
+    //  * @param {number} trueWindDirection True wind direction in degrees
+    //  */
+    // function addPressure(datetime, pressure) {
+    //     addPressure
+    //     readingStore.add(datetime, pressure, altitude, temperature, trueWindDirection, latitude);
+    // }
+
     /**
-     * Add a pressure reading.
+     * 
      * @param {Date} datetime Timestamp of barometer reading
      * @param {number} pressure Pressure in Pascal
-     * @param {number} altitude Altitude above sea level in meters, default = 0
-     * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
-     * @param {number} trueWindDirection True wind direction in degrees
+     * @param {Array} meta Meta data object containing altitude, temperature, humidity, trueWindDirection and latitude
      */
-    function addPressure(datetime, pressure, altitude = null, temperature = null, trueWindDirection = null) {
-        readingStore.add(datetime, pressure, altitude, temperature, trueWindDirection, latitude);
+    function addPressure(datetime, pressure, meta = null) {
+        readingStore.add(datetime, pressure, meta);
     }
 
     /**
@@ -102,13 +112,13 @@
             lastPressure: readingStore.getLatestReading(),
             history: pressureHistory,
             trend: pressureTrend,
-            system: pressureSystem,
-            predictions: {
+            models: {
                 pressureOnly: predictionPressureOnly,
                 quadrant: predictionPressureTendencyThresholdAndQuadrant,
                 season: predictionSeason,
                 beaufort: predictionBeaufort,
-                front: predictionFront
+                front: predictionFront,
+                system: pressureSystem
             }
         };
 
@@ -122,5 +132,5 @@
         getPredictions,
         getForecast,
         getLatitude,
-        setLatitude,
+        setLatitude
     };

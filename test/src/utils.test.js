@@ -14,37 +14,7 @@ describe("Utils Tests", function () {
 			//assert
 			assert.strictEqual(actual, expected);
 		});
-	});
-
-	describe("Correct pressure to sea level with default temperature", function () {
-
-		it("it should equal", function () {
-			//arrange
-			//act
-			var actual = utils.adjustPressureToSeaLevel(98000, 100);
-			//assert
-			assert.strictEqual(actual, 99168);
-		});
-
-		it("Correct pressure to sea level with altitude and temperature", function () {
-			//arrange
-			//act
-			var actual = utils.adjustPressureToSeaLevel(98000, 100, 30 + utils.KELVIN);
-			//assert
-			assert.strictEqual(actual, 99110);
-		});
-
-		it("Correct pressure to sea level with only temperature", function () {
-			//arrange
-			//act
-			var actual = utils.adjustPressureToSeaLevel(98000, 0, 30 + utils.KELVIN);
-			//assert
-			assert.strictEqual(actual, 98000);
-			//https://www.easycalculation.com/weather/temperature-barometer-correction.php
-		});
-	});
-
-	
+	});	
 
 	describe("dayOfYear Tests", function () {
 		it("it should equal 2025", function () {

@@ -1,7 +1,11 @@
 const EventEmitter = require('events');
 const utils = require('./utils');
 const diurnalrythm = require('./predictions/diurnalRythm');
-const globals = require('./globals')
+const globals = require('./globals');
+const EMA = require('./EMA');
+const {pressure: pressureFormulas, temperature: temperatureFormulas} = require('weather-formulas');
+
+const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
 class ReadingStore extends EventEmitter {
     constructor() {
@@ -10,46 +14,64 @@ class ReadingStore extends EventEmitter {
     }
 
     /**
-     * Add a pressure reading.
-     * @param {Date} datetime Timestamp of reading
-     * @param {number} pressure Pressure in Pascals
-     * @param {number} altitude Altitude above sea level in meters, default = 0
-     * @param {number} temperature Temperature in Kelvin, defaults to 15 Celsius degrees
-     * @param {number} trueWindDirection True wind direction in degrees
-     * @param {number} latitude Latitude in decimal degrees, eg. 45.123
+     * 
+     * @param {Date} datetime Timestamp of barometer reading
+     * @param {number} pressure Pressure in Pascal
+     * @param {Array} meta Meta data object containing altitude, temperature, humidity, trueWindDirection and latitude
      */
-    add(datetime, pressure, altitude, temperature, trueWindDirection, latitude) {
-        if(utils.isNullOrUndefined(datetime)) datetime = new Date();
-        if(utils.isNullOrUndefined(altitude)) altitude = 0;
-        if(utils.isNullOrUndefined(temperature)) temperature = utils.toKelvinFromCelsius(globals.meanSeaLevelTemperature);
-        if(!utils.isNullOrUndefined(trueWindDirection) && trueWindDirection === 360) trueWindDirection = 0;
-
-        const ema = 1;
-        const pressureASL = utils.adjustPressureToSeaLevel(pressure, altitude, temperature);
-        //const pressureASL = utils.adjustPressureToSeaLevelWithHistoricalData(pressure, altitude, this.pressures, datetime);
+    add(datetime, pressure, meta = {}) {
         
-        const diurnalPressure = utils.isValidLatitude(latitude) ?
-            diurnalrythm.correctPressure(pressure, latitude, datetime).correctedPressure :
+        meta = {
+            altitude: 0,
+            temperature: null,
+            humidity: null,
+            trueWindDirection: null,
+            latitude: null,
+            ...meta
+        }
+
+        if(utils.isNullOrUndefined(datetime)) datetime = new Date();
+        if(utils.isNullOrUndefined(meta.altitude)) meta.altitude = 0;
+        if(utils.isNullOrUndefined(meta.temperature)) meta.temperature = temperatureFormulas.celciusToKelvin(globals.meanSeaLevelTemperature);
+        if(!utils.isNullOrUndefined(meta.trueWindDirection) && meta.trueWindDirection === 360) meta.trueWindDirection = 0;
+
+        //only apply if we already have more than 3 readings the last hour
+        if (globals.applySmoothing) {
+            const oneHourAgo = Date.now() - 60 * 60 * 1000;
+            const recentReadings = this.getAll().filter(
+                reading => new Date(reading.datetime).getTime() >= oneHourAgo
+            );
+        
+            if (recentReadings.length > 3) {
+                const toSmoothen = [...recentReadings.map(r => r.pressure), pressure];
+                const smoothed = EMA.process(toSmoothen);
+                pressure = smoothed[smoothed.length - 1];
+            }
+        }
+        
+        const pressureASL = meta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, meta.altitude, meta.temperature)) : pressure;
+        
+        const diurnalPressure = utils.isValidLatitude(meta.latitude) ?
+            diurnalrythm.correctPressure(pressure, meta.latitude, datetime).correctedPressure :
             pressure; //default to avoid nulls
 
-        const diurnalPressureASL = utils.isValidLatitude(latitude) ?
-            diurnalrythm.correctPressure(pressureASL, latitude, datetime).correctedPressure :
+        const diurnalPressureASL = utils.isValidLatitude(meta.latitude) ?
+            diurnalrythm.correctPressure(pressureASL, meta.latitude, datetime).correctedPressure :
             pressureASL; //default to
 
         const reading = {
             datetime: datetime,
             pressure: pressure,
             meta: {
-                altitude: altitude,
-                temperature: temperature,
-                trueWindDirection: trueWindDirection,
-                latitude: latitude
+                altitude: meta.altitude,
+                temperature: meta.temperature,
+                trueWindDirection: meta.trueWindDirection,
+                latitude: meta.latitude
             },
             calculated: {
                 pressureASL: pressureASL,
                 diurnalPressure: diurnalPressure,
-                diurnalPressureASL: diurnalPressureASL,
-                EMA: ema
+                diurnalPressureASL: diurnalPressureASL
             }
         };
 
@@ -141,7 +163,8 @@ class ReadingStore extends EventEmitter {
         if(reading === null) throw new Error("Reading cannot be null.")
         let result = null;
 
-        if(globals.applyAdjustToSeaLevel) {
+        //if(globals.applyAdjustToSeaLevel) {
+        if(reading.meta.altitude > 0) {
             result = globals.applyDiurnalRythm ? reading?.calculated?.diurnalPressureASL : reading?.calculated?.pressureASL;
         } else {
             result = globals.applyDiurnalRythm ? reading?.calculated?.diurnalPressure : reading.pressure;
