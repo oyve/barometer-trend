@@ -3,7 +3,7 @@ const utils = require('./utils');
 const diurnalrythm = require('./predictions/diurnalRythm');
 const globals = require('./globals');
 const EMA = require('./EMA');
-const {pressure: pressureFormulas, temperature: temperatureFormulas, humidity} = require('weather-formulas');
+const {pressure: pressureFormulas, temperature: temperatureFormulas} = require('weather-formulas');
 
 const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
