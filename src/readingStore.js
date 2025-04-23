@@ -3,7 +3,7 @@ const utils = require('./utils');
 const diurnalrythm = require('./predictions/diurnalRythm');
 const globals = require('./globals');
 const EMA = require('./EMA');
-const {pressure: pressureFormulas, temperature: temperatureFormulas} = require('weather-formulas');
+const {pressure: pressureFormulas, temperature: temperatureFormulas, humidity} = require('weather-formulas');
 
 const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
@@ -35,6 +35,45 @@ class ReadingStore extends EventEmitter {
         if(utils.isNullOrUndefined(meta.temperature)) meta.temperature = temperatureFormulas.celciusToKelvin(globals.meanSeaLevelTemperature);
         if(!utils.isNullOrUndefined(meta.trueWindDirection) && meta.trueWindDirection === 360) meta.trueWindDirection = 0;
 
+        const smoothing = this.#smoothPressure(pressure);
+        pressure = smoothing !== null && smoothing.smoothed && smoothing.smoothed !== pressure ? smoothing.smoothed : pressure;
+        
+        const pressureASL = meta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, meta.altitude, meta.temperature)) : pressure;
+        
+        const diurnalPressure = utils.isValidLatitude(meta.latitude) ?
+            diurnalrythm.correctPressure(pressure, meta.latitude, datetime).correctedPressure :
+            pressure; //default to pressure
+
+        const diurnalPressureASL = utils.isValidLatitude(meta.latitude) ?
+            diurnalrythm.correctPressure(pressureASL, meta.latitude, datetime).correctedPressure :
+            pressureASL; //default to pressure ASL
+
+        const reading = {
+            datetime: datetime,
+            pressure: pressure,
+            meta: {
+                altitude: meta.altitude,
+                temperature: meta.temperature,
+                humidity: meta.humidity,
+                trueWindDirection: meta.trueWindDirection,
+                latitude: meta.latitude
+            },
+            calculated: {
+                smoothingCorrrection: smoothing?.correction || 0,
+                pressureASL: pressureASL, //defaults to pressure if not ASL
+                diurnalPressure: diurnalPressure, //defaults to pressure if not diurnal
+                diurnalPressureASL: diurnalPressureASL //default to pressure ASL if not diurnal
+            },
+            originalPressure: () => pressure + calculated.smoothingCorrrection
+        };
+
+        this.readings.push(reading);
+        this.#removeOldPressures();
+        this.readings.sort((a, b) => a.datetime.getTime() - b.datetime.getTime()); //oldest to newest
+        this.emit('pressureAdded', reading);
+    }
+
+    #smoothPressure(pressure) {
         //only apply if we already have more than 3 readings the last hour
         if (globals.applySmoothing) {
             const oneHourAgo = Date.now() - 60 * 60 * 1000;
@@ -45,40 +84,15 @@ class ReadingStore extends EventEmitter {
             if (recentReadings.length > 3) {
                 const toSmoothen = [...recentReadings.map(r => r.pressure), pressure];
                 const smoothed = EMA.process(toSmoothen);
-                pressure = smoothed[smoothed.length - 1];
+                let pressureSmoothed = smoothed[smoothed.length - 1];
+
+                return { pressure: pressure, smoothed: pressureSmoothed, correction: pressureSmoothed - pressure };
             }
+
+            return { pressure: pressure, smoothed: null, correction: 0 };
         }
-        
-        const pressureASL = meta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, meta.altitude, meta.temperature)) : pressure;
-        
-        const diurnalPressure = utils.isValidLatitude(meta.latitude) ?
-            diurnalrythm.correctPressure(pressure, meta.latitude, datetime).correctedPressure :
-            pressure; //default to avoid nulls
 
-        const diurnalPressureASL = utils.isValidLatitude(meta.latitude) ?
-            diurnalrythm.correctPressure(pressureASL, meta.latitude, datetime).correctedPressure :
-            pressureASL; //default to
-
-        const reading = {
-            datetime: datetime,
-            pressure: pressure,
-            meta: {
-                altitude: meta.altitude,
-                temperature: meta.temperature,
-                trueWindDirection: meta.trueWindDirection,
-                latitude: meta.latitude
-            },
-            calculated: {
-                pressureASL: pressureASL,
-                diurnalPressure: diurnalPressure,
-                diurnalPressureASL: diurnalPressureASL
-            }
-        };
-
-        this.readings.push(reading);
-        this.#removeOldPressures();
-        this.readings.sort((a, b) => a.datetime.getTime() - b.datetime.getTime()); //oldest to newest
-        this.emit('pressureAdded', reading);
+        return null;
     }
 
     #removeOldPressures(threshold = utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
