@@ -1,5 +1,8 @@
 const utils = require('./utils');
+const globals = require('./globals');
 const readingStore = require('./readingStore');
+const ForecastBase = require('./predictions/forecastBase');
+const EMA = require('./EMA');
 
 const TENDENCY = {
 	RISING: { key: 'RISING' },
@@ -7,11 +10,11 @@ const TENDENCY = {
 };
 
 const TREND = {
-	STEADY: { key: 'STEADY', severity: 0 },
-	SLOWLY: { key: 'SLOWLY', severity: 1 },
-	CHANGING: { key: 'CHANGING', severity: 2 },
-	QUICKLY: { key: 'QUICKLY', severity: 3 },
-	RAPIDLY: { key: 'RAPIDLY', severity: 4 }
+	STEADY: { key: 'STEADY', severity: 1, category: "Normal" },
+	SLOWLY: { key: 'SLOWLY', severity: 2, category: "Minor" },
+	CHANGING: { key: 'CHANGING', severity: 3, category: "Moderate" },
+	QUICKLY: { key: 'QUICKLY', severity: 4, category: "Major" },
+	RAPIDLY: { key: 'RAPIDLY', severity: 5, category: "Severe" }
 };
 
 const THRESHOLDS_RATIO = [
@@ -22,69 +25,69 @@ const THRESHOLDS_RATIO = [
 	{ pascal: 9999, trend: TREND.RAPIDLY }
 ];
 
-function ascendingNumbers(a, b) {
-	return a - b;
-}
+const TIME_PERIODS = {
+    THREE_HOURS: utils.MINUTES.THREE_HOURS,
+    ONE_HOUR: utils.MINUTES.ONE_HOUR
+};
 
-function getSeverityNotion(severity, tendency) {
-    if(severity === 0) return severity;
+class TrendAnalyzer extends ForecastBase
+{
+	constructor() {
+		super();
+	}
 
-    return tendency === TENDENCY.RISING ? severity : -severity;
-}
+	#calculate(from) {
+		if (typeof from !== 'number') return null;
+		if (from === 0) return null;
 
-function calculate(from) {
-	if (readingStore.getAll().length < 2) return null;
-
-	let subsetOfPressures = readingStore.getPressuresSince(from);
-
-	if (subsetOfPressures.length >= 2) {
-		let earlier = subsetOfPressures[0];
-		let later = subsetOfPressures[subsetOfPressures.length - 1];
-
-		let earlierValue = readingStore.getPressureByDefaultChoice(earlier);
-		let laterValue = readingStore.getPressureByDefaultChoice(later);
-
-		let difference = laterValue - earlierValue;
-		let ratio = difference / from;
-		let tendency = difference >= 0 ? TENDENCY.RISING : TENDENCY.FALLING;
+		let subsetOfPressures = readingStore.getPressuresSince(from).map(r => readingStore.getPressureByDefaultChoice(r));
+		if (!subsetOfPressures || subsetOfPressures.length < 2) return null;
 		
-		let threshold = THRESHOLDS_RATIO.sort(ascendingNumbers).find((t) => Math.abs(ratio) < t.pascal);
+		if(globals.applySmoothing) {
+			toSmoothen = [...subsetOfPressures]
+			subsetOfPressures = EMA.process(toSmoothen)
+		}
+
+		let first = subsetOfPressures[0];
+		let last = subsetOfPressures[subsetOfPressures.length - 1];
+
+		let difference = last - first;
+		let ratio = difference / from;
+
+		let tendency = difference >= 0 ? TENDENCY.RISING : TENDENCY.FALLING;
+		let threshold = THRESHOLDS_RATIO.sort((a, b) => a.pascal - b.pascal).find((t) => Math.abs(ratio) < t.pascal);
 
 		return {
 			tendency: tendency.key,
-			trend: threshold.trend.key,
-			from: earlier,
-			to: later,
+			trend: threshold.trend,
+			from: first,
+			to: last,
 			difference: difference,
 			ratio: Math.abs(ratio),
-			period: Math.abs(from),
-			severity: getSeverityNotion(threshold.trend.severity, tendency),
+			period: Math.abs(from)
 		}
 	}
 
-	return null;
-}
-
-function compareSeverity(earlier, later) {
-	if (earlier !== null && later !== null && earlier.severity > later.severity) {
-		return earlier;
+	#pickHighestSeverity(earlier, later) {
+		if (!earlier) return later;
+		if (!later) return earlier;
+		return earlier.severity > later.severity ? earlier : later;
 	}
 
-    return later;
-}
+	forecast() {
+		let threeHours = this.#calculate(TIME_PERIODS.THREE_HOURS);
+		let oneHour = this.#calculate(TIME_PERIODS.ONE_HOUR);
 
-function getTrend() {
-	let threeHours = calculate(-utils.MINUTES.THREE_HOURS);
-	let oneHour = calculate(-utils.MINUTES.ONE_HOUR);
+		if(threeHours === null && oneHour === null) return null;
 
-    let actual = threeHours;
-    actual = compareSeverity(oneHour, actual);
-	
-	return actual;
+		let actual = this.#pickHighestSeverity(oneHour, threeHours);
+		
+		return actual;
+	}
 }
 
 module.exports = {
-	getTrend,
+	TrendAnalyzer,
 	TENDENCY,
 	TREND
 }

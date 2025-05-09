@@ -1,4 +1,4 @@
-// const {humidity} = require('weather-formulas');
+//const FrontAnalyzer = require("./predictions/front");
 
 const MINUTES = {
     ONE_HOUR: 60,
@@ -24,6 +24,11 @@ function minutesFrom(datetime, minutes) {
     return now;
 }
 
+function minutesDifference(datetime1, datetime2) {
+    let difference = Math.abs(new Date(datetime1) - new Date(datetime2)) / 60000;
+    return difference;
+}
+
 /**
  * Check if a value is null or undefined.
  * @param {*} value Value to check.
@@ -31,21 +36,6 @@ function minutesFrom(datetime, minutes) {
  */
 function isNullOrUndefined(value) {
     return value === null || value === undefined;
-}
-
-/**
- * Filter pressures within a specific time period.
- * @param {Array<Object>} pressures Array of pressure readings.
- * @param {Date} startTime Start of the period.
- * @param {Date} endTime End of the period.
- * @returns {Array<Object>} Pressures within the period.
- */
-function getPressuresByPeriod(pressures, startTime, endTime) {
-    if (!(startTime instanceof Date) || !(endTime instanceof Date)) {
-        throw new Error("Invalid input for startTime or endTime.");
-    }
-
-    return pressures.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
 }
 
 /**
@@ -99,16 +89,72 @@ function isNorthernHemisphere(latitude) {
     return latitude > 0;
 }
 
+function getAverageValue(readings, selector) {
+    if (!readings.length) return null;
+
+    const validValues = readings
+        .map(selector)
+        .filter(v => typeof v === 'number');
+
+    if (!validValues.length) return null;
+
+    const sum = validValues.reduce((acc, v) => acc + v, 0);
+    return sum / validValues.length;
+}
+
+function makeStars(full, total) {
+    const fullStar = '★';
+    const emptyStar = '☆';
+
+    return fullStar.repeat(full) + emptyStar.repeat(total - full);
+}
+
+function getThreeStarRating(percentage) {
+    const totalStars = 3;
+    const stars = [];
+    let rating = (percentage / 100) * totalStars;
+  
+    for (let i = 0; i < totalStars; i++) {
+      if (rating >= 1) {
+        stars.push('★');
+      } else if (rating >= 0.5) {
+        stars.push('⯨');
+      } else {
+        stars.push('✩');
+      }
+      rating -= 1;
+    }
+  
+    return stars.join('');
+}
+
+function getDataQualityRating(percentage)
+{
+    const qualityIntervals = [
+        { level: 1, label: 'poor', threshold: 33 },
+        { level: 2, label: 'moderate', threshold: 66 },
+        { level: 3, label: 'good', threshold: 100 },
+    ];
+
+    const defaultInterval = qualityIntervals[0];
+
+    return qualityIntervals.sort((a, b) => a.threshold > b.threshold).find(i => percentage >= i.threshold) || defaultInterval;
+}
+
 module.exports = {
     isNullOrUndefined,
     minutesFromNow,
     minutesFrom,
+    minutesDifference,
     isSummer,
-    getPressuresByPeriod,
     getDayOfYear,
     get24HourFormat,
     isValidLatitude,
     isNorthernHemisphere,
+    getAverageValue,
+    makeStars,
+    getThreeStarRating,
+    getDataQualityRating,
     MINUTES,
     KELVIN,
 };

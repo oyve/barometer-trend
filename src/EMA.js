@@ -13,7 +13,6 @@ class EMASmoothing {
    * Uses a combination of trend detection and EMA for smoothing.
    *
    * @param {number[]} data - Array of barometric readings (in Pascals).
-   * @param {number} alpha - Smoothing factor for EMA (0.1–0.5).
    * @param {number} deviationThreshold - The number of standard deviations beyond which a value is considered an outlier.
    * @returns {number[]} Filtered and smoothed data array.
    */
@@ -73,7 +72,6 @@ class EMASmoothing {
     /**
      * @description Takes an array of pressure readings and returns an array of smoothened pressure readings using EMA.
      * @param {Array} readings Array of pressure readings 
-     * @param {number} [roundTo=0] Number of decimal places to round the result to (default is 0)
      * @returns {Array} Array of smoothened pressure readings
      */
     process(readings) {
@@ -81,5 +79,5 @@ class EMASmoothing {
         return filteredReadings;
     }
 }
-const smoothener = new EMASmoothing(0.1);
-module.exports = smoothener;
+const smoothenerAsSingleton = new EMASmoothing(0.1);
+module.exports = smoothenerAsSingleton;

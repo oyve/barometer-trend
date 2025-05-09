@@ -1,7 +1,9 @@
 const assert = require('assert');
-const front = require('../../../src/predictions/front');
 const utils = require('../../../src/utils');
 const readingStore = require('../../../src/readingStore');
+const FrontAnalyzer = require('../../../src/predictions/front');
+
+const frontAnalyzer = new FrontAnalyzer();
 
 describe("Front Tests", function () {
 	describe("Analyze pressures", function () {
@@ -25,7 +27,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -49,7 +51,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -74,7 +76,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -99,7 +101,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -124,7 +126,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -149,7 +151,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -174,7 +176,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -199,7 +201,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -224,7 +226,7 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
 			assert.strictEqual(actual.key, expected);
 		});
@@ -232,7 +234,6 @@ describe("Front Tests", function () {
 		it("it has only less than one hour readings", function () {
 			//arrange
 			readingStore.clear();
-			const expected = null;
 
 			const pressures = [
 				{ datetime: utils.minutesFromNow(-59), pressure: 101310 },
@@ -241,9 +242,9 @@ describe("Front Tests", function () {
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, null);
+			assert.strictEqual(actual, null);
 		});
 
 		it("it should not be recognized", function () {
@@ -258,9 +259,9 @@ describe("Front Tests", function () {
 			]; //FSF
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = front.getFront(readingStore.getAll());
+			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, null);
+			assert.strictEqual(actual, null);
 		});
 	});
 });

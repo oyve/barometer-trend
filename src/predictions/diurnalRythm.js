@@ -54,11 +54,11 @@ function getDiurnalVariation(latitude) {
  */
 function getWeatherAnomaly(weatherSystem, latitude, pressureObserved) {
     const anomalies = {
-        tropics: { HIGH: 300, LOW: -200, BETWEEN: 50 },
-        subtropics: { HIGH: 400, LOW: -300, BETWEEN: 50 },
-        midLatitudes: { HIGH: 500, LOW: -400, BETWEEN: 50 },
-        highMidLatitudes: { HIGH: 600, LOW: -500, BETWEEN: 50 },
-        polar: { HIGH: 700, LOW: -600, BETWEEN: 50 },
+        tropics: { HIGH: 300, LOW: -200, NORMAL: 50 },
+        subtropics: { HIGH: 400, LOW: -300, NORMAL: 50 },
+        midLatitudes: { HIGH: 500, LOW: -400, NORMAL: 50 },
+        highMidLatitudes: { HIGH: 600, LOW: -500, NORMAL: 50 },
+        polar: { HIGH: 700, LOW: -600, NORMAL: 50 },
     };
 
     const region = Object.keys(diurnalPressureData).find((key) => {

@@ -144,4 +144,55 @@ describe("Utils Tests", function () {
 			assert.strictEqual(actual, expected);
 		});
 	});
+
+	describe("Three star rating Tests", function () {
+		it("it should be 25%", function () {
+			//arrange
+			let expected = "⯨✩✩";
+			//act
+			var actual = utils.getThreeStarRating(25);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be 34%", function () {
+			//arrange
+			let expected = "★✩✩";
+			//act
+			var actual = utils.getThreeStarRating(34);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be 50%", function () {
+			//arrange
+			let expected = "★⯨✩";
+			//act
+			var actual = utils.getThreeStarRating(50);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be 77%", function () {
+			//arrange
+			let expected = "★★✩";
+			//act
+			var actual = utils.getThreeStarRating(77);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be 90%", function () {
+			//arrange
+			let expected = "★★⯨";
+			//act
+			var actual = utils.getThreeStarRating(90);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+		it("it should be 100%", function () {
+			//arrange
+			let expected = "★★★";
+			//act
+			var actual = utils.getThreeStarRating(100);
+			//assert
+			assert.strictEqual(actual, expected);
+		});
+	});
 });

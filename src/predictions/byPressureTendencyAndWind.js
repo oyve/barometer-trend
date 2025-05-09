@@ -10,7 +10,7 @@ const predictionsNorthernHemisphere = require('./prediction_nh.json');
  * @returns {string} The weather prediction.
  */
 function getPrediction(pressure, windDirection, tendency, trend = null, isNorthernHemisphere = true) {
-    if (windDirection === null || windDirection === undefined) return 'N/A - No true wind data';
+    if (windDirection === null || windDirection === undefined) return 'N/A';
 
     let quadrant = getQuadrantByCompassDegree(windDirection);
 
@@ -22,10 +22,10 @@ function getPrediction(pressure, windDirection, tendency, trend = null, isNorthe
 
     try {
         let prediction = predictionsNorthernHemisphere.find((p) => pressure <= p.pressure)["forecast"][tendency][quadrant];
-        return prediction || 'N/A';
+        return prediction || "N/A";
     } catch (error) {
         console.error("Error in getPrediction: ", error);
-        return 'N/A';
+        return "N/A";
     }
 }
 

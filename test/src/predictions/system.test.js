@@ -1,7 +1,10 @@
 const assert = require('assert');
 const system = require('../../../src/predictions/system');
+const readingStore = require('../../../src/readingStore');
+const { read } = require('fs');
+const utils = require("../../../src/utils")
 
-describe("Prediction System Tests", function () {
+describe("System Tests", function () {
 	describe("System match", function () {
 		it("it should be NORMAL", function () {
 			//arrange
@@ -69,9 +72,11 @@ describe("Prediction System Tests", function () {
 	describe("getSystemByPressureTrend Tests", function () {
 		it("it should be null", function () {
 			//arrange
+			readingStore.clear();
 			const pressures = [
 				{ datetime: new Date(), pressure: 101100 }
 			];
+			pressures.forEach((p) => readingStore.add(p.pressure));
 
 			//act
 			var actual = system.getSystemByPressureTrend(pressures);
@@ -80,42 +85,46 @@ describe("Prediction System Tests", function () {
 		});
 		it("it should be trending to LOW", function () {
 			//arrange
+			readingStore.clear();
 			const pressures = [
-				{ datetime: new Date(), pressure: 101100 },
-				{ datetime: new Date(), pressure: 101000 },
-				{ datetime: new Date(), pressure: 100900 },
+				{ datetime: utils.minutesFromNow(-3), pressure: 101100 },
+				{ datetime: utils.minutesFromNow(-2), pressure: 101000 },
+				{ datetime: utils.minutesFromNow(-1), pressure: 100900 },
 			];
-
+			pressures.forEach((p) => readingStore.add(p.datetime, p.pressure));
+			
 			//act
-			var actual = system.getSystemByPressureTrend(pressures);
+			var actual = system.getSystemByPressureTrend(readingStore.getAll());
 			//assert
 			assert.strictEqual(actual.key, 0);
 			assert.strictEqual(actual.name, "Low");
 		});
 		it("it should be trending to NORMAL", function () {
 			//arrange
+			readingStore.clear();
 			const pressures = [
-				{ datetime: new Date(), pressure: 101100 },
-				{ datetime: new Date(), pressure: 101200 },
-				{ datetime: new Date(), pressure: 101300 },
+				{ datetime: utils.minutesFromNow(-3), pressure: 101100 },
+				{ datetime: utils.minutesFromNow(-2), pressure: 101200 },
+				{ datetime: utils.minutesFromNow(-1), pressure: 101300 },
 			];
-
+			pressures.forEach((p) => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = system.getSystemByPressureTrend(pressures);
+			var actual = system.getSystemByPressureTrend(readingStore.getAll());
 			//assert
 			assert.strictEqual(actual.key, 1);
 			assert.strictEqual(actual.name, "Normal");
 		});
 		it("it should be trending to HIGH", function () {
 			//arrange
+			readingStore.clear();
 			const pressures = [
-				{ datetime: new Date(), pressure: 101400 },
-				{ datetime: new Date(), pressure: 101500 },
-				{ datetime: new Date(), pressure: 101600 },
+				{ datetime: utils.minutesFromNow(-3), pressure: 101400 },
+				{ datetime: utils.minutesFromNow(-2), pressure: 101500 },
+				{ datetime: utils.minutesFromNow(-1), pressure: 101600 },
 			];
-
+			pressures.forEach((p) => readingStore.add(p.datetime, p.pressure));
 			//act
-			var actual = system.getSystemByPressureTrend(pressures);
+			var actual = system.getSystemByPressureTrend(readingStore.getAll());
 			//assert
 			assert.strictEqual(actual.key, 2);
 			assert.strictEqual(actual.name, "High");

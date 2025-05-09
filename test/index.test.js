@@ -43,7 +43,7 @@ describe("Function Tests - Trend chooser", function () {
 
         //assert
         assert.strictEqual(actual.trend.tendency, "RISING");
-        assert.strictEqual(actual.trend.trend, "STEADY");
+        assert.strictEqual(actual.trend.trend.key, "STEADY");
     });
 
     it("it should be fALLING.RAPIDLY and pick the ONE HOUR prognose", function () {
@@ -62,7 +62,7 @@ describe("Function Tests - Trend chooser", function () {
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend, "RAPIDLY");
+        assert.strictEqual(actual.trend.trend.key, "RAPIDLY");
     });
 
     it("it should not include older pressure readings", function () {
@@ -82,7 +82,7 @@ describe("Function Tests - Trend chooser", function () {
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend, "STEADY");
+        assert.strictEqual(actual.trend.trend.key, "STEADY");
         assert.strictEqual(actualCount, 2);
     });
 
@@ -102,7 +102,7 @@ describe("Function Tests - Trend chooser", function () {
 
         //assert
         assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend, "RAPIDLY");
+        assert.strictEqual(actual.trend.trend.key, "RAPIDLY");
         assert.strictEqual(actual.models.quadrant, "Increasing rain, clearing within 12 hours");
     });
 });

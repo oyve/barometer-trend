@@ -15,6 +15,33 @@ describe("ReadingStore Tests", function () {
             //assert
             assert.ok(true, "My function does not crash");
         });
+        it("it should not add older than", function () {
+            //arrange
+            expected = 0;
+            readingStore.clear();
+            let old = utils.minutesFromNow(-50*60); //50 hours ago
+            readingStore.add(old, 101500);
+            //act
+            let actual = readingStore.count()
+
+            //assert
+            assert.strictEqual(actual, expected)
+            assert.ok(true, "My function does not crash");
+        });
+        it("it should not add two same datetimes", function () {
+            //arrange
+            expected = 1;
+            readingStore.clear();
+            let old = utils.minutesFromNow(-10); //50 hours ago
+            readingStore.add(old, 101500);
+            readingStore.add(old, 101500);
+            //act
+            let actual = readingStore.count()
+
+            //assert
+            assert.strictEqual(actual, expected)
+            assert.ok(true, "My function does not crash");
+        });
     });
     describe("Has pressure", function () {
         it("it should not have", function () {
@@ -161,12 +188,12 @@ describe("ReadingStore Tests", function () {
             const expected = 101500;
             const pressures = [
                 { datetime: utils.minutesFromNow(-61), calculated: { pressureASL: 101400 }},
-                { datetime: utils.minutesFromNow(-60), calculated: { pressureASL: expected }},
-                { datetime: utils.minutesFromNow(-59), calculated: { pressureASL: 101600 }},
+                { datetime: utils.minutesFromNow(-55), calculated: { pressureASL: expected }},
+                { datetime: utils.minutesFromNow(-50), calculated: { pressureASL: 101600 }},
             ];
             pressures.forEach(p => readingStore.add(p.datetime, p.calculated.pressureASL));
             //act
-            var actual = readingStore.getPressureClosestTo(utils.minutesFromNow(-60));
+            var actual = readingStore.getPressureClosestTo(utils.minutesFromNow(-57));
             //assert
             assert.strictEqual(actual.calculated.pressureASL, expected);
         });
@@ -191,7 +218,7 @@ describe("ReadingStore Tests", function () {
         });
     });
         
-    describe("Smoothig tests", function () {
+    describe("Smoothing tests", function () {
         it("it should smooth", function () {
             //arrange
             globals.setApplySmoothing(true);
@@ -210,6 +237,59 @@ describe("ReadingStore Tests", function () {
             //act
             var all = readingStore.getAll();
             var actual = all.at(-1).pressure; //get the last value
+            //assert
+            assert.strictEqual(actual, expected);
+            globals.setDefaults();
+        });
+    });
+
+
+    
+    describe("Data Quality tests", function () {
+        it("it should be 25%", function () {
+            //arrange
+            readingStore.clear();
+            const expected = (1 / 6) * 100;
+            const pressures = [
+                { datetime: utils.minutesFromNow(-25), pressure: 101325 }
+            ];
+            pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+            //act
+            var actual = readingStore.getDataQuality();
+            //assert
+            assert.strictEqual(actual, expected);
+            globals.setDefaults();
+        });
+        it("it should be 50%", function () {
+            //arrange
+            readingStore.clear();
+            const expected = (2 / 6) * 100;
+            const pressures = [
+                { datetime: utils.minutesFromNow(-50), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-25), pressure: 101325 }
+            ];
+            pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+            //act
+            var actual = readingStore.getDataQuality();
+            //assert
+            assert.strictEqual(actual, expected);
+            globals.setDefaults();
+        });
+        it("it should be 100%", function () {
+            //arrange
+            readingStore.clear();
+            const expected = (6 / 6) * 100;
+            const pressures = [
+                { datetime: utils.minutesFromNow(-170), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-140), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-110), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-80), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-50), pressure: 101325 },
+                { datetime: utils.minutesFromNow(-20), pressure: 101325 }
+            ];
+            pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+            //act
+            var actual = readingStore.getDataQuality();
             //assert
             assert.strictEqual(actual, expected);
             globals.setDefaults();

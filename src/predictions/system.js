@@ -1,14 +1,13 @@
-const EMA = require('../EMA');
-const globals = require('../globals');
+const regression = require('regression');
 
 const LOW_THRESHOLD = 101000;  // Low pressure threshold (in hPa)
 //const NORMAL_THRESHOLD = 101325;  // Normal (average) pressure threshold (in hPa)
 const HIGH_THRESHOLD = 101500;  // High pressure threshold (in hPa)
 
 const SYSTEMS = [
-    { key: 0, name: "Low", short: "LOW", minThreshold: 0, maxThreshold: LOW_THRESHOLD },
-    { key: 1, name: "Normal", short: "NORMAL", minThreshold: LOW_THRESHOLD, maxThreshold: HIGH_THRESHOLD },
-    { key: 2, name: "High", short: "HIGH", minThreshold: HIGH_THRESHOLD, maxThreshold: Number.MAX_SAFE_INTEGER }
+    { key: 0, name: "Low", text: "a below-normal", short: "LOW", minThreshold: 0, maxThreshold: LOW_THRESHOLD },
+    { key: 1, name: "Normal", text: "normal", short: "NORMAL", minThreshold: LOW_THRESHOLD, maxThreshold: HIGH_THRESHOLD },
+    { key: 2, name: "High", text: "an above-normal", short: "HIGH", minThreshold: HIGH_THRESHOLD, maxThreshold: Number.MAX_SAFE_INTEGER }
 ];
 
 /**
@@ -31,46 +30,56 @@ function getSystemByPressure(pressure) {
  * @returns {Object} The pressure system (LOW, NORMAL, HIGH) based on the trend of the readings.
  */
 function getSystemByPressureTrend(readings) {
-    if (readings.length < 2) {
-        return null;  // Not enough data to determine trend;
-    }
+    if(!readings) return null;
+    if (readings.length < 2) return null;
 
-    if(globals.applySmoothing) {
-        readings = EMA.process(readings);
-    }
+    const readingStore = require('../readingStore');
+    const points = readings.map((r, i) => [i, readingStore.getPressureByDefaultChoice(r)]);
 
-    const firstPressure = readings[0].pressure;
-    const lastPressure = readings[readings.length - 1].pressure;
-    const rateOfChange = lastPressure - firstPressure;
+    const result = regression.linear(points);
+    const slope = result.equation[0];
+    const lastPressure = points[points.length - 1][1];
 
     let trendingKey;
-    if (rateOfChange > 0) {
-        // Pressure is rising
-        if (lastPressure >= HIGH_THRESHOLD) {
-            trendingKey = 2;
-        } else if (lastPressure >= LOW_THRESHOLD) {
-            trendingKey = 1;
-        } else {
-            trendingKey = 0;
-        }
-    } else if (rateOfChange < 0) {
-        // Pressure is falling
-        if (lastPressure <= LOW_THRESHOLD) {
-            trendingKey = 0;
-        } else if (lastPressure <= HIGH_THRESHOLD) {
-            trendingKey = 1;
-        } else {
-            trendingKey = 2;
-        }
+    if (slope > 0) {
+        trendingKey = lastPressure >= HIGH_THRESHOLD ? 2 :
+                      lastPressure >= LOW_THRESHOLD ? 1 : 0;
+    } else if (slope < 0) {
+        trendingKey = lastPressure <= LOW_THRESHOLD ? 0 :
+                      lastPressure <= HIGH_THRESHOLD ? 1 : 2;
     } else {
-        // Pressure is stable
         trendingKey = 1;
     }
 
-    return SYSTEMS.find(s => s.key === trendingKey);;
+    return SYSTEMS.find(s => s.key === trendingKey);
+}
+
+function getDirectionToSystem(system, trueWindDirection, isNorthernHemisphere) {
+    if (!system) return null;
+    if(!trueWindDirection) return null;
+
+    let degrees = null;
+    if(system.key === 0) {
+        degrees = isNorthernHemisphere ? trueWindDirection - 90 : trueWindDirection + 90; // Low pressure system is to the left of the wind
+    } else if(system.key === 2) {
+        degrees = isNorthernHemisphere ? trueWindDirection + 90 : trueWindDirection - 90; // High pressure system is to the right of the wind
+    }
+    
+    return { degrees: degrees };
+}
+
+function forecast(latestPressure, pressures) { //}, trueWindDirection, isNorthernHemisphere = true) {
+    const currentSystem = getSystemByPressure(latestPressure);
+    return {
+        current: currentSystem,
+        //trueDirection: getDirectionToSystem(currentSystem, trueWindDirection, isNorthernHemisphere),
+        trending: getSystemByPressureTrend(pressures),
+    }
 }
 
 module.exports = {
+    forecast,
     getSystemByPressure,
-    getSystemByPressureTrend
+    getSystemByPressureTrend,
+    getDirectionToSystem
 };

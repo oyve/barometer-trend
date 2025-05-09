@@ -67,7 +67,9 @@ describe("History Tests", function () {
 			barometer.addPressure(utils.minutesFromNow(0), 101500);
 
 			//act
-			let actual = barometer.getForecast().history;
+			let asdf = barometer.getForecast()
+			let actual = asdf.history;
+			//let actual = barometer.getForecast().history;
 
 			//assert
 			assert.strictEqual(actual.length, 48);
