@@ -1,7 +1,7 @@
 
 const assert = require('assert');
-const PR = require('../../src/pressureReadings');
-const utils = require('../../src/utils');
+const PR = require('../../dist/pressureReadings');
+const utils = require('../../dist/utils');
 
 describe("Pressure Readings Tests", function () {
     describe("Add pressure", function () {

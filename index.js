@@ -1,15 +1,15 @@
     'use strict'
-    const front = require('./src/predictions/front');
-    const byPressureTrend = require('./src/predictions/byPressureTrend');
-    const byPressureTendencyAndWind = require('./src/predictions/byPressureTendencyAndWind');
-    const byPressureTrendAndSeason = require('./src/predictions/byPressureTrendAndSeason');
-    const beaufort = require('./src/predictions/beaufort');
-    const trend = require('./src/trend');
-    const utils = require('./src/utils');
-    const history = require('./src/predictions/history');
-    const system = require('./src/predictions/system');
-    const pressureReadings = require('./src/pressureReadings');
-    const globals = require('./src/globals')
+    const front = require('./dist/predictions/front');
+    const byPressureTrend = require('./dist/predictions/byPressureTrend');
+    const byPressureTendencyAndWind = require('./dist/predictions/byPressureTendencyAndWind');
+    const byPressureTrendAndSeason = require('./dist/predictions/byPressureTrendAndSeason');
+    const beaufort = require('./dist/predictions/beaufort');
+    const trend = require('./dist/trend');
+    const utils = require('./dist/utils');
+    const history = require('./dist/predictions/history');
+    const system = require('./dist/predictions/system');
+    const pressureReadings = require('./dist/pressureReadings');
+    const globals = require('./dist/globals')
 
     let latitude = null;
 

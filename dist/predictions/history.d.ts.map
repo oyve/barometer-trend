@@ -1,0 +1,1 @@
+{"version":3,"file":"history.d.ts","sourceRoot":"","sources":["../../src/predictions/history.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,UAAU,CAAC;AAElC,UAAU,qBAAqB;IAC3B,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,EAAE,KAAK,CAAC,eAAe,GAAG,IAAI,CAAC;CAC1C;AAED;;;;;GAKG;AACH,wBAAgB,oBAAoB,CAAC,SAAS,EAAE,KAAK,CAAC,eAAe,EAAE,EAAE,KAAK,GAAE,MAAW,GAAG,qBAAqB,EAAE,CAgBpH"}

@@ -1,6 +1,6 @@
 const assert = require('assert');
-const front = require('../../../src/predictions/front');
-const utils = require('../../../src/utils');
+const front = require('../../../dist/predictions/front');
+const utils = require('../../../dist/utils');
 
 describe("Front Tests", function () {
 	describe("Analyze pressures", function () {

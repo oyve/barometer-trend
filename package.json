@@ -7,10 +7,13 @@
   "files": [
     "index.js",
     "src",
+    "dist",
     "LICENSE",
     "NOTICE"
   ],
   "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "mocha --recursive"
   },
   "repository": {

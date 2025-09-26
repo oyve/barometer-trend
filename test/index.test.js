@@ -1,7 +1,7 @@
 
 const assert = require('assert');
 const barometer = require('../index');
-const utils = require('../src/utils');
+const utils = require('../dist/utils');
 
 describe("Unit Tests", function () {
     describe("Set Latitude", function () {

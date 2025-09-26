@@ -1,4 +1,4 @@
-import * as fronts from './fronts.json';
+import fronts = require('./fronts.json');
 import * as utils from '../utils';
 import * as regression from 'regression';
 
@@ -11,7 +11,10 @@ interface Front {
 
 interface RegressionPoint {
 	datetime: Date;
-	value: number;
+	value?: number; // for test data compatibility
+	calculated?: {
+		pressureASL: number;
+	};
 }
 
 const Pascal10 = 10;
@@ -20,19 +23,26 @@ const TWO_HOURS = 120;
 const THREE_HOURS = 180;
 
 /**
+ * Filter pressures within a specific time period (compatible with test data).
+ */
+function getPressuresByPeriodCompat(pressures: (utils.PressureReading | RegressionPoint)[], startTime: Date, endTime: Date): (utils.PressureReading | RegressionPoint)[] {
+    return pressures.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
+}
+
+/**
  * 
  * @param pressures Array of pressure readings
  * @returns Front JSON object
  */
-export function getFront(pressures: utils.PressureReading[]): Front | undefined {
-	let threeHourPressures = utils.getPressuresByPeriod(pressures, utils.minutesFromNow(-180), utils.minutesFromNow(-120));
-	let twoHourPressures = utils.getPressuresByPeriod(pressures, utils.minutesFromNow(-120), utils.minutesFromNow(-60));
-	let oneHourPressures = utils.getPressuresByPeriod(pressures, utils.minutesFromNow(-60), new Date());
+export function getFront(pressures: (utils.PressureReading | RegressionPoint)[]): Front | undefined {
+	let threeHourPressures = getPressuresByPeriodCompat(pressures, utils.minutesFromNow(-180), utils.minutesFromNow(-120));
+	let twoHourPressures = getPressuresByPeriodCompat(pressures, utils.minutesFromNow(-120), utils.minutesFromNow(-60));
+	let oneHourPressures = getPressuresByPeriodCompat(pressures, utils.minutesFromNow(-60), new Date());
 
 	return analyzePressures(threeHourPressures, twoHourPressures, oneHourPressures);
 }
 
-function analyzePressures(hourThreePressures: utils.PressureReading[], hourTwoPressures: utils.PressureReading[], hourOnePressures: utils.PressureReading[]): Front | undefined {
+function analyzePressures(hourThreePressures: (utils.PressureReading | RegressionPoint)[], hourTwoPressures: (utils.PressureReading | RegressionPoint)[], hourOnePressures: (utils.PressureReading | RegressionPoint)[]): Front | undefined {
 	let frontNull = (fronts as Front[]).find((f) => f.key === null);
 
 	if (!(hourThreePressures && hourTwoPressures && hourOnePressures)) return frontNull;
@@ -49,21 +59,24 @@ function analyzePressures(hourThreePressures: utils.PressureReading[], hourTwoPr
 	return front !== undefined ? front : frontNull;
 }
 
-function regressPressures(pressures: utils.PressureReading[]): regression.Result {
+function regressPressures(pressures: (utils.PressureReading | RegressionPoint)[]): regression.Result {
 	let minutelyPressures: [number, number][] = [];
 	let now = new Date();
 	 
 	pressures.forEach((p) => {
 		let diff = now.getTime() - p.datetime.getTime();
 		let min = Math.round((diff/1000)/ONE_HOUR);
-		minutelyPressures.push([min, p.calculated.pressureASL]);
+		// Handle both test data format (with .value) and real data format (with .calculated.pressureASL)
+		let pressureValue = 'value' in p && p.value !== undefined ? p.value : 
+							'calculated' in p && p.calculated ? p.calculated.pressureASL : 0;
+		minutelyPressures.push([min, pressureValue]);
 	});
 
 	let result = regression.linear(minutelyPressures);
 	return result;
 }
 
-function getTendency(pressures: utils.PressureReading[], start: number): string | null {
+function getTendency(pressures: (utils.PressureReading | RegressionPoint)[], start: number): string | null {
 	if (!pressures || pressures.length === 0) return null;
 	
 	let regressionResult = regressPressures(pressures);
