@@ -94,7 +94,7 @@ describe("ReadingStore Tests", function () {
             readingStore.add(null, expected);
             
             //act
-            var actual = readingStore.getPressureByDefaultChoice();
+            var actual = readingStore.getPressureByDefault();
 
             //assert
             assert.strictEqual(actual, expected);
@@ -110,7 +110,7 @@ describe("ReadingStore Tests", function () {
             readingStore.add(null, 101500, { altitude: 1000 });
             
             //act
-            var actual = readingStore.getPressureByDefaultChoice();
+            var actual = readingStore.getPressureByDefault();
     
             //assert
             assert.strictEqual(actual, expected);
@@ -126,7 +126,7 @@ describe("ReadingStore Tests", function () {
             readingStore.add(new Date("2025-03-03T12:00:00"), 101500, { altitude: 1000, latitude: 45.123 });
             
             //act
-            var actual = readingStore.getPressureByDefaultChoice();
+            var actual = readingStore.getPressureByDefault();
     
             //assert
             assert.strictEqual(actual, expected);
@@ -142,7 +142,7 @@ describe("ReadingStore Tests", function () {
             readingStore.add(new Date("2025-03-03T12:00:00"), 101500, { altitude: 0, latitude: 45.123 });
             
             //act
-            var actual = readingStore.getPressureByDefaultChoice();
+            var actual = readingStore.getPressureByDefault();
     
             //assert
             assert.strictEqual(actual, expected);

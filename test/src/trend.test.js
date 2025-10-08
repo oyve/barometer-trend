@@ -214,8 +214,8 @@ describe("Trend Tests", function () {
 			readingStore.clear();
 			let pressures = [
 				{ datetime: utils.minutesFromNow(-170), pressure: 101350},
-				{ datetime: utils.minutesFromNow(-55), pressure: 101350 + 150},
-				{ datetime: utils.minutesFromNow(-1), pressure: 101350 + 360},
+				{ datetime: utils.minutesFromNow(-55), pressure: 101350 + 400},
+				{ datetime: utils.minutesFromNow(-1), pressure: 101350 + 500},
 			];
 			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
 			//act
