@@ -41,7 +41,7 @@ export function getSystemByPressureTrend(readings: any[]): PressureSystem | null
     const regression = require('regression');
     const readingStore = require('../readingStore');
     
-    const points: [number, number][] = readings.map((r, i) => [i, readingStore.getPressureByDefaultChoice(r)]);
+    const points: [number, number][] = readings.map((r, i) => [i, readingStore.getPressureByDefault(r)]);
 
     const result = regression.linear(points);
     const slope = result.equation[0];

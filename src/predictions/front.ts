@@ -50,9 +50,9 @@ class FrontAnalyzer extends ForecastBase {
 	}
 
 	analyzePressures(): AnalyzedPressures {
-		const threeHourPressures = readingStore.getPressuresByPeriod(TIME_PERIODS.THREE_HOURS, TIME_PERIODS.TWO_HOURS);
-		const twoHourPressures = readingStore.getPressuresByPeriod(TIME_PERIODS.TWO_HOURS, TIME_PERIODS.ONE_HOUR);
-		const oneHourPressures = readingStore.getPressuresByPeriod(TIME_PERIODS.ONE_HOUR, new Date());
+		const threeHourPressures = readingStore.getByPeriod(TIME_PERIODS.THREE_HOURS, TIME_PERIODS.TWO_HOURS);
+		const twoHourPressures = readingStore.getByPeriod(TIME_PERIODS.TWO_HOURS, TIME_PERIODS.ONE_HOUR);
+		const oneHourPressures = readingStore.getByPeriod(TIME_PERIODS.ONE_HOUR, new Date());
 
 		if (!(threeHourPressures && twoHourPressures && oneHourPressures)) {
 			return { t1: null, t2: null, t3: null };
@@ -72,7 +72,7 @@ class FrontAnalyzer extends ForecastBase {
 		pressures.forEach((p) => {
 			const diff = now.getTime() - p.datetime.getTime();
 			const hours = Math.round((diff/1000)/ONE_HOUR);
-			minutelyPressures.push([hours, readingStore.getPressureByDefaultChoice(p)]);
+			minutelyPressures.push([hours, readingStore.getPressureByDefault(p)]);
 		});
 
 		const result = regression.linear(minutelyPressures);

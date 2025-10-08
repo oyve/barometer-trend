@@ -110,15 +110,15 @@ class ReadingStore extends EventEmitter {
      * Get the last pressure reading.
      * @returns The last pressure reading.
      */
-    getLatestReading(): Reading | undefined {
+    getLatest(): Reading | undefined {
         return this.readings[this.readings.length - 1];
     }
 
-    getFirstReading(): Reading | null {
+    getFirst(): Reading | null {
         return this.readings.length > 0 ? this.readings[0] : null;
     }
 
-    findReadingBefore(datetime: Date): Reading | null {
+    getBefore(datetime: Date): Reading | null {
         if (!(datetime instanceof Date)) throw new Error("Invalid input for datetime.");
     
         let previous: Reading | null = null;
@@ -131,7 +131,7 @@ class ReadingStore extends EventEmitter {
         return previous;        
     }
 
-    findReadingAfter(datetime: Date): Reading | null {
+    getAfter(datetime: Date): Reading | null {
         if (!(datetime instanceof Date)) throw new Error("Invalid input for datetime.");
     
         let next: Reading | null = null;
@@ -146,22 +146,12 @@ class ReadingStore extends EventEmitter {
         return next;
     }
 
-    getPressuresByPeriod(startTime: Date, endTime: Date, readings: Reading[] = this.readings): Reading[] {
+    getByPeriod(startTime: Date, endTime: Date, readings: Reading[] = this.readings): Reading[] {
         if (!(startTime instanceof Date) || !(endTime instanceof Date)) {
             throw new Error("Invalid input for startTime or endTime.");
         }
     
         return readings.filter((p) => p.datetime.getTime() >= startTime.getTime() && p.datetime.getTime() <= endTime.getTime());
-    }
-
-    /**
-     * Get readings since X minutes
-     * @param minutes Number of minutes
-     * @returns Readings
-     */
-    getPressuresSince(minutes: number): Reading[] {
-        const earlier = utils.minutesFromNow(-Math.abs(minutes));
-        return this.readings.filter((p) => p.datetime.getTime() >= earlier.getTime());
     }
 
     /**
@@ -210,7 +200,7 @@ class ReadingStore extends EventEmitter {
      * @param reading The reading to return pressure of. By default the latest is used.
      * @returns The pressure of the reading
      */
-    getPressureByDefaultChoice(reading: Reading | undefined = this.getLatestReading()): number {
+    getPressureByDefault(reading: Reading | undefined = this.getLatest()): number {
         if(reading === null || reading === undefined) throw new Error("Reading cannot be null.")
         let result: number;
 
@@ -223,22 +213,14 @@ class ReadingStore extends EventEmitter {
         return result;
     }
 
-    getPressureAverageByPeriod(minutes: number = 10, reading: Reading | undefined = this.getLatestReading()): number {
+    getAveragePressureByPeriod(minutes: number = 10, reading: Reading | undefined = this.getLatest()): number {
         if (!reading) return 0;
-        const readings = this.getPressuresByPeriod(utils.minutesFrom(reading.datetime, -minutes), reading.datetime);
+        const readings = this.getByPeriod(utils.minutesFrom(reading.datetime, -minutes), reading.datetime);
         let sum = 0;
         readings.forEach(r => {
-            sum += this.getPressureByDefaultChoice(r);
+            sum += this.getPressureByDefault(r);
         });
         return sum / readings.length;
-    }
-
-    /**
-     * 
-     * @returns Returns all pressure readings
-     */
-    getAll(): Reading[] {
-        return [...this.readings].sort(sortOlderToNewer);
     }
 
     /**
@@ -246,8 +228,15 @@ class ReadingStore extends EventEmitter {
      * @param minutes Number of minutes to get readings for
      * @returns Readings
      */
-    getAllLastMinutes(minutes: number): Reading[] {
-        return this.readings.filter((p) => p.datetime.getTime() >= utils.minutesFromNow(-Math.abs(minutes)).getTime());
+    getAll(minutes: number = 0): Reading[] {
+        let scope = [];
+        if(minutes <= 0) { 
+            scope = this.readings;
+        } else {
+            scope = this.readings.filter((p) => p.datetime.getTime() >= utils.minutesFromNow(-Math.abs(minutes)).getTime());
+        }
+
+        return scope.sort(sortOlderToNewer);
     }
 
     /**
@@ -263,7 +252,7 @@ class ReadingStore extends EventEmitter {
         while(offset > 0) {
             const startPeriod = utils.minutesFromNow(-offset);
             const endPeriod = utils.minutesFromNow(-(offset - interval));
-            if(this.getPressuresByPeriod(startPeriod, endPeriod).length >= 1) score++;
+            if(this.getByPeriod(startPeriod, endPeriod).length >= 1) score++;
             offset -= interval;
         }
     

@@ -52,7 +52,7 @@ export class TrendAnalyzer extends ForecastBase
 		if (typeof from !== 'number') return null;
 		if (from === 0) return null;
 
-		const subsetOfPressuresRaw = readingStore.getPressuresSince(from).map(r => readingStore.getPressureByDefaultChoice(r));
+		const subsetOfPressuresRaw = readingStore.getAll(from).map(r => readingStore.getPressureByDefault(r));
 		if (!subsetOfPressuresRaw || subsetOfPressuresRaw.length < 2) return null;
 		
 		let subsetOfPressures = subsetOfPressuresRaw;

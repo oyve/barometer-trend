@@ -80,7 +80,7 @@ function getForecast(isNorthernHemisphere?: boolean): any {
 
     if (readingStore.readings.length < 2) return null;
 
-    const last10Minutes = readingStore.getAllLastMinutes(10);
+    const last10Minutes = readingStore.getAll(10);
 
     const trendAnalyzer = new TrendAnalyzer();
     const frontAnalyzer = new FrontAnalyzer();
@@ -88,19 +88,19 @@ function getForecast(isNorthernHemisphere?: boolean): any {
     const pressureTrend = trendAnalyzer.forecast();
     if (pressureTrend === null) return null;
 
-    const pressureSystems = system.forecast(readingStore.getPressureByDefaultChoice(), readingStore.getPressuresSince(-60));
+    const pressureSystems = system.forecast(readingStore.getPressureByDefault(), readingStore.getAll(-60));
     const forecastPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend.key);
     const forecastFront = frontAnalyzer.forecast();
     const beaufortForecast = beaufort.forecast(pressureTrend.ratio, utils.getAverageValue(last10Minutes, r => r.meta?.trueWindSpeed));
-    const forecastByPressureAndSeason = byPressureTrendAndSeason.getPrediction(readingStore.getPressureByDefaultChoice(), pressureTrend.tendency, pressureTrend.trend.key, utils.isSummer(isNorthernHemisphere));
-    const latestReading = readingStore.getLatestReading();
+    const forecastByPressureAndSeason = byPressureTrendAndSeason.getPrediction(readingStore.getPressureByDefault(), pressureTrend.tendency, pressureTrend.trend.key, utils.isSummer(isNorthernHemisphere));
+    const latestReading = readingStore.getLatest();
     const forecastPressureTendencyThresholdAndQuadrant = latestReading ? 
-        byPressureTendencyAndWind.getPrediction(readingStore.getPressureByDefaultChoice(), latestReading.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere) :
+        byPressureTendencyAndWind.getPrediction(readingStore.getPressureByDefault(), latestReading.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere) :
         'N/A';
-    const labels = barometerLabel.getBarometerLabel(readingStore.getPressureByDefaultChoice());
+    const labels = barometerLabel.getBarometerLabel(readingStore.getPressureByDefault());
 
     const forecast = {
-        pressure: readingStore.getLatestReading(),
+        pressure: readingStore.getLatest(),
         trend: pressureTrend,
         models: {
             pressureOnly: forecastPressureOnly,
@@ -124,7 +124,7 @@ function getForecast(isNorthernHemisphere?: boolean): any {
 }
 
 function getForecastMinutes(): number {
-    const first = readingStore.getFirstReading();
+    const first = readingStore.getFirst();
     if(first === null) return 0;
     const diffMs = Math.abs(new Date().getTime() - first.datetime.getTime()); // difference in milliseconds
     return Math.floor(diffMs / 60000);
@@ -152,7 +152,7 @@ async function getForecastAsync(isNorthernHemisphere?: boolean): Promise<any> {
 function getBarometerUpdates(): any {
     if(readingStore.count() < 1) return null;
     
-    return barometerLabel.getBarometerLabel(readingStore.getPressureByDefaultChoice());
+    return barometerLabel.getBarometerLabel(readingStore.getPressureByDefault());
 }
 
 /**
