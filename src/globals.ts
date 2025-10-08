@@ -106,4 +106,4 @@ class Globals {
 
 const globalsAsSingleton = new Globals();
 
-export = globalsAsSingleton;
+export default globalsAsSingleton;

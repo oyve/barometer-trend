@@ -1,4 +1,4 @@
-import predictionsNorthernHemisphere = require('./prediction_nh.json');
+const predictionsNorthernHemisphere = require('./prediction_nh.json');
 import { Trend } from '../types';
 
 interface Quadrant {

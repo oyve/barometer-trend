@@ -1,8 +1,8 @@
 import * as utils from './utils';
-import globals = require('./globals');
-import readingStore = require('./readingStore');
-import ForecastBase = require('./predictions/forecastBase');
-import EMA = require('./EMA');
+import globals from './globals';
+import readingStore from './readingStore';
+import ForecastBase from './predictions/forecastBase';
+import EMA from './EMA';
 import { Tendency, Trend, TrendResult } from './types';
 
 export const TENDENCY: { RISING: Tendency; FALLING: Tendency } = {

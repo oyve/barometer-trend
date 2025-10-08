@@ -4,15 +4,17 @@
   "description": "Analyse and calculate tendency, trend and weather predictions of barometric pressure",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "commonjs",
+  "type": "module",
   "files": [
     "dist",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "README.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc --project tsconfig.cjs.json && node scripts/rename-cjs-files.cjs && node scripts/add-js-extensions.cjs && node scripts/generate-exports.cjs",
     "prepublishOnly": "npm run build",
+    "watch": "tsc --watch",
     "test": "npm run build && mocha --recursive"
   },
   "repository": {
@@ -52,5 +54,72 @@
   "dependencies": {
     "regression": "^2.0.1",
     "weather-formulas": "^1.0.7"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./ai_seasonal": {
+      "require": "./dist/cjs/predictions/ai_seasonal.cjs",
+      "import": "./dist/esm/predictions/ai_seasonal.js",
+      "types": "./dist/types/predictions/ai_seasonal.d.ts"
+    },
+    "./beaufort": {
+      "require": "./dist/cjs/predictions/beaufort.cjs",
+      "import": "./dist/esm/predictions/beaufort.js",
+      "types": "./dist/types/predictions/beaufort.d.ts"
+    },
+    "./byPressureTendencyAndWind": {
+      "require": "./dist/cjs/predictions/byPressureTendencyAndWind.cjs",
+      "import": "./dist/esm/predictions/byPressureTendencyAndWind.js",
+      "types": "./dist/types/predictions/byPressureTendencyAndWind.d.ts"
+    },
+    "./byPressureTrend": {
+      "require": "./dist/cjs/predictions/byPressureTrend.cjs",
+      "import": "./dist/esm/predictions/byPressureTrend.js",
+      "types": "./dist/types/predictions/byPressureTrend.d.ts"
+    },
+    "./byPressureTrendAndSeason": {
+      "require": "./dist/cjs/predictions/byPressureTrendAndSeason.cjs",
+      "import": "./dist/esm/predictions/byPressureTrendAndSeason.js",
+      "types": "./dist/types/predictions/byPressureTrendAndSeason.d.ts"
+    },
+    "./diurnalRythm": {
+      "require": "./dist/cjs/predictions/diurnalRythm.cjs",
+      "import": "./dist/esm/predictions/diurnalRythm.js",
+      "types": "./dist/types/predictions/diurnalRythm.d.ts"
+    },
+    "./fog": {
+      "require": "./dist/cjs/predictions/fog.cjs",
+      "import": "./dist/esm/predictions/fog.js",
+      "types": "./dist/types/predictions/fog.d.ts"
+    },
+    "./forecastBase": {
+      "require": "./dist/cjs/predictions/forecastBase.cjs",
+      "import": "./dist/esm/predictions/forecastBase.js",
+      "types": "./dist/types/predictions/forecastBase.d.ts"
+    },
+    "./forecastText": {
+      "require": "./dist/cjs/predictions/forecastText.cjs",
+      "import": "./dist/esm/predictions/forecastText.js",
+      "types": "./dist/types/predictions/forecastText.d.ts"
+    },
+    "./front": {
+      "require": "./dist/cjs/predictions/front.cjs",
+      "import": "./dist/esm/predictions/front.js",
+      "types": "./dist/types/predictions/front.d.ts"
+    },
+    "./label": {
+      "require": "./dist/cjs/predictions/label.cjs",
+      "import": "./dist/esm/predictions/label.js",
+      "types": "./dist/types/predictions/label.d.ts"
+    },
+    "./system": {
+      "require": "./dist/cjs/predictions/system.cjs",
+      "import": "./dist/esm/predictions/system.js",
+      "types": "./dist/types/predictions/system.d.ts"
+    }
   }
 }

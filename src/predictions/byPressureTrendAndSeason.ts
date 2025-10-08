@@ -1,4 +1,4 @@
-import predictionSeasonJSON = require('./prediction_season.json');
+const predictionSeasonJSON = require('./prediction_season.json');
 
 interface SeasonPrediction {
     summer: string;

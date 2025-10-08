@@ -1,8 +1,9 @@
-import fronts = require('./fronts.json');
+// @ts-ignore
+const fronts = require('./fronts.json');
 import * as utils from '../utils';
 import * as regression from 'regression';
-import readingStore = require('../readingStore');
-import ForecastBase = require('./forecastBase');
+import readingStore from '../readingStore';
+import ForecastBase from './forecastBase';
 import { Reading } from '../types';
 
 const Pascal10 = 10;
@@ -93,4 +94,4 @@ class FrontAnalyzer extends ForecastBase {
 	}
 }
 
-export = FrontAnalyzer;
+export default FrontAnalyzer;

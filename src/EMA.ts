@@ -84,4 +84,4 @@ class EMASmoothing {
 }
 
 const smoothenerAsSingleton = new EMASmoothing(0.1);
-export = smoothenerAsSingleton;
+export default smoothenerAsSingleton;

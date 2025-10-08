@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import * as utils from './utils';
 import * as diurnalrythm from './predictions/diurnalRythm';
-import globals = require('./globals');
-import EMA = require('./EMA');
+import globals from'./globals';
+import EMA from './EMA';
 import { pressure as pressureFormulas, temperature as temperatureFormulas } from 'weather-formulas';
 import { Reading, ReadingMeta } from './types';
 
@@ -270,4 +270,4 @@ class ReadingStore extends EventEmitter {
 
 const readingStoreAsSingleton = new ReadingStore();
 
-export = readingStoreAsSingleton;
+export default readingStoreAsSingleton;

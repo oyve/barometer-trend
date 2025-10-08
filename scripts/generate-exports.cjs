@@ -34,10 +34,9 @@ function generateExports(directory) {
   return exportsField;
 }
 
-let exportFormulas = generateExports('formulas');
-let scalesFormulas = generateExports('scales');
+let predictions = generateExports('predictions');
 
-const exportsField = {...exportFormulas, ...scalesFormulas };
+const exportsField = {...predictions };
 
 const pkgPath = path.resolve(__dirname, '../package.json');
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
