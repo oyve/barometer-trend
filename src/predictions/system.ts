@@ -3,6 +3,7 @@ export interface PressureSystem {
     name: string;
     short: string;
     threshold: number;
+    text?: string;
 }
 
 /**
@@ -28,6 +29,12 @@ export function getSystemByPressure(pressure: number): PressureSystem {
     }
 }
 
-export function forecast(pressure: number, pressures: any[]): any {
-    return getSystemByPressure(pressure);
+export function forecast(pressure: number, pressures: any[]): { current: PressureSystem } {
+    const system = getSystemByPressure(pressure);
+    return {
+        current: {
+            ...system,
+            text: system.name.toLowerCase()
+        }
+    };
 }
