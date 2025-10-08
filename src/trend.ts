@@ -65,7 +65,7 @@ export class TrendAnalyzer extends ForecastBase
 		const last = subsetOfPressures[subsetOfPressures.length - 1];
 
 		const difference = last - first;
-		const ratio = difference / from;
+		const ratio = difference / Math.abs(from);
 
 		const tendency = difference >= 0 ? TENDENCY.RISING : TENDENCY.FALLING;
 		const threshold = THRESHOLDS_RATIO.sort((a, b) => a.pascal - b.pascal).find((t) => Math.abs(ratio) < t.pascal);

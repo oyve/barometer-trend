@@ -41,8 +41,8 @@ function hasPressures(): boolean {
  * Get latitude
  * @returns Returns latitude, null if not set
  */
-function getLatitude(): number | null {
-    return latitude;
+function getLatitude(): number | null | undefined {
+    return latitude === null ? undefined : latitude;
 }
 
 /**
