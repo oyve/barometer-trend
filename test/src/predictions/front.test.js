@@ -1,7 +1,7 @@
 const assert = require('assert');
-const utils = require('../../../src/utils');
-const readingStore = require('../../../src/readingStore');
-const FrontAnalyzer = require('../../../src/predictions/front');
+const utils = require('../../../dist/src/utils');
+const readingStore = require('../../../dist/src/readingStore');
+const FrontAnalyzer = require('../../../dist/src/predictions/front');
 
 const frontAnalyzer = new FrontAnalyzer();
 

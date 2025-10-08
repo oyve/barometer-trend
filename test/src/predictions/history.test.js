@@ -1,8 +1,8 @@
 const assert = require('assert');
-const history = require('../../../src/predictions/history');
-const barometer = require('../../../index');
-const utils = require('../../../src/utils');
-const readingStore = require('../../../src/readingStore');
+const history = require('../../../dist/src/predictions/history');
+const barometer = require('../../../dist/index');
+const utils = require('../../../dist/src/utils');
+const readingStore = require('../../../dist/src/readingStore');
 
 describe("History Tests", function () {
 	describe("Unit tests", function () {

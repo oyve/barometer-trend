@@ -1,6 +1,6 @@
 
 const assert = require('assert');
-const EMA = require('../../src/EMA');
+const EMA = require('../../dist/src/EMA');
 
 describe("Smoothing Tests", function () {
     describe("Downward trend", function () {

@@ -1,8 +1,8 @@
 
 const assert = require('assert');
-const barometer = require('../index');
-const utils = require('../src/utils');
-const readingStore = require('../src/readingStore');
+const barometer = require('../dist/index');
+const utils = require('../dist/src/utils');
+const readingStore = require('../dist/src/readingStore');
 
 describe("Unit Tests", function () {
     describe("Set Latitude", function () {

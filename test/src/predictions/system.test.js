@@ -1,8 +1,8 @@
 const assert = require('assert');
-const system = require('../../../src/predictions/system');
-const readingStore = require('../../../src/readingStore');
+const system = require('../../../dist/src/predictions/system');
+const readingStore = require('../../../dist/src/readingStore');
 const { read } = require('fs');
-const utils = require("../../../src/utils")
+const utils = require("../../../dist/src/utils")
 
 describe("System Tests", function () {
 	describe("System match", function () {

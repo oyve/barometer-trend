@@ -1,7 +1,7 @@
 const assert = require('assert');
 
 // Assume getBarometerLabel and barometerRanges are exported from your file
-const { getBarometerLabel } = require('../../../src/predictions/label');
+const { getBarometerLabel } = require('../../../dist/src/predictions/label');
 
 describe('getBarometerLabel', () => {
   it('should return "Stormy" for 97000 Pa', () => {

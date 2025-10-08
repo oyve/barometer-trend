@@ -1,5 +1,5 @@
 const assert = require('assert');
-const diurnalRythm = require('../../../src/predictions/diurnalRythm');
+const diurnalRythm = require('../../../dist/src/predictions/diurnalRythm');
 
 describe("Diurnal Rythm Tests", function () {
     describe("Mid-High Latitude Correct Pressure Calculations for 24-Hour Cycle", function () {
