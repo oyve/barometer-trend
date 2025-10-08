@@ -1,8 +1,8 @@
 const assert = require('assert');
-const trend = require('../../src/trend');
-const utils = require('../../src/utils');
-const globals = require('../../src/globals');
-const readingStore = require('../../src/readingStore');
+const trend = require('../../dist/src/trend');
+const utils = require('../../dist/src/utils');
+const globals = require('../../dist/src/globals');
+const readingStore = require('../../dist/src/readingStore');
 
 
 const trendAnalyzer = new trend.TrendAnalyzer(); 

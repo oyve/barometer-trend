@@ -1,7 +1,30 @@
 const MAX_RATIO = 9999;
 const MIN_RATIO = -9999;
 
-const BEAUFORT_RATIOS = [
+interface BeaufortRatio {
+    low: number;
+    high: number;
+    force: string;
+    min: number;
+    max: number;
+    description: string;
+}
+
+interface BeaufortScale {
+    min: number;
+    max: number;
+    category: string;
+    force: number;
+}
+
+interface BeaufortForecast {
+    force: string;
+    min: number;
+    max: number;
+    description: string;
+}
+
+const BEAUFORT_RATIOS: BeaufortRatio[] = [
     { low: 2.67, high: 3.33, force: "F6-7", min: 6, max: 7, description: "Strong breeze to near gale" },
     { low: 3.33, high: 5.5, force: "F8-9", min: 8, max: 9, description: "Gale to strong gale" },
     { low: 5.5, high: MAX_RATIO, force: "F10+", min: 10, max: 12, description: "Storm or more" },
@@ -11,15 +34,15 @@ const BEAUFORT_RATIOS = [
 
 /**
  * Get the Beaufort scale object based on wind speed (measured at a 10 minutes average to be correct).
- * @param {number} windSpeed - Wind speed in meters per second (m/s).
- * @returns {BeaufortScale | null} - Beaufort scale object or null if not found.
+ * @param windSpeed - Wind speed in meters per second (m/s).
+ * @returns Beaufort scale object or null if not found.
  */
-function getBeaufortScaleByWindSpeed(windSpeed) {
+export function getBeaufortScaleByWindSpeed(windSpeed: number | null | undefined): BeaufortScale | null {
     if(windSpeed === undefined || windSpeed === null) return null;
     if(windSpeed < 0) throw new Error('Wind speed cannot be negative.');
     windSpeed = Math.round(windSpeed * 10) / 10; //to 1 decimal place
     
-    const beaufortScale = [
+    const beaufortScale: BeaufortScale[] = [
         { min: 0, max: 0.2, category: 'Calm', force: 0 },
         { min: 0.3, max: 1.5, category: 'Light Air', force: 1 },
         { min: 1.6, max: 3.3, category: 'Light Breeze', force: 2 },
@@ -46,12 +69,12 @@ function getBeaufortScaleByWindSpeed(windSpeed) {
 
 /**
  * Get Beaufort scale details by pressure variation ratio
- * @param {number} ratio - The pressure variation ratio
- * @returns {Object} Beaufort scale details
+ * @param ratio - The pressure variation ratio
+ * @returns Beaufort scale details
  */
-function getByPressureVariationRatio(ratio) {
+export function getByPressureVariationRatio(ratio: number): BeaufortForecast {
     try {
-        let beaufort = BEAUFORT_RATIOS.find((b) => ratio <= b.high && ratio >= b.low);
+        const beaufort = BEAUFORT_RATIOS.find((b) => ratio <= b.high && ratio >= b.low);
         return beaufort !== undefined ?
             { force: beaufort.force, min: beaufort.min, max: beaufort.max, description: beaufort.description } :
             { force: "Less than F6", min: 0, max: 6, description: "Less than a strong breeze" };
@@ -61,15 +84,9 @@ function getByPressureVariationRatio(ratio) {
     }
 }
 
-function forecast(ratio, windSpeed) {
+export function forecast(ratio: number, windSpeed: number | null | undefined): { byPressure: BeaufortForecast; byWind: BeaufortScale | null } {
     return {
         byPressure: getByPressureVariationRatio(ratio),
         byWind: getBeaufortScaleByWindSpeed(windSpeed)
     };
 }
-
-module.exports = {
-    getByPressureVariationRatio,
-    getBeaufortScaleByWindSpeed,
-    forecast
-};

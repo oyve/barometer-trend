@@ -4,7 +4,15 @@
  * The labels are used to categorize the current atmospheric pressure into different weather conditions.
  */
 
-const barometerRanges = [
+interface BarometerRange {
+  label: string;
+  minPa: number;
+  maxPa: number;
+  description: string;
+  detailedDescription: string;
+}
+
+const barometerRanges: BarometerRange[] = [
     {
       label: "Stormy",
       minPa: 0,
@@ -51,17 +59,13 @@ const barometerRanges = [
   
   /**
    * 
-   * @param {number} pressurePa Pressure in Pascal
-   * @returns {Object} An object containing the label and description for the given pressure
+   * @param pressurePa Pressure in Pascal
+   * @returns An object containing the label and description for the given pressure
    */
-  function getBarometerLabel(pressurePa) {
+  export function getBarometerLabel(pressurePa: number): BarometerRange | null {
     pressurePa = Math.round(pressurePa); // Round to the nearest integer
     const match = barometerRanges.find(
       range => pressurePa >= range.minPa && pressurePa <= range.maxPa
     );
     return match ?? null;
   }
-  
-  module.exports = {
-    getBarometerLabel
-  };

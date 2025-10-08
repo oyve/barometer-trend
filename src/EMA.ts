@@ -3,7 +3,10 @@
  * The EMA is calculated using a smoothing factor (alpha) that determines the weight of the most recent reading.
  */
 class EMASmoothing {
-    constructor(alpha = 0.1) {
+    private alpha: number;
+    private ema: number | null;
+
+    constructor(alpha: number = 0.1) {
         this.alpha = alpha; //smoothing factor (0.1 - 0.3)
         this.ema = null;
     }
@@ -12,11 +15,11 @@ class EMASmoothing {
    * Corrects outliers by adjusting them to fit the surrounding trend, particularly for downward or upward trends.
    * Uses a combination of trend detection and EMA for smoothing.
    *
-   * @param {number[]} data - Array of barometric readings (in Pascals).
-   * @param {number} deviationThreshold - The number of standard deviations beyond which a value is considered an outlier.
-   * @returns {number[]} Filtered and smoothed data array.
+   * @param data - Array of barometric readings (in Pascals).
+   * @param deviationThreshold - The number of standard deviations beyond which a value is considered an outlier.
+   * @returns Filtered and smoothed data array.
    */
-  smoothOutliersWithTrendCorrection(data, deviationThreshold = 2) {
+  smoothOutliersWithTrendCorrection(data: number[], deviationThreshold: number = 2): number[] {
       //Calculate mean and standard deviation of the dataset
       const mean = data.reduce((sum, value) => sum + value, 0) / data.length;
       const squaredDifferences = data.map(value => Math.pow(value - mean, 2));
@@ -55,7 +58,7 @@ class EMASmoothing {
           }
           else {
             //Apply EMA smoothing if trend is unclear
-            const ema = this.#EMASmoothening(currentValue, previousValue);
+            const ema = this.EMASmoothening(currentValue, previousValue);
             result[i] = Math.round(ema);
           }
         }
@@ -64,20 +67,21 @@ class EMASmoothing {
       return result;
     }
 
-    #EMASmoothening(currentValue, nextValue) {
-        let ema = this.alpha * currentValue + (1 - this.alpha) * nextValue;
+    private EMASmoothening(currentValue: number, nextValue: number): number {
+        const ema = this.alpha * currentValue + (1 - this.alpha) * nextValue;
         return ema;
     }
 
     /**
      * @description Takes an array of pressure readings and returns an array of smoothened pressure readings using EMA.
-     * @param {Array} readings Array of pressure readings 
-     * @returns {Array} Array of smoothened pressure readings
+     * @param readings Array of pressure readings 
+     * @returns Array of smoothened pressure readings
      */
-    process(readings) {
-        let filteredReadings = this.smoothOutliersWithTrendCorrection(readings, 1.5);
+    process(readings: number[]): number[] {
+        const filteredReadings = this.smoothOutliersWithTrendCorrection(readings, 1.5);
         return filteredReadings;
     }
 }
+
 const smoothenerAsSingleton = new EMASmoothing(0.1);
-module.exports = smoothenerAsSingleton;
+export = smoothenerAsSingleton;

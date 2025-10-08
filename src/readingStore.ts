@@ -1,15 +1,18 @@
-const EventEmitter = require('events');
-const utils = require('./utils');
-const diurnalrythm = require('./predictions/diurnalRythm');
-const globals = require('./globals');
-const EMA = require('./EMA');
-const { pressure: pressureFormulas, temperature: temperatureFormulas } = require('weather-formulas');
+import { EventEmitter } from 'events';
+import * as utils from './utils';
+import * as diurnalrythm from './predictions/diurnalRythm';
+import globals = require('./globals');
+import EMA = require('./EMA');
+import { pressure as pressureFormulas, temperature as temperatureFormulas } from 'weather-formulas';
+import { Reading, ReadingMeta } from './types';
 
 const oneHourAgo = Date.now() - 60 * 60 * 1000;
 const MINUTES_SPACING = 2;
-const sortOlderToNewer = (a, b) => a.datetime.getTime() - b.datetime.getTime();
+const sortOlderToNewer = (a: Reading, b: Reading) => a.datetime.getTime() - b.datetime.getTime();
 
 class ReadingStore extends EventEmitter {
+    public readings: Reading[];
+
     constructor() {
         super();
         this.readings = [];
@@ -17,38 +20,21 @@ class ReadingStore extends EventEmitter {
 
     /**
      * 
-     * @param {Date} timestamp Timestamp of barometer reading
-     * @param {number} pressure Pressure in Pascal
-     * @param {Array} meta Meta data object containing altitude, temperature, humidity, trueWindDirection and latitude
+     * @param timestamp Timestamp of barometer reading
+     * @param pressure Pressure in Pascal
+     * @param meta Meta data object containing altitude, temperature, humidity, trueWindDirection and latitude
      */
-    add(timestamp, pressure, meta = {}) {
+    add(timestamp: Date | null | undefined, pressure: number, meta: Partial<ReadingMeta> = {}): Reading | undefined {
         if(utils.isNullOrUndefined(timestamp)) timestamp = new Date();
 
-        if(!globals.ignoreFlagInTesting && timestamp < utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
+        if(!globals.ignoreFlagInTesting && timestamp! < utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
             return; //ignore readings older than 48 hours
         }
-        if(this.getAll().find(r => r.datetime.getTime() === timestamp.getTime())) {
+        if(this.getAll().find(r => r.datetime.getTime() === timestamp!.getTime())) {
             return; //ignore duplicate readings
         }
 
-        // const latestReading = this.getLatestReading();
-        // if(!utils.isNullOrUndefined(latestReading)) {
-        //     //newer reading
-        //     if(timestamp.getTime() > latestReading.datetime.getTime() &&
-        //         utils.minutesDifference(timestamp, latestReading.datetime) < MINUTES_SPACING) {
-        //         return;
-        //     } else if(timestamp.getTime() < latestReading.datetime.getTime()) {
-        //         const readingBefore = this.findReadingBefore(timestamp);
-        //         const readingAfter = this.findReadingAfter(timestamp);
-                
-        //         if((readingBefore !== null && utils.minutesDifference(timestamp, readingBefore.datetime) < MINUTES_SPACING) && 
-        //            (readingAfter !== null && utils.minutesDifference(timestamp, readingAfter.datetime) < MINUTES_SPACING)) {
-        //             return;
-        //         }
-        //     }
-        // }
-
-        meta = {
+        const completeMeta: ReadingMeta = {
             altitude: 0,
             temperature: null,
             humidity: null,
@@ -56,53 +42,46 @@ class ReadingStore extends EventEmitter {
             trueWindSpeed: null,
             latitude: null,   
             ...meta //override defaults
-        }
+        };
 
-        if(utils.isNullOrUndefined(meta.altitude)) meta.altitude = 0;
-        if(utils.isNullOrUndefined(meta.temperature)) meta.temperature = temperatureFormulas.celciusToKelvin(globals.meanSeaLevelTemperature);
-        if(!utils.isNullOrUndefined(meta.trueWindDirection) && meta.trueWindDirection === 360) meta.trueWindDirection = 0;
+        if(utils.isNullOrUndefined(completeMeta.altitude)) completeMeta.altitude = 0;
+        if(utils.isNullOrUndefined(completeMeta.temperature)) completeMeta.temperature = temperatureFormulas.celciusToKelvin(globals.meanSeaLevelTemperature);
+        if(!utils.isNullOrUndefined(completeMeta.trueWindDirection) && completeMeta.trueWindDirection === 360) completeMeta.trueWindDirection = 0;
 
-        const smoothing = this.#smoothPressure(pressure);
+        const smoothing = this.smoothPressure(pressure);
         pressure = smoothing.smoothed && smoothing.smoothed !== pressure ? smoothing.smoothed : pressure;
         
-        const pressureASL = meta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, meta.altitude, meta.temperature)) : pressure;
+        const pressureASL = completeMeta.altitude > 0 ? Math.round(pressureFormulas.adjustPressureToSeaLevelSimple(pressure, completeMeta.altitude, completeMeta.temperature!)) : pressure;
         
-        const diurnalPressure = utils.isValidLatitude(meta.latitude) ?
-            diurnalrythm.correctPressure(pressure, meta.latitude, timestamp).correctedPressure :
+        const diurnalPressure = utils.isValidLatitude(completeMeta.latitude!)  ?
+            diurnalrythm.correctPressure(pressure, completeMeta.latitude!, timestamp!).correctedPressure :
             pressure; //default to pressure
 
-        const diurnalPressureASL = utils.isValidLatitude(meta.latitude) ?
-            diurnalrythm.correctPressure(pressureASL, meta.latitude, timestamp).correctedPressure :
+        const diurnalPressureASL = utils.isValidLatitude(completeMeta.latitude!) ?
+            diurnalrythm.correctPressure(pressureASL, completeMeta.latitude!, timestamp!).correctedPressure :
             pressureASL; //default to pressure ASL
 
-        const reading = {
-            datetime: timestamp,
+        const reading: Reading = {
+            datetime: timestamp!,
             pressure: pressure,
-            meta: {
-                altitude: meta.altitude,
-                temperature: meta.temperature,
-                humidity: meta.humidity,
-                trueWindDirection: meta.trueWindDirection,
-                trueWindSpeed: meta.trueWindSpeed,
-                latitude: meta.latitude
-            },
+            meta: completeMeta,
             calculated: {
                 smoothed: smoothing.correction,
                 pressureASL: pressureASL, //defaults to pressure if not ASL
                 diurnalPressure: diurnalPressure, //defaults to pressure if not diurnal
                 diurnalPressureASL: diurnalPressureASL //default to pressure ASL if not diurnal
             },
-            originalPressure: () => pressure + calculated.smoothingCorrrection
+            originalPressure: () => pressure + smoothing.correction
         };
 
         this.readings.push(reading);
-        this.#removeOldPressures();
+        this.removeOldPressures();
         this.readings.sort(sortOlderToNewer);
         this.emit('pressureAdded', reading);
         return reading;
     }
 
-    #smoothPressure(pressure) {
+    private smoothPressure(pressure: number): { pressure: number; smoothed: number | null; correction: number } {
         //only apply if we already have more than 3 readings the last hour
         if (globals.applySmoothing) {
             const recentReadings = this.getAll().filter(
@@ -112,7 +91,7 @@ class ReadingStore extends EventEmitter {
             if (recentReadings.length > 3) {
                 const toSmoothen = [...recentReadings.map(r => r.pressure), pressure];
                 const smoothed = EMA.process(toSmoothen);
-                let pressureSmoothed = smoothed[smoothed.length - 1];
+                const pressureSmoothed = smoothed[smoothed.length - 1];
 
                 return { pressure: pressure, smoothed: pressureSmoothed, correction: pressureSmoothed - pressure };
             }
@@ -121,7 +100,7 @@ class ReadingStore extends EventEmitter {
         return { pressure: pressure, smoothed: null, correction: 0 };
     }
 
-    #removeOldPressures(threshold = utils.minutesFromNow(-globals.keepPressureReadingsFor)) {
+    private removeOldPressures(threshold: Date = utils.minutesFromNow(-globals.keepPressureReadingsFor)): void {
         if(!globals.ignoreFlagInTesting) {
             this.readings = this.readings.filter((p) => p.datetime.getTime() >= threshold.getTime());
         }
@@ -129,20 +108,20 @@ class ReadingStore extends EventEmitter {
 
     /**
      * Get the last pressure reading.
-     * @returns {Object} The last pressure reading.
+     * @returns The last pressure reading.
      */
-    getLatestReading() {
+    getLatestReading(): Reading | undefined {
         return this.readings[this.readings.length - 1];
     }
 
-    getFirstReading() {
-        this.readings.length > 0 ? this.readings[0] : null;
+    getFirstReading(): Reading | null {
+        return this.readings.length > 0 ? this.readings[0] : null;
     }
 
-    findReadingBefore(datetime) {
+    findReadingBefore(datetime: Date): Reading | null {
         if (!(datetime instanceof Date)) throw new Error("Invalid input for datetime.");
     
-        let previous = null;
+        let previous: Reading | null = null;
     
         for (const p of this.readings) {
             if (p.datetime.getTime() < datetime.getTime()) previous = p;
@@ -152,10 +131,10 @@ class ReadingStore extends EventEmitter {
         return previous;        
     }
 
-    findReadingAfter(datetime) {
+    findReadingAfter(datetime: Date): Reading | null {
         if (!(datetime instanceof Date)) throw new Error("Invalid input for datetime.");
     
-        let next = null;
+        let next: Reading | null = null;
     
         for (const p of this.readings) {
             if (p.datetime.getTime() > datetime.getTime()) {
@@ -167,7 +146,7 @@ class ReadingStore extends EventEmitter {
         return next;
     }
 
-    getPressuresByPeriod(startTime, endTime, readings = this.readings) {
+    getPressuresByPeriod(startTime: Date, endTime: Date, readings: Reading[] = this.readings): Reading[] {
         if (!(startTime instanceof Date) || !(endTime instanceof Date)) {
             throw new Error("Invalid input for startTime or endTime.");
         }
@@ -177,24 +156,24 @@ class ReadingStore extends EventEmitter {
 
     /**
      * Get readings since X minutes
-     * @param {number} minutes Number of minutes
+     * @param minutes Number of minutes
      * @returns Readings
      */
-    getPressuresSince(minutes) {
+    getPressuresSince(minutes: number): Reading[] {
         const earlier = utils.minutesFromNow(-Math.abs(minutes));
         return this.readings.filter((p) => p.datetime.getTime() >= earlier.getTime());
     }
 
     /**
      * Get pressure closest to the given datetime
-     * @param {Date} datetime Datetime to search
+     * @param datetime Datetime to search
      * @returns Reading
      */
-    getPressureClosestTo(datetime) {
+    getPressureClosestTo(datetime: Date): Reading | null {
         if (!(datetime instanceof Date)) throw new Error("Invalid input for datetime.");
     
-        let previous = null;
-        let next = null;
+        let previous: Reading | null = null;
+        let next: Reading | null = null;
     
         for (const p of this.readings) {
             if (p.datetime.getTime() <= datetime.getTime()) previous = p;
@@ -208,34 +187,33 @@ class ReadingStore extends EventEmitter {
         if (utils.isNullOrUndefined(next)) return previous;
         if (utils.isNullOrUndefined(previous)) return next;
     
-        const diffNext = Math.abs(next.datetime.getTime() - datetime.getTime());
-        const diffPrevious = Math.abs(previous.datetime.getTime() - datetime.getTime());
+        const diffNext = Math.abs(next!.datetime.getTime() - datetime.getTime());
+        const diffPrevious = Math.abs(previous!.datetime.getTime() - datetime.getTime());
     
         return diffNext < diffPrevious ? next : previous;
     }
 
     /**
      * Check if there are any pressure readings.
-     * @returns {boolean} True if there are pressure readings, false otherwise.
+     * @returns True if there are pressure readings, false otherwise.
      */
-    hasPressures() {
+    hasPressures(): boolean {
         return this.readings.length > 0;
     }
 
-    count() {
+    count(): number {
         return this.readings.length;
     }
 
     /**
      * Returns the pressure of a reading by global default choices of Adjust To Sea Level and/or applying Diurnal Rythm corrections.
-     * @param {Object} reading The reading to return pressure of. By default the latest is used.
+     * @param reading The reading to return pressure of. By default the latest is used.
      * @returns The pressure of the reading
      */
-    getPressureByDefaultChoice(reading = this.getLatestReading()) {
-        if(reading === null) throw new Error("Reading cannot be null.")
-        let result = null;
+    getPressureByDefaultChoice(reading: Reading | undefined = this.getLatestReading()): number {
+        if(reading === null || reading === undefined) throw new Error("Reading cannot be null.")
+        let result: number;
 
-        //if(globals.applyAdjustToSeaLevel) {
         if(reading.meta.altitude > 0) {
             result = globals.applyDiurnalRythm ? reading?.calculated?.diurnalPressureASL : reading?.calculated?.pressureASL;
         } else {
@@ -245,11 +223,12 @@ class ReadingStore extends EventEmitter {
         return result;
     }
 
-    getPressureAverageByPeriod(minutes = 10, reading = this.getLatestReading()) {
-        let readings = getPressuresByPeriod(reading.datetime, utils.minutesFrom(reading.datetime, -minutes));
+    getPressureAverageByPeriod(minutes: number = 10, reading: Reading | undefined = this.getLatestReading()): number {
+        if (!reading) return 0;
+        const readings = this.getPressuresByPeriod(utils.minutesFrom(reading.datetime, -minutes), reading.datetime);
         let sum = 0;
-        readings.forEach(reading => {
-            sum += this.getPressureByDefaultChoice(reading);
+        readings.forEach(r => {
+            sum += this.getPressureByDefaultChoice(r);
         });
         return sum / readings.length;
     }
@@ -258,16 +237,16 @@ class ReadingStore extends EventEmitter {
      * 
      * @returns Returns all pressure readings
      */
-    getAll() {
-        return this.readings.sort();
+    getAll(): Reading[] {
+        return [...this.readings].sort(sortOlderToNewer);
     }
 
     /**
      * 
-     * @param {number} minutes Number of minutes to get readings for
+     * @param minutes Number of minutes to get readings for
      * @returns Readings
      */
-    getAllLastMinutes(minutes) {
+    getAllLastMinutes(minutes: number): Reading[] {
         return this.readings.filter((p) => p.datetime.getTime() >= utils.minutesFromNow(-Math.abs(minutes)).getTime());
     }
 
@@ -275,31 +254,31 @@ class ReadingStore extends EventEmitter {
      * 
      * @returns Quality in terms of percentage. 100% best.
      */
-    getDataQuality() {
+    getDataQuality(): number {
         let score = 0;
-        let start = 180;
+        const start = 180;
         let offset = start;
-        let interval = 30;
+        const interval = 30;
     
         while(offset > 0) {
-            let startPeriod = utils.minutesFromNow(-offset);
-            let endPeriod = utils.minutesFromNow(-(offset - interval));
+            const startPeriod = utils.minutesFromNow(-offset);
+            const endPeriod = utils.minutesFromNow(-(offset - interval));
             if(this.getPressuresByPeriod(startPeriod, endPeriod).length >= 1) score++;
             offset -= interval;
         }
     
-        let qualityInPercent = score / (start / interval) * 100;
+        const qualityInPercent = score / (start / interval) * 100;
         return qualityInPercent;
     }
 
     /**
      * Clear the pressure readings. (Mainly for testing purposes)
      */
-    clear() {
+    clear(): void {
         this.readings = [];
     }
 }
 
 const readingStoreAsSingleton = new ReadingStore();
 
-module.exports = readingStoreAsSingleton;
+export = readingStoreAsSingleton;

@@ -19,6 +19,13 @@ const defaults = {
  * Global constants and settings for the library.
  */
 class Globals {
+    public meanSeaLevelTemperature: number;
+    public keepPressureReadingsFor: number;
+    public applyAdjustToSeaLevel: boolean;
+    public applyDiurnalRythm: boolean;
+    public ignoreFlagInTesting: boolean;
+    public applySmoothing: boolean;
+
     constructor() {
         this.meanSeaLevelTemperature = defaults.meanSeaLevelTemperature; //celcius
         this.keepPressureReadingsFor = defaults.keepPressureReadingsFor; //48 hours
@@ -30,64 +37,64 @@ class Globals {
 
     /**
      * 
-     * @param {number} value Mean temperature at sea level, default = 15 Celsius degrees.
+     * @param value Mean temperature at sea level, default = 15 Celsius degrees.
      * @description Default: 15 Celsius degrees. This is used for pressure calculations.
      */
-    setMeanSeaLevelTemperature(value = defaults.meanSeaLevelTemperature) {
+    setMeanSeaLevelTemperature(value: number = defaults.meanSeaLevelTemperature): void {
         this.meanSeaLevelTemperature = value;
     }
 
     /**
      * 
-     * @param {number} value Number of whole minutes to keep pressure readings for. Default: 48 hours.
+     * @param value Number of whole minutes to keep pressure readings for. Default: 48 hours.
      * @example
      * globals.setKeepPressureReadingsFor(120); //keep pressure readings for 120 minutes
      */
-    setKeepPressureReadingsFor(value = defaults.keepPressureReadingsFor) {
+    setKeepPressureReadingsFor(value: number = defaults.keepPressureReadingsFor): void {
         if(Number.isInteger(value) && value > 0) this.keepPressureReadingsFor = value;
     }
 
     /**
      * When set to true internal calculations will use readings adjusted to sea level. Can be combined with diurnal.
-     * @param {boolean} value True or false, default = false
+     * @param value True or false, default = false
      * @example
      * globals.setApplyAdjustToSeaLevel(true); //apply sea level adjustment
      */
-    setApplyAdjustToSeaLevel(value = defaults.applyAdjustToSeaLevel) {
+    setApplyAdjustToSeaLevel(value: boolean = defaults.applyAdjustToSeaLevel): void {
         this.applyAdjustToSeaLevel = value;
     }
 
     /**
      * When set to true internal calculations will use readings adjusted to diurnal rythm. Can be comined with sea level.
-     * @param {boolean} value True or false, default = false
+     * @param value True or false, default = false
      * @example
      * globals.setApplyDiurnalRythm(true); //apply diurnal rythm
      */
-    setApplyDiurnalRythm(value = defaults.applyDiurnalRythm) {
+    setApplyDiurnalRythm(value: boolean = defaults.applyDiurnalRythm): void {
         this.applyDiurnalRythm = value;
     }
 
     /**
      * @description When set to true internal calculations will use readings smoothed with an exponential moving average.
-     * @param {boolean} value True or false, default = false
+     * @param value True or false, default = false
      * @example
      * globals.setApplySmoothing(true); //apply smoothing
      */
-    setApplySmoothing(value = defaults.applySmoothing) {
+    setApplySmoothing(value: boolean = defaults.applySmoothing): void {
         this.applySmoothing = value;
     }
 
     /**
      * A flag to be set under testing where parameteres change dynamically with dates, such as diurnal.
-     * @param {boolean} value True or false, default = false
+     * @param value True or false, default = false
      * @example
      * globals.setIgnoreFlagInTesting(true); //ignore flag in testing
      */
-    setIgnoreFlagInTesting(value = defaults.ignoreFlagInTesting) {
+    setIgnoreFlagInTesting(value: boolean = defaults.ignoreFlagInTesting): void {
         this.ignoreFlagInTesting = value;
     }
 
-    setDefaults() {
+    setDefaults(): void {
         this.meanSeaLevelTemperature = defaults.meanSeaLevelTemperature;
         this.keepPressureReadingsFor = defaults.keepPressureReadingsFor;
         this.applyAdjustToSeaLevel = defaults.applyAdjustToSeaLevel;
@@ -99,4 +106,4 @@ class Globals {
 
 const globalsAsSingleton = new Globals();
 
-module.exports = globalsAsSingleton;
+export = globalsAsSingleton;

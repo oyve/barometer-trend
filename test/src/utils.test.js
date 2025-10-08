@@ -1,6 +1,6 @@
 const assert = require('assert');
-const utils = require('../../src/utils');
-const readingStore = require('../../src/readingStore');
+const utils = require('../../dist/src/utils');
+const readingStore = require('../../dist/src/readingStore');
 
 describe("Utils Tests", function () {
 	describe("Minutes from now", function () {

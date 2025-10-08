@@ -1,7 +1,7 @@
 
 const assert = require('assert');
-const globals = require('../../src/globals');
-const utils = require('../../src/utils');
+const globals = require('../../dist/src/globals');
+const utils = require('../../dist/src/utils');
 
 describe("Globals Tests", function () {
     describe("Mean tempereature", function () {

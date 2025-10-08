@@ -1,8 +1,8 @@
 
 const assert = require('assert');
-const readingStore = require('../../src/readingStore');
-const utils = require('../../src/utils');
-const globals = require('../../src/globals');
+const readingStore = require('../../dist/src/readingStore');
+const utils = require('../../dist/src/utils');
+const globals = require('../../dist/src/globals');
 
 describe("ReadingStore Tests", function () {
     describe("Add pressure", function () {

@@ -2,18 +2,18 @@
   "name": "barometer-trend",
   "version": "2.2.8",
   "description": "Analyse and calculate tendency, trend and weather predictions of barometric pressure",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "commonjs",
   "files": [
-    "index.js",
-    "src",
+    "dist",
     "LICENSE",
-    "src/readingStore.js",
-    "src/globals.js",
     "NOTICE"
   ],
   "scripts": {
-    "test": "mocha --recursive"
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && mocha --recursive"
   },
   "repository": {
     "type": "git",
@@ -42,7 +42,12 @@
   },
   "homepage": "https://github.com/oyve/barometer-trend#readme",
   "devDependencies": {
-    "mocha": "^10.1.0"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.7.0",
+    "@types/regression": "^2.0.6",
+    "mocha": "^10.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "regression": "^2.0.1",

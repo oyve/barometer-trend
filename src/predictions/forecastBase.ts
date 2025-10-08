@@ -5,9 +5,9 @@ class ForecastBase {
       }
     }
   
-    forecast() {
+    forecast(): any {
       throw new Error("Method 'forecast()' must be implemented.");
     }
   }
   
-  module.exports = ForecastBase
+  export = ForecastBase;
