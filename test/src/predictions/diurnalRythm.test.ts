@@ -1,5 +1,4 @@
-const assert = require('assert');
-const diurnalRythm = require('../../../dist/src/predictions/diurnalRythm');
+import { DiurnalRythmAnalyzer } from '../../../src/predictions/diurnalRythm';
 
 describe("Diurnal Rythm Tests", function () {
     describe("Mid-High Latitude Correct Pressure Calculations for 24-Hour Cycle", function () {
@@ -22,10 +21,10 @@ describe("Diurnal Rythm Tests", function () {
                 const date = new Date(time);
 
                 // Act
-                const result = diurnalRythm.correctPressure(pressureObserved, latitude, date);
+                const result = DiurnalRythmAnalyzer.correctPressure(pressureObserved, latitude, date);
 
                 // Assert
-                assert.strictEqual(result.correctedPressure, expectedPressure, `Failed at ${time}`);
+                expect(result.correctedPressure).toBe(expectedPressure);
             });
         });
     });
@@ -53,7 +52,7 @@ describe("Diurnal Rythm Tests", function () {
     //             const result = diurnalRythm.correctPressure(pressureObserved, latitude, date);
 
     //             // Assert
-    //             assert.strictEqual(result.correctedPressure, expectedPressure, `Failed at ${time}`);
+    //             expect(result.correctedPressure).toBe(expectedPressure);
     //         });
     //     });
     // });
@@ -66,9 +65,9 @@ describe("Diurnal Rythm Tests", function () {
             const date = new Date("2025-07-16T12:00:00");
 
             // Act & Assert
-            assert.throws(() => {
-                diurnalRythm.correctPressure(pressureObserved, latitude, date);
-            }, /Invalid pressure value/);
+            expect(() => {
+                DiurnalRythmAnalyzer.correctPressure(pressureObserved, latitude, date);
+            }).toThrow(/Invalid pressure value/);
         });
 
         it("should throw an error for invalid latitude", function () {
@@ -78,9 +77,9 @@ describe("Diurnal Rythm Tests", function () {
             const date = new Date("2025-07-16T12:00:00");
 
             // Act & Assert
-            assert.throws(() => {
-                diurnalRythm.correctPressure(pressureObserved, latitude, date);
-            }, /Invalid latitude value/);
+            expect(() => {
+                DiurnalRythmAnalyzer.correctPressure(pressureObserved, latitude, date);
+            }).toThrow(/Invalid latitude value/);
         });
     });
 });

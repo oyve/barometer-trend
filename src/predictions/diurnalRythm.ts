@@ -1,30 +1,23 @@
 import * as utils from '../utils';
-import * as system from './system';
-
-// Function to calculate seasonal adjustment based on solar declination
-function calculateSolarDeclination(dayOfYear: number): number {
-    const epsilon = 23.44 * Math.PI / 180; // Earth's axial tilt in radians
-    const omega = (2 * Math.PI / 365) * (dayOfYear - 81); // Earth's orbital angle
-    return epsilon * Math.sin(omega); // Solar declination in radians
-}
-
-/**
- * Get seasonal adjustment factor based on day of the year and latitude.
- * @param dayOfYear - Day of the year (1-365).
- * @param latitude - Latitude in decimal degrees.
- * @returns Seasonal adjustment factor.
- */
-function getSeasonalAdjustment(dayOfYear: number, latitude: number): number {
-    const declination = calculateSolarDeclination(dayOfYear);
-    const angle = Math.asin(Math.sin(latitude * Math.PI / 180) * Math.sin(declination));
-    const adjustmentFactor = 1 + 0.25 * Math.sin(angle); // Increased modulation for better accuracy
-    return Math.max(0.8, Math.min(1.2, adjustmentFactor)); // Clamp the adjustment factor to avoid extreme values
-}
+import { SystemAnalyzer as system } from './system';
 
 interface DiurnalData {
     latRange: [number, number];
     baseAmplitude: number;
     peakTimes: number[];
+}
+
+interface WeatherAnomalies {
+    HIGH: number;
+    LOW: number;
+    NORMAL: number;
+}
+
+interface PressureCorrectionResult {
+    correctedPressure: number;
+    correctionFactor: number;
+    anomaly: number;
+    seasonalFactor: number;
 }
 
 // Diurnal pressure data with base amplitudes and adjusted 4-peak cycle (6-hour periodicity)
@@ -36,113 +29,132 @@ const diurnalPressureData: Record<string, DiurnalData> = {
     polar: { latRange: [70, 90], baseAmplitude: 50, peakTimes: [8, 14, 20, 2] },
 };
 
-/**
- * Get diurnal variation data based on latitude.
- * @param latitude - Latitude in decimal degrees.
- * @returns Diurnal variation data for the region.
- */
-function getDiurnalVariation(latitude: number): DiurnalData {
-    for (const region in diurnalPressureData) {
-        const { latRange } = diurnalPressureData[region];
-        if (latitude >= latRange[0] && latitude < latRange[1]) {
-            return diurnalPressureData[region];
-        }
+
+class DiurnalRythmAnalyzer {
+    constructor() {
+        // Initialization if needed
     }
-    return { latRange: [0, 0], baseAmplitude: 0, peakTimes: [0, 0, 0, 0] }; // Default for unexpected values
+
+    // Function to calculate seasonal adjustment based on solar declination
+    calculateSolarDeclination(dayOfYear: number): number {
+        const epsilon = 23.44 * Math.PI / 180; // Earth's axial tilt in radians
+        const omega = (2 * Math.PI / 365) * (dayOfYear - 81); // Earth's orbital angle
+        return epsilon * Math.sin(omega); // Solar declination in radians
+    }
+
+    /**
+     * Get seasonal adjustment factor based on day of the year and latitude.
+     * @param dayOfYear - Day of the year (1-365).
+     * @param latitude - Latitude in decimal degrees.
+     * @returns Seasonal adjustment factor.
+     */
+    getSeasonalAdjustment(dayOfYear: number, latitude: number): number {
+        const declination = this.calculateSolarDeclination(dayOfYear);
+        const angle = Math.asin(Math.sin(latitude * Math.PI / 180) * Math.sin(declination));
+        const adjustmentFactor = 1 + 0.25 * Math.sin(angle); // Increased modulation for better accuracy
+        return Math.max(0.8, Math.min(1.2, adjustmentFactor)); // Clamp the adjustment factor to avoid extreme values
+    }
+
+    /**
+     * Get diurnal variation data based on latitude.
+     * @param latitude - Latitude in decimal degrees.
+     * @returns Diurnal variation data for the region.
+     */
+    getDiurnalVariation(latitude: number): DiurnalData {
+        for (const region in diurnalPressureData) {
+            const { latRange } = diurnalPressureData[region];
+            if (latitude >= latRange[0] && latitude < latRange[1]) {
+                return diurnalPressureData[region];
+            }
+        }
+        return { latRange: [0, 0], baseAmplitude: 0, peakTimes: [0, 0, 0, 0] }; // Default for unexpected values
+    }
+
+    /**
+     * Get weather anomaly based on the weather system and latitude.
+     * @param weatherSystem - Weather system type (e.g., HIGH, LOW, BETWEEN).
+     * @param latitude - Latitude in decimal degrees.
+     * @param pressureObserved - Observed pressure in pascals.
+     * @returns Weather anomaly adjustment.
+     */
+    getWeatherAnomaly(weatherSystem: string, latitude: number, pressureObserved: number): number {
+        const anomalies: Record<string, WeatherAnomalies> = {
+            tropics: { HIGH: 300, LOW: -200, NORMAL: 50 },
+            subtropics: { HIGH: 400, LOW: -300, NORMAL: 50 },
+            midLatitudes: { HIGH: 500, LOW: -400, NORMAL: 50 },
+            highMidLatitudes: { HIGH: 600, LOW: -500, NORMAL: 50 },
+            polar: { HIGH: 700, LOW: -600, NORMAL: 50 },
+        };
+
+        const region = Object.keys(diurnalPressureData).find((key) => {
+            const { latRange } = diurnalPressureData[key];
+            return latitude >= latRange[0] && latitude < latRange[1];
+        });
+
+        const baseAnomaly = region && anomalies[region] ? anomalies[region][weatherSystem as keyof WeatherAnomalies] ?? 0 : 0;
+
+        // Scale anomaly based on pressure deviation
+        const meanPressure = 101325; // Standard atmospheric pressure in Pascals
+        const pressureDeviation = pressureObserved - meanPressure;
+        const scaledAnomaly = baseAnomaly + 0.1 * pressureDeviation;
+
+        return scaledAnomaly;
+    }
+
+
+
+    /**
+     * Correct observed atmospheric pressure for diurnal variations and weather anomalies.
+     * @param pressureObserved - Observed pressure in pascals.
+     * @param latitude - Latitude of the observation.
+     * @param date - Date and time of the observation.
+     * @returns Corrected pressure and metadata.
+     */
+    correctPressure(pressureObserved: number, latitude: number, date: Date): PressureCorrectionResult {
+        if (pressureObserved <= 0) throw new Error("Invalid pressure value");
+        if (!utils.isValidLatitude(latitude)) throw new Error("Invalid latitude value");
+
+        const time = utils.get24HourFormat(date); // 0-23
+        const dayOfYear = utils.getDayOfYear(date);
+
+        // Get diurnal variation data and apply seasonal adjustment
+        const variationData = this.getDiurnalVariation(Math.abs(latitude));
+        const { baseAmplitude, peakTimes } = variationData;
+        const seasonalFactor = this.getSeasonalAdjustment(dayOfYear, latitude);
+        const amplitude = baseAmplitude * seasonalFactor;
+
+        // Find the closest peak time
+        const closestPeakTime = peakTimes.reduce((closest, peakTime) => {
+            const hoursFromPeak = (time - peakTime + 24) % 24;
+            const closestHoursFromPeak = (time - closest + 24) % 24;
+
+            // Normalize to range [-12, 12]
+            const normalizedHoursFromPeak = hoursFromPeak > 12 ? hoursFromPeak - 24 : hoursFromPeak;
+            const normalizedClosestHoursFromPeak = closestHoursFromPeak > 12 ? closestHoursFromPeak - 24 : closestHoursFromPeak;
+
+            return Math.abs(normalizedHoursFromPeak) < Math.abs(normalizedClosestHoursFromPeak) ? peakTime : closest;
+        }, peakTimes[0]);
+
+        // Calculate correction factor based on the closest peak time
+        const rawDifference = (time - closestPeakTime + 24) % 24;
+        const signedHoursFromClosestPeak = rawDifference > 12
+            ? rawDifference - 24
+            : rawDifference;
+        const twoPiOver24 = 2 * Math.PI / 24;
+        const correctionFactor = amplitude * Math.cos(twoPiOver24 * signedHoursFromClosestPeak) * Math.sign(signedHoursFromClosestPeak);
+
+        // Apply weather anomaly based on system type
+        const pressureSystem = system.getSystemByPressure(pressureObserved - correctionFactor); //{name: 'LOW'};
+        const anomaly = this.getWeatherAnomaly(pressureSystem.name, latitude, pressureObserved);
+
+        return {
+            correctedPressure: Math.round(pressureObserved - correctionFactor + anomaly),
+            correctionFactor,
+            anomaly,
+            seasonalFactor,
+        };
+    }
 }
 
-interface WeatherAnomalies {
-    HIGH: number;
-    LOW: number;
-    NORMAL: number;
-}
-
-/**
- * Get weather anomaly based on the weather system and latitude.
- * @param weatherSystem - Weather system type (e.g., HIGH, LOW, BETWEEN).
- * @param latitude - Latitude in decimal degrees.
- * @param pressureObserved - Observed pressure in pascals.
- * @returns Weather anomaly adjustment.
- */
-function getWeatherAnomaly(weatherSystem: string, latitude: number, pressureObserved: number): number {
-    const anomalies: Record<string, WeatherAnomalies> = {
-        tropics: { HIGH: 300, LOW: -200, NORMAL: 50 },
-        subtropics: { HIGH: 400, LOW: -300, NORMAL: 50 },
-        midLatitudes: { HIGH: 500, LOW: -400, NORMAL: 50 },
-        highMidLatitudes: { HIGH: 600, LOW: -500, NORMAL: 50 },
-        polar: { HIGH: 700, LOW: -600, NORMAL: 50 },
-    };
-
-    const region = Object.keys(diurnalPressureData).find((key) => {
-        const { latRange } = diurnalPressureData[key];
-        return latitude >= latRange[0] && latitude < latRange[1];
-    });
-
-    const baseAnomaly = region && anomalies[region] ? anomalies[region][weatherSystem as keyof WeatherAnomalies] ?? 0 : 0;
-
-    // Scale anomaly based on pressure deviation
-    const meanPressure = 101325; // Standard atmospheric pressure in Pascals
-    const pressureDeviation = pressureObserved - meanPressure;
-    const scaledAnomaly = baseAnomaly + 0.1 * pressureDeviation;
-
-    return scaledAnomaly;
-}
-
-interface PressureCorrectionResult {
-    correctedPressure: number;
-    correctionFactor: number;
-    anomaly: number;
-    seasonalFactor: number;
-}
-
-/**
- * Correct observed atmospheric pressure for diurnal variations and weather anomalies.
- * @param pressureObserved - Observed pressure in pascals.
- * @param latitude - Latitude of the observation.
- * @param date - Date and time of the observation.
- * @returns Corrected pressure and metadata.
- */
-export function correctPressure(pressureObserved: number, latitude: number, date: Date): PressureCorrectionResult {
-    if (pressureObserved <= 0) throw new Error("Invalid pressure value");
-    if (!utils.isValidLatitude(latitude)) throw new Error("Invalid latitude value");
-
-    const time = utils.get24HourFormat(date); // 0-23
-    const dayOfYear = utils.getDayOfYear(date);
-
-    // Get diurnal variation data and apply seasonal adjustment
-    const variationData = getDiurnalVariation(Math.abs(latitude));
-    const { baseAmplitude, peakTimes } = variationData;
-    const seasonalFactor = getSeasonalAdjustment(dayOfYear, latitude);
-    const amplitude = baseAmplitude * seasonalFactor;
-
-    // Find the closest peak time
-    const closestPeakTime = peakTimes.reduce((closest, peakTime) => {
-        const hoursFromPeak = (time - peakTime + 24) % 24;
-        const closestHoursFromPeak = (time - closest + 24) % 24;
-
-        // Normalize to range [-12, 12]
-        const normalizedHoursFromPeak = hoursFromPeak > 12 ? hoursFromPeak - 24 : hoursFromPeak;
-        const normalizedClosestHoursFromPeak = closestHoursFromPeak > 12 ? closestHoursFromPeak - 24 : closestHoursFromPeak;
-
-        return Math.abs(normalizedHoursFromPeak) < Math.abs(normalizedClosestHoursFromPeak) ? peakTime : closest;
-    }, peakTimes[0]);
-
-    // Calculate correction factor based on the closest peak time
-    const rawDifference = (time - closestPeakTime + 24) % 24;
-    const signedHoursFromClosestPeak = rawDifference > 12
-        ? rawDifference - 24
-        : rawDifference;
-    const twoPiOver24 = 2 * Math.PI / 24;
-    const correctionFactor = amplitude * Math.cos(twoPiOver24 * signedHoursFromClosestPeak) * Math.sign(signedHoursFromClosestPeak);
-
-    // Apply weather anomaly based on system type
-    const pressureSystem = system.getSystemByPressure(pressureObserved - correctionFactor);
-    const anomaly = getWeatherAnomaly(pressureSystem.name, latitude, pressureObserved);
-
-    return {
-        correctedPressure: Math.round(pressureObserved - correctionFactor + anomaly),
-        correctionFactor,
-        anomaly,
-        seasonalFactor,
-    };
-}
+const diurnalRythm = new DiurnalRythmAnalyzer();
+export { diurnalRythm as DiurnalRythmAnalyzer };

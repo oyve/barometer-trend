@@ -3,12 +3,12 @@ import * as byPressureTendencyAndWind from './src/predictions/byPressureTendency
 import * as byPressureTrendAndSeason from './src/predictions/byPressureTrendAndSeason';
 import * as beaufort from './src/predictions/beaufort';
 import * as utils from './src/utils';
-import * as system from './src/predictions/system';
-import readingStore = require('./src/readingStore');
+import { SystemAnalyzer as system } from './src/predictions/system';
+import { ReadingStore } from './src/readingStore';
 import * as barometerLabel from './src/predictions/label';
 import { TrendAnalyzer, TENDENCY, TREND } from './src/trend';
 import * as forecastText from './src/predictions/forecastText';
-import FrontAnalyzer = require('./src/predictions/front');
+import { FrontAnalyzer as frontAnalyzer } from './src/predictions/front';
 import { Reading } from './src/types';
 
 let latitude: number | null = null;
@@ -16,8 +16,8 @@ let latitude: number | null = null;
 /**
  * Clear the pressure readings. (Mainly for testing purposes)
  */
-function clear(): void {
-    readingStore.clear();
+export function clear(): void {
+    ReadingStore.clear();
 }
 
 /**
@@ -26,22 +26,22 @@ function clear(): void {
  * @param pressure Pressure in Pascal
  * @param meta Meta data object containing altitude, temperature, humidity, trueWindDirection and latitude
  */
-function addPressure(datetime: Date, pressure: number, meta: Record<string, any> = {}): Reading | undefined {
-    return readingStore.add(datetime, pressure, meta);
+export function addPressure(datetime: Date, pressure: number, meta: Record<string, any> = {}): Reading | undefined {
+    return ReadingStore.add(datetime, pressure, meta);
 }
 
 /**
  * @returns True or false
  */
-function hasPressures(): boolean {
-    return readingStore.hasPressures();
+export function hasPressures(): boolean {
+    return ReadingStore.hasPressures();
 }
 
 /**
  * Get latitude
  * @returns Returns latitude, null if not set
  */
-function getLatitude(): number | null | undefined {
+export function getLatitude(): number | null | undefined {
     return latitude === null ? undefined : latitude;
 }
 
@@ -50,7 +50,7 @@ function getLatitude(): number | null | undefined {
  * @param lat Latitude in decimal format, i.e. 45.123
  * @returns true or false if set after validation
  */
-function setLatitude(lat: number): boolean {
+export function setLatitude(lat: number): boolean {
     if(utils.isValidLatitude(lat)) {
         latitude = lat;
         return true;
@@ -64,9 +64,9 @@ function setLatitude(lat: number): boolean {
  * If latitude is set it will determine northern|southern hemisphere (default: northern)
  * @returns Object
  */
-function getForecast(): any;
-function getForecast(isNorthernHemisphere: boolean): any;
-function getForecast(isNorthernHemisphere?: boolean): any {
+export function getForecast(): any;
+export function getForecast(isNorthernHemisphere: boolean): any;
+export function getForecast(isNorthernHemisphere?: boolean): any {
     // Handle no arguments case - check if latitude is set
     if (arguments.length === 0) {
         if (latitude === null) return null;
@@ -78,29 +78,29 @@ function getForecast(isNorthernHemisphere?: boolean): any {
         isNorthernHemisphere = true;
     }
 
-    if (readingStore.readings.length < 2) return null;
+    if (ReadingStore.readings.length < 2) return null;
 
-    const last10Minutes = readingStore.getAll(10);
+    const last10Minutes = ReadingStore.getAll(10);
 
     const trendAnalyzer = new TrendAnalyzer();
-    const frontAnalyzer = new FrontAnalyzer();
+    //const frontAnalyzer = new FrontAnalyzer();
 
     const pressureTrend = trendAnalyzer.forecast();
     if (pressureTrend === null) return null;
 
-    const pressureSystems = system.forecast(readingStore.getPressureByDefault(), readingStore.getAll(-60));
+    const pressureSystems = system.forecast();
     const forecastPressureOnly = byPressureTrend.getPrediction(pressureTrend.tendency, pressureTrend.trend.key);
     const forecastFront = frontAnalyzer.forecast();
     const beaufortForecast = beaufort.forecast(pressureTrend.ratio, utils.getAverageValue(last10Minutes, r => r.meta?.trueWindSpeed));
-    const forecastByPressureAndSeason = byPressureTrendAndSeason.getPrediction(readingStore.getPressureByDefault(), pressureTrend.tendency, pressureTrend.trend.key, utils.isSummer(isNorthernHemisphere));
-    const latestReading = readingStore.getLatest();
+    const forecastByPressureAndSeason = byPressureTrendAndSeason.getPrediction(ReadingStore.getPressureByDefault(), pressureTrend.tendency, pressureTrend.trend.key, utils.isSummer(isNorthernHemisphere));
+    const latestReading = ReadingStore.getLatest();
     const forecastPressureTendencyThresholdAndQuadrant = latestReading ? 
-        byPressureTendencyAndWind.getPrediction(readingStore.getPressureByDefault(), latestReading.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere) :
+        byPressureTendencyAndWind.getPrediction(ReadingStore.getPressureByDefault(), latestReading.meta.trueWindDirection, pressureTrend.tendency, pressureTrend.trend, isNorthernHemisphere) :
         'N/A';
-    const labels = barometerLabel.getBarometerLabel(readingStore.getPressureByDefault());
+    const labels = barometerLabel.getBarometerLabel(ReadingStore.getPressureByDefault());
 
     const forecast = {
-        pressure: readingStore.getLatest(),
+        pressure: ReadingStore.getLatest(),
         trend: pressureTrend,
         models: {
             pressureOnly: forecastPressureOnly,
@@ -111,7 +111,7 @@ function getForecast(isNorthernHemisphere?: boolean): any {
             pressureSystem: pressureSystems,
             label: labels
         },
-        dataQuality: readingStore.getDataQuality(),
+        dataQuality: ReadingStore.getDataQuality(),
         forecastMinutes: getForecastMinutes()
     };
 
@@ -124,15 +124,15 @@ function getForecast(isNorthernHemisphere?: boolean): any {
 }
 
 function getForecastMinutes(): number {
-    const first = readingStore.getFirst();
+    const first = ReadingStore.getFirst();
     if(first === null) return 0;
     const diffMs = Math.abs(new Date().getTime() - first.datetime.getTime()); // difference in milliseconds
     return Math.floor(diffMs / 60000);
 }
 
-async function getForecastAsync(): Promise<any>;
-async function getForecastAsync(isNorthernHemisphere: boolean): Promise<any>;
-async function getForecastAsync(isNorthernHemisphere?: boolean): Promise<any> {
+export async function getForecastAsync(): Promise<any>;
+export async function getForecastAsync(isNorthernHemisphere: boolean): Promise<any>;
+export async function getForecastAsync(isNorthernHemisphere?: boolean): Promise<any> {
     return new Promise((resolve, reject) => {
         try {
             if (arguments.length === 0) {
@@ -149,28 +149,16 @@ async function getForecastAsync(isNorthernHemisphere?: boolean): Promise<any> {
     });
 }
 
-function getBarometerUpdates(): any {
-    if(readingStore.count() < 1) return null;
+export function getBarometerUpdates(): any {
+    if(ReadingStore.count() < 1) return null;
     
-    return barometerLabel.getBarometerLabel(readingStore.getPressureByDefault());
+    return barometerLabel.getBarometerLabel(ReadingStore.getPressureByDefault());
 }
 
 /**
  * Change altitude for all existing readings
  * @param altitude Altitude
  */
-function changeAltitude(altitude: number): void {
-    readingStore.getAll().forEach(r => r.meta.altitude = altitude);
+export function changeAltitude(altitude: number): void {
+    ReadingStore.getAll().forEach((r: Reading) => r.meta.altitude = altitude);
 }
-
-export = {
-    clear,
-    hasPressures,
-    addPressure,
-    getForecast,
-    getBarometerUpdates,
-    getLatitude,
-    setLatitude,
-    getForecastAsync,
-    changeAltitude
-};

@@ -1,5 +1,4 @@
-const assert = require('assert');
-const beaufort = require('../../../dist/src/predictions/beaufort');
+import * as beaufort from '../../../src/predictions/beaufort';
 
 describe("Beaufort Tests", function () {
 	describe("Get beaufort prognose", function () {
@@ -10,7 +9,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(+3).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 
 		it("it should equal F8-9", function () {
@@ -19,7 +18,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(+4).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 
 		it("it should equal F10+", function () {
@@ -28,7 +27,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(+6).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 
 		it("it should equal F6-7", function () {
@@ -37,7 +36,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(-2).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 
 		it("it should equal F8-12", function () {
@@ -46,7 +45,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(-4).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 
 		it("it should equal Less than F6", function () {
@@ -55,7 +54,7 @@ describe("Beaufort Tests", function () {
 			//act
 			var actual = beaufort.getByPressureVariationRatio(1).force;
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 
@@ -69,7 +68,7 @@ describe("Beaufort Tests", function () {
 			windSpeeds.forEach((windSpeed) => {
 				let actual = beaufort.getBeaufortScaleByWindSpeed(windSpeed);
 				//assert
-				assert.strictEqual(actual?.force, i);
+				expect(actual?.force).toBe(i);
 				i++;
 			});
 		});
@@ -79,7 +78,7 @@ describe("Beaufort Tests", function () {
 			//act
 			let actual = beaufort.getBeaufortScaleByWindSpeed(5.44);
 			//assert
-			assert.strictEqual(actual?.force, expected);
+			expect(actual?.force).toBe(expected);
 		});
 		it('should round decimals down', () => {
 			//arrange
@@ -87,7 +86,7 @@ describe("Beaufort Tests", function () {
 			//act
 			let actual = beaufort.getBeaufortScaleByWindSpeed(5.45);
 			//assert
-			assert.strictEqual(actual?.force, expected);
+			expect(actual?.force).toBe(expected);
 		});
 	});
 });

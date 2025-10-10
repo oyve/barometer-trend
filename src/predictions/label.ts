@@ -15,7 +15,7 @@ interface BarometerRange {
 const barometerRanges: BarometerRange[] = [
     {
       label: "Stormy",
-      minPa: 0,
+      minPa: -Infinity,
       maxPa: 97999,
       description: "Severe weather likely",
       detailedDescription: "Severe storms or extreme weather conditions likely"
@@ -63,6 +63,7 @@ const barometerRanges: BarometerRange[] = [
    * @returns An object containing the label and description for the given pressure
    */
   export function getBarometerLabel(pressurePa: number): BarometerRange | null {
+    if(pressurePa < 0) return null
     pressurePa = Math.round(pressurePa); // Round to the nearest integer
     const match = barometerRanges.find(
       range => pressurePa >= range.minPa && pressurePa <= range.maxPa

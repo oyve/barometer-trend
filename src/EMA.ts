@@ -26,7 +26,7 @@ class EMASmoothing {
       const variance = squaredDifferences.reduce((sum, value) => sum + value, 0) / data.length;
       const standardDeviation = Math.sqrt(variance);
     
-      console.log(`Mean: ${mean}, Standard Deviation: ${standardDeviation}`);
+      //console.log(`Mean: ${mean}, Standard Deviation: ${standardDeviation}`);
     
       const result = [...data]; // Copy data for smoothing
     

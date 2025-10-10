@@ -1,16 +1,13 @@
-const assert = require('assert');
-const utils = require('../../../dist/src/utils');
-const readingStore = require('../../../dist/src/readingStore');
-const FrontAnalyzer = require('../../../dist/src/predictions/front');
-
-const frontAnalyzer = new FrontAnalyzer();
+import * as utils from '../../../src/utils';
+import { ReadingStore } from '../../../src/readingStore';
+import { FrontAnalyzer as frontAnalyzer } from '../../../src/predictions/front';
 
 describe("Front Tests", function () {
 	describe("Analyze pressures", function () {
 
 		it("it should equal FFF", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "FFF";
 			const pressures = [
 				{ datetime: utils.minutesFromNow(-179), pressure: 101330 },
@@ -25,16 +22,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101305 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101300 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal FFS", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "FFS";
 			const pressures = [
 				{ datetime: utils.minutesFromNow(-179), pressure: 101330 },
@@ -49,16 +46,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101305 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101310 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal FFR", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "FFR";
 
 			const pressures = [
@@ -74,16 +71,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101315 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101320 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal RFF", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "RFF";
 
 			const pressures = [
@@ -99,16 +96,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101305 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101300 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal RRR", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "RRR";
 
 			const pressures = [
@@ -124,16 +121,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101365 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101370 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal RRS", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "RRS";
 
 			const pressures = [
@@ -149,16 +146,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101350 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101355 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal FRR", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "FRR";
 
 			const pressures = [
@@ -174,16 +171,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101345 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101350 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal RRF", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "RRF";
 
 			const pressures = [
@@ -199,16 +196,16 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101345 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101340 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it should equal SSS", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = "SSS";
 
 			const pressures = [
@@ -224,32 +221,32 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-30), pressure: 101315 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101310 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual.key, expected);
+			expect(actual?.key).toBe(expected);
 		});
 
 		it("it has only less than one hour readings", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 
 			const pressures = [
 				{ datetime: utils.minutesFromNow(-59), pressure: 101310 },
 				{ datetime: utils.minutesFromNow(-30), pressure: 101305 },
 				{ datetime: utils.minutesFromNow(-1), pressure: 101300 },
 			];
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual, null);
+			expect(actual).toBeNull();
 		});
 
 		it("it should not be recognized", function () {
 			//arrange
-			readingStore.clear();
+			ReadingStore.clear();
 			const expected = null;
 			const pressures = [
 				{ datetime: utils.minutesFromNow(-179), pressure: 101300 },
@@ -257,11 +254,11 @@ describe("Front Tests", function () {
 				{ datetime: utils.minutesFromNow(-59), pressure: 101200 },
 				{ datetime: new Date(), pressure: 101100 }
 			]; //FSF
-			pressures.forEach(p => readingStore.add(p.datetime, p.pressure));
+			pressures.forEach(p => ReadingStore.add(p.datetime, p.pressure));
 			//act
 			var actual = frontAnalyzer.forecast();
 			//assert
-			assert.strictEqual(actual, null);
+			expect(actual).toBeNull();
 		});
 	});
 });

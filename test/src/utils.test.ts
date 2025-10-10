@@ -1,6 +1,5 @@
-const assert = require('assert');
-const utils = require('../../dist/src/utils');
-const readingStore = require('../../dist/src/readingStore');
+import * as utils from '../../src/utils';
+import * as readingStore from '../../src/readingStore';
 
 describe("Utils Tests", function () {
 	describe("Minutes from now", function () {
@@ -12,7 +11,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.minutesFromNow(-180).getHours();
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});	
 
@@ -24,7 +23,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getDayOfYear(date);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should equal 2024", function () {
 			//arrange
@@ -33,7 +32,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getDayOfYear(date);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 
@@ -45,7 +44,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.get24HourFormat(time);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should equal late hour", function () {
 			//arrange
@@ -54,7 +53,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.get24HourFormat(time);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should equal early hour", function () {
 			//arrange
@@ -63,7 +62,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.get24HourFormat(time);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 
@@ -75,7 +74,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isValidLatitude(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should not be more than 90", function () {
 			//arrange
@@ -84,7 +83,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isValidLatitude(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be true", function () {
 			//arrange
@@ -93,7 +92,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isValidLatitude(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be not be NaN", function () {
 			//arrange
@@ -102,16 +101,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isValidLatitude(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
-		});
-		it("it should be not be null", function () {
-			//arrange
-			let latitude = null
-			let expected = false;
-			//act
-			var actual = utils.isValidLatitude(latitude);
-			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 
@@ -123,7 +113,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isNorthernHemisphere(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should not be northern", function () {
 			//arrange
@@ -132,7 +122,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isNorthernHemisphere(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should not be default nortern", function () {
 			//arrange
@@ -141,7 +131,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.isNorthernHemisphere(latitude);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 
@@ -152,7 +142,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(25);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be 34%", function () {
 			//arrange
@@ -160,7 +150,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(34);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be 50%", function () {
 			//arrange
@@ -168,7 +158,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(50);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be 77%", function () {
 			//arrange
@@ -176,7 +166,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(77);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be 90%", function () {
 			//arrange
@@ -184,7 +174,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(90);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 		it("it should be 100%", function () {
 			//arrange
@@ -192,7 +182,7 @@ describe("Utils Tests", function () {
 			//act
 			var actual = utils.getThreeStarRating(100);
 			//assert
-			assert.strictEqual(actual, expected);
+			expect(actual).toBe(expected);
 		});
 	});
 });

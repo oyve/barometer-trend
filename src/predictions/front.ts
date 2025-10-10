@@ -2,8 +2,8 @@
 const fronts = require('./fronts.json');
 import * as utils from '../utils';
 import * as regression from 'regression';
-import readingStore from '../readingStore';
-import ForecastBase from './forecastBase';
+import { ReadingStore } from '../readingStore';
+import { ForecastBase } from './forecastBase';
 import { Reading } from '../types';
 
 const Pascal10 = 10;
@@ -51,9 +51,9 @@ class FrontAnalyzer extends ForecastBase {
 	}
 
 	analyzePressures(): AnalyzedPressures {
-		const threeHourPressures = readingStore.getByPeriod(TIME_PERIODS.THREE_HOURS, TIME_PERIODS.TWO_HOURS);
-		const twoHourPressures = readingStore.getByPeriod(TIME_PERIODS.TWO_HOURS, TIME_PERIODS.ONE_HOUR);
-		const oneHourPressures = readingStore.getByPeriod(TIME_PERIODS.ONE_HOUR, new Date());
+		const threeHourPressures = ReadingStore.getByPeriod(TIME_PERIODS.THREE_HOURS, TIME_PERIODS.TWO_HOURS);
+		const twoHourPressures = ReadingStore.getByPeriod(TIME_PERIODS.TWO_HOURS, TIME_PERIODS.ONE_HOUR);
+		const oneHourPressures = ReadingStore.getByPeriod(TIME_PERIODS.ONE_HOUR, new Date());
 
 		if (!(threeHourPressures && twoHourPressures && oneHourPressures)) {
 			return { t1: null, t2: null, t3: null };
@@ -73,7 +73,7 @@ class FrontAnalyzer extends ForecastBase {
 		pressures.forEach((p) => {
 			const diff = now.getTime() - p.datetime.getTime();
 			const hours = Math.round((diff/1000)/ONE_HOUR);
-			minutelyPressures.push([hours, readingStore.getPressureByDefault(p)]);
+			minutelyPressures.push([hours, ReadingStore.getPressureByDefault(p)]);
 		});
 
 		const result = regression.linear(minutelyPressures);
@@ -94,4 +94,5 @@ class FrontAnalyzer extends ForecastBase {
 	}
 }
 
-export default FrontAnalyzer;
+const frontAnalyzer = new FrontAnalyzer();
+export { frontAnalyzer as FrontAnalyzer }

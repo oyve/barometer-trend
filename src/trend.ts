@@ -1,7 +1,7 @@
 import * as utils from './utils';
-import globals from './globals';
-import readingStore from './readingStore';
-import ForecastBase from './predictions/forecastBase';
+import { Globals } from './globals';
+import { ReadingStore } from './readingStore';
+import { ForecastBase } from './predictions/forecastBase';
 import EMA from './EMA';
 import { Tendency, Trend, TrendResult } from './types';
 
@@ -52,11 +52,11 @@ export class TrendAnalyzer extends ForecastBase
 		if (typeof from !== 'number') return null;
 		if (from === 0) return null;
 
-		const subsetOfPressuresRaw = readingStore.getAll(from).map(r => readingStore.getPressureByDefault(r));
+		const subsetOfPressuresRaw = ReadingStore.getAll(from).map(r => ReadingStore.getPressureByDefault(r));
 		if (!subsetOfPressuresRaw || subsetOfPressuresRaw.length < 2) return null;
 		
 		let subsetOfPressures = subsetOfPressuresRaw;
-		if(globals.applySmoothing) {
+		if(Globals.applySmoothing) {
 			const toSmoothen = [...subsetOfPressuresRaw];
 			subsetOfPressures = EMA.process(toSmoothen);
 		}

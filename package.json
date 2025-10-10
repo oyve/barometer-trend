@@ -15,7 +15,7 @@
     "build": "tsc && tsc --project tsconfig.cjs.json && node scripts/rename-cjs-files.cjs && node scripts/add-js-extensions.cjs && node scripts/generate-exports.cjs",
     "prepublishOnly": "npm run build",
     "watch": "tsc --watch",
-    "test": "npm run build && mocha --recursive"
+    "test": "npm run build && jest"
   },
   "repository": {
     "type": "git",
@@ -44,10 +44,13 @@
   },
   "homepage": "https://github.com/oyve/barometer-trend#readme",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.7.0",
     "@types/regression": "^2.0.6",
+    "jest": "^30.2.0",
     "mocha": "^10.1.0",
+    "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },

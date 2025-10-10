@@ -1,6 +1,4 @@
-
-const assert = require('assert');
-const EMA = require('../../dist/src/EMA');
+import EMA from '../../src/EMA';
 
 describe("Smoothing Tests", function () {
     describe("Downward trend", function () {
@@ -11,7 +9,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
         it("it should smoothen fall of 50", function () {
             //arrange     
@@ -20,7 +18,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
         it("it should smoothen rise of 50", function () {
             //arrange     
@@ -29,7 +27,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
     });
     describe("Upward trend", function () {
@@ -40,7 +38,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
         it("it should smoothen fall of 50", function () {
             //arrange     
@@ -49,7 +47,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
         it("it should smoothen rise of 50", function () {
             //arrange     
@@ -58,7 +56,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
     });
 
@@ -70,7 +68,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
         it("it should smoothen end fall of 50", function () {
             //arrange     
@@ -79,7 +77,7 @@ describe("Smoothing Tests", function () {
             //act
             var actual = EMA.process(data);
             //assert
-            assert.deepEqual(actual, expected);
+            expect(actual).toEqual(expected);
         });
     });
 });

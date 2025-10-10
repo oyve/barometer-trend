@@ -1,8 +1,6 @@
-
-const assert = require('assert');
-const barometer = require('../dist/index');
-const utils = require('../dist/src/utils');
-const readingStore = require('../dist/src/readingStore');
+import * as barometer from '../index';
+import * as utils from '../src/utils';
+import { ReadingStore } from '../src/readingStore';
 
 describe("Unit Tests", function () {
     describe("Set Latitude", function () {
@@ -12,16 +10,16 @@ describe("Unit Tests", function () {
             //act
             var actual = barometer.getLatitude();
             //assert
-            assert.strictEqual(actual, expected);
-            });
+            expect(actual).toBe(expected);
+        });
         it("it should set", function () {
-        //arrange
-        const expected = 45.123;
-        barometer.setLatitude(expected);
-        //act
-        var actual = barometer.getLatitude();
-        //assert
-        assert.strictEqual(actual, expected);
+            //arrange
+            const expected = 45.123;
+            barometer.setLatitude(expected);
+            //act
+            var actual = barometer.getLatitude();
+            //assert
+            expect(actual).toBe(expected);
         });
     });
 });
@@ -42,8 +40,8 @@ describe("Function Tests - Trend chooser", function () {
         var actual = barometer.getForecast();
 
         //assert
-        assert.strictEqual(actual.trend.tendency, "RISING");
-        assert.strictEqual(actual.trend.trend.key, "STEADY");
+        expect(actual?.trend.tendency).toBe("RISING");
+        expect(actual?.trend.trend.key).toBe("STEADY");
     });
 
     it("it should be fALLING.RAPIDLY and pick the ONE HOUR prognose", function () {
@@ -61,8 +59,8 @@ describe("Function Tests - Trend chooser", function () {
         var actual = barometer.getForecast();
 
         //assert
-        assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend.key, "RAPIDLY");
+        expect(actual?.trend.tendency).toBe("FALLING");
+        expect(actual?.trend.trend.key).toBe("RAPIDLY");
     });
 
     it("it should not include older pressure readings", function () {
@@ -78,12 +76,12 @@ describe("Function Tests - Trend chooser", function () {
 
         //act
         var actual = barometer.getForecast();
-        var actualCount = readingStore.count();
+        var actualCount = ReadingStore.count();
 
         //assert
-        assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend.key, "STEADY");
-        assert.strictEqual(actualCount, 2);
+        expect(actual?.trend.tendency).toBe("FALLING");
+        expect(actual?.trend.trend.key).toBe("STEADY");
+        expect(actualCount).toBe(2);
     });
 
     it("it should be fALLING.RAPIDLY and include wind", function () {
@@ -101,8 +99,8 @@ describe("Function Tests - Trend chooser", function () {
         var actual = barometer.getForecast();
 
         //assert
-        assert.strictEqual(actual.trend.tendency, "FALLING");
-        assert.strictEqual(actual.trend.trend.key, "RAPIDLY");
-        assert.strictEqual(actual.models.quadrant, "Increasing rain, clearing within 12 hours");
+        expect(actual?.trend.tendency).toBe("FALLING");
+        expect(actual?.trend.trend.key).toBe("RAPIDLY");
+        expect(actual?.models.quadrant).toBe("Increasing rain, clearing within 12 hours");
     });
 });

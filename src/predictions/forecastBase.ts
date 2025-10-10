@@ -10,4 +10,4 @@ class ForecastBase {
     }
   }
   
-  export default ForecastBase;
+  export { ForecastBase };
