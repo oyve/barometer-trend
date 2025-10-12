@@ -2,8 +2,9 @@
   "name": "barometer-trend",
   "version": "2.2.8",
   "description": "Analyse and calculate tendency, trend and weather predictions of barometric pressure",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "type": "module",
   "files": [
     "dist",
@@ -12,7 +13,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc && tsc --project tsconfig.cjs.json && node scripts/rename-cjs-files.cjs && node scripts/add-js-extensions.cjs && node scripts/generate-exports.cjs",
+    "build": "tsc && tsc --project tsconfig.cjs.json && node scripts/rename-cjs-files.cjs && node scripts/add-js-extensions.cjs && node scripts/generate-exports.cjs && npm run copy-json",
+    "copy-json": "cpx \"src/**/*.json\" dist/esm && cpx \"src/**/*.json\" dist/cjs",
     "prepublishOnly": "npm run build",
     "watch": "tsc --watch",
     "test": "npm run build && jest"
@@ -48,6 +50,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.7.0",
     "@types/regression": "^2.0.6",
+    "cpx": "^1.5.0",
     "jest": "^30.2.0",
     "mocha": "^10.1.0",
     "ts-jest": "^29.4.4",
@@ -63,6 +66,16 @@
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./readingStore": {
+      "require": "./dist/cjs/readingStore.cjs",
+      "import": "./dist/esm/readingStore.js",
+      "types": "./dist/types/readingStore.d.ts"
+    },
+    "./globals": {
+      "require": "./dist/cjs/globals.cjs",
+      "import": "./dist/esm/globals.js",
+      "types": "./dist/types/globals.d.ts"
     }
   }
 }
