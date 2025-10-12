@@ -20,7 +20,10 @@ function renameJsToCjs(dir) {
             // Update require statements in the renamed file
             let content = fs.readFileSync(newFullPath, "utf8");
             content = content.replace(/require\(['"](\..*?)['"]\)/g, (match, p1) => {
-                if (!p1.endsWith(".cjs")) {
+                if(p1.endsWith(".json")) {
+                    return match;
+                }
+                else if (!p1.endsWith(".cjs")) {
                     return `require('${p1}.cjs')`;
                 }
                 return match;
