@@ -1,9 +1,7 @@
-const { dir } = require('console');
 const fs = require('fs');
 const path = require('path');
 
-function generateExports(directory) {
-
+function generateExports(directory, singleFiles = []) {
   // Initialize the exports field with the default index file
   const exportsField = {
     '.': {
@@ -13,18 +11,17 @@ function generateExports(directory) {
     },
   };
 
-  if(directory !== null) {
-      // Define paths
+  if (directory !== null) {
+    // Define paths
     const cjsDir = path.resolve(__dirname, `../dist/cjs/${directory}`);
     const esmDir = path.resolve(__dirname, `../dist/esm/${directory}`);
 
     // Get all JavaScript files in the ESM directory
     const files = fs.readdirSync(esmDir).filter(file => file.endsWith('.js'));
 
-
     // Add entries for other files dynamically
     files.forEach(file => {
-      const name = `./${path.basename(file, '.js')}`;
+      const name = `./${directory}/${path.basename(file, '.js')}`;
       exportsField[name] = {
         require: `./dist/cjs/${directory}/${file.replace('.js', '.cjs')}`,
         import: `./dist/esm/${directory}/${file}`,
@@ -33,15 +30,34 @@ function generateExports(directory) {
     });
   }
 
-  // Read, update, and write the package.json fil
-  console.log(`Generated exports for directory /${directory}`);
+  // Handle single files (e.g., predictions/readingStore.ts)
+  singleFiles.forEach(filePath => {
+    const relPath = filePath.replace(/\.ts$/, '').replace(/^src\//, '');
+    let dirName = path.dirname(relPath).replace(/^\.\//, '');
+    if (dirName === '.') dirName = '';
+    const baseName = path.basename(relPath);
+
+    const exportPath = dirName ? `./${dirName}/${baseName}` : `./${baseName}`;
+
+    exportsField[exportPath] = {
+      require: `./dist/cjs/${dirName ? dirName + '/' : ''}${baseName}.cjs`,
+      import: `./dist/esm/${dirName ? dirName + '/' : ''}${baseName}.js`,
+      types: `./dist/types/${dirName ? dirName + '/' : ''}${baseName}.d.ts`
+    };
+  });
+
+  // Read, update, and write the package.json file
+  console.log(`Generated exports for directory /${directory} and single files:`, singleFiles);
   return exportsField;
 }
 
-//let predictions = generateExports('predictions');
-let predictions = generateExports(null);
+// Example usage:
+let predictions = generateExports(null, [
+  'src/readingStore.ts',
+  'src/globals.ts',
+]);
 
-const exportsField = {...predictions };
+const exportsField = { ...predictions };
 
 const pkgPath = path.resolve(__dirname, '../package.json');
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
