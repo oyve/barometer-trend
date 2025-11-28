@@ -1,6 +1,6 @@
-import * as barometer from '../index';
-import * as utils from '../src/utils';
-import { ReadingStore } from '../src/readingStore';
+import * as barometer from '../../src/index';
+import * as utils from '../../src/utils';
+import { ReadingStore } from '../../src/readingStore';
 
 describe("Unit Tests", function () {
     describe("Set Latitude", function () {

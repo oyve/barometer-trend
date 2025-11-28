@@ -1,15 +1,15 @@
-import * as byPressureTrend from './src/predictions/byPressureTrend';
-import * as byPressureTendencyAndWind from './src/predictions/byPressureTendencyAndWind';
-import * as byPressureTrendAndSeason from './src/predictions/byPressureTrendAndSeason';
-import * as beaufort from './src/predictions/beaufort';
-import * as utils from './src/utils';
-import { SystemAnalyzer as system } from './src/predictions/system';
-import { ReadingStore } from './src/readingStore';
-import * as barometerLabel from './src/predictions/label';
-import { TrendAnalyzer, TENDENCY, TREND } from './src/trend';
-import * as forecastText from './src/predictions/forecastText';
-import { FrontAnalyzer as frontAnalyzer } from './src/predictions/front';
-import { Reading } from './src/types';
+import * as byPressureTrend from './predictions/byPressureTrend';
+import * as byPressureTendencyAndWind from './predictions/byPressureTendencyAndWind';
+import * as byPressureTrendAndSeason from './predictions/byPressureTrendAndSeason';
+import * as beaufort from './predictions/beaufort';
+import * as utils from './utils';
+import { SystemAnalyzer as system } from './predictions/system';
+import { ReadingStore } from './readingStore';
+import * as barometerLabel from './predictions/label';
+import { TrendAnalyzer, TENDENCY, TREND } from './trend';
+import * as forecastText from './predictions/forecastText';
+import { FrontAnalyzer as frontAnalyzer } from './predictions/front';
+import { Reading } from './types';
 
 let latitude: number | null = null;
 
