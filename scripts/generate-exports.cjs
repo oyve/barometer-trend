@@ -11,6 +11,11 @@ function generateExports(directory) {
       import: './dist/esm/index.js',
       types: "./dist/types/index.d.ts"
     },
+    "./globals": {
+      require: "./dist/cjs/globals.cjs",
+      import: "./dist/esm/globals.js",
+      types: "./dist/types/globals.d.ts"
+    },
   };
 
   if(directory !== null) {

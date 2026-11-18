@@ -1,4 +1,4 @@
-import * as barometer from '../index';
+import * as barometer from '../src/index';
 import * as utils from '../src/utils';
 import { ReadingStore } from '../src/readingStore';
 

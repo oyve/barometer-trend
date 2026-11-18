@@ -2,6 +2,11 @@ const fs = require("fs");
 const path = require("path");
 
 const esmDir = path.join(__dirname, "../dist/esm");
+const sourcePredictionsDir = path.join(__dirname, "../src/predictions");
+const esmPredictionsDir = path.join(esmDir, "predictions");
+for (const file of fs.readdirSync(sourcePredictionsDir).filter(file => file.endsWith(".json"))) {
+    fs.copyFileSync(path.join(sourcePredictionsDir, file), path.join(esmPredictionsDir, file));
+}
 
 function addJsExtensions(dir) {
     const files = fs.readdirSync(dir);

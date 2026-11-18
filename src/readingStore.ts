@@ -12,10 +12,12 @@ const sortOlderToNewer = (a: Reading, b: Reading) => a.datetime.getTime() - b.da
 
 class ReadingStore extends EventEmitter {
     public readings: Reading[];
+    private timestamps: Set<number>;
 
     constructor() {
         super();
         this.readings = [];
+        this.timestamps = new Set();
     }
 
     /**
@@ -30,7 +32,8 @@ class ReadingStore extends EventEmitter {
         if(!Globals.ignoreFlagInTesting && timestamp! < utils.minutesFromNow(-Globals.keepPressureReadingsFor)) {
             return; //ignore readings older than 48 hours
         }
-        if(this.getAll().find(r => r.datetime.getTime() === timestamp!.getTime())) {
+        const timestampMs = timestamp!.getTime();
+        if(this.timestamps.has(timestampMs)) {
             return; //ignore duplicate readings
         }
 
@@ -74,9 +77,13 @@ class ReadingStore extends EventEmitter {
             originalPressure: () => pressure + smoothing.correction
         };  
 
+        const latest = this.getLatest();
         this.readings.push(reading);
+        this.timestamps.add(timestampMs);
         this.removeOldPressures();
-        this.readings.sort(sortOlderToNewer);
+        if(latest && timestampMs < latest.datetime.getTime()) {
+            this.readings.sort(sortOlderToNewer);
+        }
         this.emit('pressureAdded', reading);
         return reading;
     }
@@ -102,7 +109,11 @@ class ReadingStore extends EventEmitter {
 
     private removeOldPressures(threshold: Date = utils.minutesFromNow(-Globals.keepPressureReadingsFor)): void {
         if(!Globals.ignoreFlagInTesting) {
-            this.readings = this.readings.filter((p) => p.datetime.getTime() >= threshold.getTime());
+            const filtered = this.readings.filter((p) => p.datetime.getTime() >= threshold.getTime());
+            if(filtered.length !== this.readings.length) {
+                this.readings = filtered;
+                this.timestamps = new Set(filtered.map(p => p.datetime.getTime()));
+            }
         }
     }
 
@@ -265,6 +276,7 @@ class ReadingStore extends EventEmitter {
      */
     clear(): void {
         this.readings = [];
+        this.timestamps.clear();
     }
 }
 
