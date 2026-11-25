@@ -2,6 +2,11 @@ const fs = require("fs");
 const path = require("path");
 
 const esmDir = path.join(__dirname, "../dist/esm");
+const sourcePredictionsDir = path.join(__dirname, "../src/predictions");
+const esmPredictionsDir = path.join(esmDir, "predictions");
+for (const file of fs.readdirSync(sourcePredictionsDir).filter(file => file.endsWith(".json"))) {
+    fs.copyFileSync(path.join(sourcePredictionsDir, file), path.join(esmPredictionsDir, file));
+}
 
 function addJsExtensions(dir) {
     const files = fs.readdirSync(dir);
@@ -15,6 +20,13 @@ function addJsExtensions(dir) {
         // If it's a .js file, process its content
         else if (file.endsWith(".js")) {
             let content = fs.readFileSync(fullPath, "utf8");
+
+            // TypeScript preserves the CommonJS-style JSON requires used by the
+            // sources. Provide a local require function in ESM output so those
+            // files can also be loaded through the package import condition.
+            if (/\brequire\s*\(/.test(content)) {
+                content = `import { createRequire } from "node:module";\nconst require = createRequire(import.meta.url);\n${content}`;
+            }
 
             // Replace import/export paths without .js extensions
             content = content.replace(/from\s+['"](\..*?[^.])['"]/g, (match, p1) => {

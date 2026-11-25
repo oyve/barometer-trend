@@ -295,4 +295,13 @@ describe("ReadingStore.Tests", function () {
             Globals.setDefaults();
         });
     });
+	it('ignores large batches of duplicate timestamps without growing the store', () => {
+		ReadingStore.clear();
+		const timestamp = new Date();
+		for (let i = 0; i < 10000; i++) {
+			ReadingStore.add(timestamp, 101325);
+		}
+		expect(ReadingStore.count()).toBe(1);
+	});
+
 });

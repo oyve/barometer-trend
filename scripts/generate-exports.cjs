@@ -1,4 +1,3 @@
-const { dir } = require('console');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,6 +9,11 @@ function generateExports(directory) {
       require: './dist/cjs/index.cjs',
       import: './dist/esm/index.js',
       types: "./dist/types/index.d.ts"
+    },
+    "./globals": {
+      require: "./dist/cjs/globals.cjs",
+      import: "./dist/esm/globals.js",
+      types: "./dist/types/globals.d.ts"
     },
   };
 
@@ -34,7 +38,9 @@ function generateExports(directory) {
   }
 
   // Read, update, and write the package.json fil
-  console.log(`Generated exports for directory /${directory}`);
+  if (directory !== null) {
+    console.log(`Generated exports for directory /${directory}`);
+  }
   return exportsField;
 }
 
