@@ -21,6 +21,13 @@ function addJsExtensions(dir) {
         else if (file.endsWith(".js")) {
             let content = fs.readFileSync(fullPath, "utf8");
 
+            // TypeScript preserves the CommonJS-style JSON requires used by the
+            // sources. Provide a local require function in ESM output so those
+            // files can also be loaded through the package import condition.
+            if (/\brequire\s*\(/.test(content)) {
+                content = `import { createRequire } from "node:module";\nconst require = createRequire(import.meta.url);\n${content}`;
+            }
+
             // Replace import/export paths without .js extensions
             content = content.replace(/from\s+['"](\..*?[^.])['"]/g, (match, p1) => {
                 if (!p1.endsWith(".js")) {

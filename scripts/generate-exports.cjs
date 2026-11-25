@@ -1,4 +1,3 @@
-const { dir } = require('console');
 const fs = require('fs');
 const path = require('path');
 
@@ -39,7 +38,9 @@ function generateExports(directory) {
   }
 
   // Read, update, and write the package.json fil
-  console.log(`Generated exports for directory /${directory}`);
+  if (directory !== null) {
+    console.log(`Generated exports for directory /${directory}`);
+  }
   return exportsField;
 }
 
